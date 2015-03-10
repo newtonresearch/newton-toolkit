@@ -1,0 +1,1 @@
+//	Set fn-return//	to evaluate selected textprotoEditor:DefineKey({key: 76}, 'EvaluateSelection);

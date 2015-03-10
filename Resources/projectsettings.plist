@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>title</key>
+		<string>Project Settings</string>
+		<key>settings</key>
+		<array>
+			<dict>
+				<key>title</key>
+				<string>Platform</string>
+				<key>path</key>
+				<string>projectSettings.platform</string>
+				<key>type</key>
+				<string>platform</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Language</string>
+				<key>path</key>
+				<string>projectSettings.language</string>
+				<key>type</key>
+				<string>string</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Compile for Debugging</string>
+				<key>path</key>
+				<string>projectSettings.debugBuild</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Ignore Native Keyword</string>
+				<key>path</key>
+				<string>projectSettings.ignoreNative</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Check Global Function Calls</string>
+				<key>path</key>
+				<string>projectSettings.checkGlobalFunctions</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>NTK 1.0 Build Rules</string>
+				<key>path</key>
+				<string>projectSettings.oldBuildRules</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Use stepChildren slot</string>
+				<key>path</key>
+				<string>projectSettings.useStepChildren</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Suppress Byte Code</string>
+				<key>path</key>
+				<string>projectSettings.suppressByteCodes</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Faster Functions (Newton 2.0)</string>
+				<key>path</key>
+				<string>projectSettings.fasterFunctions</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<key>title</key>
+		<string>Output Settings</string>
+		<key>settings</key>
+		<array>
+			<dict>
+				<key>title</key>
+				<string>Name</string>
+				<key>path</key>
+				<string>outputSettings.applicationName</string>
+				<key>type</key>
+				<string>string</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Symbol</string>
+				<key>path</key>
+				<string>outputSettings.applicationSymbol</string>
+				<key>type</key>
+				<string>string</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Output</string>
+				<key>path</key>
+				<string>outputSettings.partType</string>
+				<key>type</key>
+				<string>part</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Custom Part</string>
+				<key>path</key>
+				<string>outputSettings.customPartType</string>
+				<key>type</key>
+				<string>string</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Result</string>
+				<key>path</key>
+				<string>outputSettings.topFrameExpression</string>
+				<key>type</key>
+				<string>string</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Auto Close</string>
+				<key>path</key>
+				<string>outputSettings.autoClose</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>New-Style Stores (Newton 2.0)</string>
+				<key>path</key>
+				<string>outputSettings.fasterSoups</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<key>title</key>
+		<string>Package Settings</string>
+		<key>settings</key>
+		<array>
+			<dict>
+				<key>title</key>
+				<string>Name</string>
+				<key>path</key>
+				<string>packageSettings.packageName</string>
+				<key>type</key>
+				<string>string</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Version</string>
+				<key>path</key>
+				<string>packageSettings.version</string>
+				<key>type</key>
+				<string>string</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Copyright</string>
+				<key>path</key>
+				<string>packageSettings.copyright</string>
+				<key>type</key>
+				<string>string</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Use Compression</string>
+				<key>path</key>
+				<string>packageSettings.optimizeSpeed</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Copy Protected</string>
+				<key>path</key>
+				<string>packageSettings.copyProtected</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Delete Old Package on Download</string>
+				<key>path</key>
+				<string>packageSettings.deleteOnDownload</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Auto Remove Package</string>
+				<key>path</key>
+				<string>packageSettings.dispatchOnly</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Newton OS 2.0 Only</string>
+				<key>path</key>
+				<string>packageSettings.newton20only</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Tighter Object Packing</string>
+				<key>path</key>
+				<string>packageSettings.fourByteAlignment</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Faster Compression</string>
+				<key>path</key>
+				<string>packageSettings.zippyCompression</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<key>title</key>
+		<string>Profiler Settings</string>
+		<key>settings</key>
+		<array>
+			<dict>
+				<key>title</key>
+				<string>Compile for Profiling</string>
+				<key>path</key>
+				<string>profilerSettings.compileForProfiling</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>Profile Native Functions</string>
+				<key>path</key>
+				<string>profilerSettings.compileForSpeed</string>
+				<key>type</key>
+				<string>boolean</string>
+			</dict>
+		</array>
+	</dict>
+
+</array>
+</plist>

@@ -1,0 +1,134 @@
+
+constant kState_Disconnected := 0;	// ready-to-go (default state)
+constant kState_Listen := 1;		// preparation for (asynchronous) listen
+constant kState_Listening := 2;		// in-process of (asynchronous) listen
+constant kState_Connect := 3;		// preparation for (asynchronous) connect
+constant kState_Connecting := 4;	// in-process of (asynchronous) connect
+constant kState_Connected := 5;		// connected (requires disconnect)
+constant kState_Disconnecting := 6;	// in-process of (asynchronous) disconnect
+
+epFrame := {
+	_proto: protoStreamingEndpoint,
+
+	fEndPointOptions: nil,
+
+	BuildConfigOptions: func()
+	begin
+	local options :=
+		[
+			{	label:		kCMSAsyncSerial,
+				type:		'service,
+				opCode:		opSetRequired,
+				result:		nil,	},
+			
+			{	label:		kCMOSerialIOParms,
+				type:		'option,
+				opCode:		opSetRequired,
+				result:		nil,
+				form:		'template,
+				data:	{
+					arglist:	[
+						k1StopBits,				// 1 stop bit
+						kNoParity,				// no parity bit
+						k8DataBits,				// 8 data bits
+						k38400bps,	],			// date rate in bps
+					typelist:	['struct,
+						'long,					// stop bits
+						'long,					// parity
+						'long,					// data bits
+						'long,	],	},	},		// bps
+			
+			{	label:		kCMOInputFlowControlParms,
+				type:		'option,
+				opCode:		opSetRequired,
+				result:		nil,
+				form:		'template,
+				data:	{
+					arglist:	[
+						unicodeDC1, 			// xonChar	
+						unicodeDC3, 			// xoffChar	
+						nil, 						// useSoftFlowControl	
+						true, 					// useHardFlowControl	
+						0, 						// not needed; returned	
+						0,	], 					// not needed; returned	
+					typelist:	['struct,
+						'byte,					// XON character
+						'byte,					// XOFF character
+						'boolean,				// software flow control
+						'boolean,				// hardware flow control
+						'boolean,				// hardware flow blocked
+						'boolean,	],	},	},	// software flow blocked
+			
+			{	label:		kCMOOutputFlowControlParms,
+				type:		'option,
+				opCode:		opSetRequired,
+				result:		nil,
+				form:		'template,
+				data:	{
+					arglist:	[
+						unicodeDC1, 			// xonChar	
+						unicodeDC3, 			// xoffChar	
+						nil, 						// useSoftFlowControl	
+						true, 					// useHardFlowControl	
+						0, 						// not needed; returned	
+						0,	], 					// not needed; returned	
+					typelist:	['struct,
+						'byte,					// XON character
+						'byte,					// XOFF character
+						'boolean,				// software flow control
+						'boolean,				// hardware flow control
+						'boolean,				// hardware flow blocked
+						'boolean,	],	},	},	// software flow blocked
+		];
+	
+	options;
+	end,
+
+
+	MNotifyError: func(inErr)
+	begin
+	Print("Error " & inErr)
+	end,
+
+	MSetEndPointState: func(inState)
+	begin
+	fEndpointState := inState
+	end,
+	
+
+	Start: func()
+	begin
+	fEndPointOptions := :BuildConfigOptions();
+	
+	try
+		:Instantiate(self, fEndPointOptions)
+	onexception |evt.ex.comm| do
+		begin
+			:MNotifyError(CurrentException().error);
+			:MSetEndPointState(kState_Disconnected);
+			return;
+		end;
+	
+	try
+		:Bind(nil, nil)
+	onexception |evt.ex.comm| do
+		begin
+			:MNotifyError(CurrentException().error);
+			:MSetEndPointState(kState_Disconnected);
+			return;
+		end;
+	
+	try
+		begin
+			:MSetEndPointState(kState_Connecting);
+			:Connect( [ fConnectAddress ],
+					{	async:				true,
+						reqTimeout:			45000,	// 45 seconds -- for DEMO purposes only
+						completionScript:	func(ep, options, result) nil	});
+		end
+	onexception |evt.ex.comm| do
+		begin
+			:MNotifyError(CurrentException().error);
+		end;
+	end
+};

@@ -1,0 +1,36 @@
+// Calculating e
+// Translated from JavaScript:
+//  http://mysite.verizon.net/res148h4j/javascript/script_e_spigot.html
+// by Matej Horvat:
+//  http://matejhorvat.si/en/software/nsm/nsmextra.zip
+
+// if re-evaluating this function, we'll need to undefine the constants
+UndefineGlobalConstant('kDigits);
+UndefineGlobalConstant('kSize);
+
+
+begin
+constant kDigits := 20;					// How many digits of e to calculate
+//constant kSize := kDigits + 10;	// The original has "+ 9" and then accesses a[size], which is OK in JS, but not in NS.
+// like the Newton ROM compiler we don't do constant folding, so instead we have to say:
+constant kSize := 30;
+
+local a := Array(kSize, nil);
+a[0] := 0;
+a[1] := 2;
+for i := 2 to kSize - 1 do
+	a[i] := 1;
+
+local x := 0;
+for bigN := kSize - 1 to 10 by -1 do
+	begin
+	// Find the next digit
+	for smallN := bigN to 1 by -1 do
+		begin
+		a[smallN] := x mod smallN;
+		x := 10 * a[smallN - 1] + (x div smallN);
+		end;
+	Write(x);
+	end;
+Write($\n);
+end;
