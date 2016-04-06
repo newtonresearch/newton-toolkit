@@ -19,7 +19,7 @@
 
 extern "C" Ref		FIntern(RefArg inRcvr, RefArg inStr);
 extern "C" Ref		ArrayInsert(RefArg ioArray, RefArg inObj, ArrayIndex index);
-extern	  Ref		MakeStringOfLength(const UniChar * str, size_t numChars);
+extern "C" Ref		MakeStringOfLength(const UniChar * str, size_t numChars);
 
 
 /* -----------------------------------------------------------------------------
@@ -733,7 +733,7 @@ extern NSArray * gTypeNames;
 			}
 			else
 			{
-				ArrayInsert(items, item, ++index);
+				ArrayInsert(items, item, index++);
 			}
 		}
 	}

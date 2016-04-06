@@ -272,8 +272,8 @@ static void *ProjectObserverContext = &ProjectObserverContext;
 		[[NSOperationQueue mainQueue] addOperationWithBlock:^{
 			NSProgress *progress = object;
 //			progressBox.barValue = progress.fractionCompleted;
-			progressBox.statusText = progress.localizedDescription;
-			progressBox.needsDisplay = YES;
+//			progressBox.statusText = progress.localizedDescription;
+//			progressBox.needsDisplay = YES;
 	  }];
 	}
 	else if (context == ProjectObserverContext)

@@ -14,7 +14,7 @@
 		F42394D717BE6480000E4701 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F42394D517BE6480000E4701 /* InfoPlist.strings */; };
 		F42394DF17BE6B65000E4701 /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = F42394DB17BE6B65000E4701 /* Preferences.m */; };
 		F42394E317BE6E73000E4701 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42394E217BE6E73000E4701 /* Sparkle.framework */; };
-		F42394F017BE7CCD000E4701 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = F42394E217BE6E73000E4701 /* Sparkle.framework */; };
+		F42394F017BE7CCD000E4701 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = F42394E217BE6E73000E4701 /* Sparkle.framework */; };
 		F42394F417BE7E20000E4701 /* MNPSerialEndpoint.m in Sources */ = {isa = PBXBuildFile; fileRef = F42394F317BE7E20000E4701 /* MNPSerialEndpoint.m */; };
 		F42394F917BE8147000E4701 /* CRC.m in Sources */ = {isa = PBXBuildFile; fileRef = F42394F617BE8147000E4701 /* CRC.m */; };
 		F42394FA17BE8147000E4701 /* Endpoint.m in Sources */ = {isa = PBXBuildFile; fileRef = F42394F717BE8147000E4701 /* Endpoint.m */; };
@@ -42,11 +42,11 @@
 		F4A58FFD18C777C9008B0832 /* nativecode.iconset in Resources */ = {isa = PBXBuildFile; fileRef = F4A58FFC18C777C9008B0832 /* nativecode.iconset */; };
 		F4A58FFF18C7828A008B0832 /* ScriptDocument.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4A58FFE18C7828A008B0832 /* ScriptDocument.mm */; };
 		F4A5F20B17CF4E740004B6DB /* NTXEditorView.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4D450EE0BEE49A2004937CC /* NTXEditorView.mm */; };
-		F4A5F21E17CF61CF0004B6DB /* MessagePad in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4A5F21B17CF618D0004B6DB /* MessagePad */; };
-		F4A5F21F17CF61D20004B6DB /* Newton 2.0 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4A5F21C17CF618D0004B6DB /* Newton 2.0 */; };
-		F4A5F22017CF61D50004B6DB /* Newton 2.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4A5F21D17CF618D0004B6DB /* Newton 2.1 */; };
+		F4A5F21E17CF61CF0004B6DB /* MessagePad in Copy Platform Files */ = {isa = PBXBuildFile; fileRef = F4A5F21B17CF618D0004B6DB /* MessagePad */; };
+		F4A5F21F17CF61D20004B6DB /* Newton 2.0 in Copy Platform Files */ = {isa = PBXBuildFile; fileRef = F4A5F21C17CF618D0004B6DB /* Newton 2.0 */; };
+		F4A5F22017CF61D50004B6DB /* Newton 2.1 in Copy Platform Files */ = {isa = PBXBuildFile; fileRef = F4A5F21D17CF618D0004B6DB /* Newton 2.1 */; };
 		F4A5F23517CF9E320004B6DB /* NTK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4A5F23417CF9E320004B6DB /* NTK.framework */; };
-		F4A5F23817D533450004B6DB /* NTK.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4A5F23417CF9E320004B6DB /* NTK.framework */; };
+		F4A5F23817D533450004B6DB /* NTK.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = F4A5F23417CF9E320004B6DB /* NTK.framework */; };
 		F4A5F23F17D63E300004B6DB /* EditorCommands in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4D44FA90BE9DCA9004937CC /* EditorCommands */; };
 		F4A5F24017D63E330004B6DB /* GlobalData.newtonscript in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4D44FAA0BE9DCA9004937CC /* GlobalData.newtonscript */; };
 		F4A5F24117D63E360004B6DB /* GlobalFunctions.newtonscript in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4D44FAB0BE9DCA9004937CC /* GlobalFunctions.newtonscript */; };
@@ -69,7 +69,6 @@
 		F4C4C1C21A262B18002B8821 /* DVTViewNavigators_10_10.pdf in Resources */ = {isa = PBXBuildFile; fileRef = F4C4C1BD1A262B18002B8821 /* DVTViewNavigators_10_10.pdf */; };
 		F4C4C1C31A262B18002B8821 /* DVTViewUtilities_10_10.pdf in Resources */ = {isa = PBXBuildFile; fileRef = F4C4C1BF1A262B18002B8821 /* DVTViewUtilities_10_10.pdf */; };
 		F4C4C1CA1A28CE79002B8821 /* NRProgressBox.h in Headers */ = {isa = PBXBuildFile; fileRef = F4C4C1C81A28CE79002B8821 /* NRProgressBox.h */; };
-		F4C4C1CB1A28CE79002B8821 /* NRProgressBox.m in Sources */ = {isa = PBXBuildFile; fileRef = F4C4C1C91A28CE79002B8821 /* NRProgressBox.m */; };
 		F4D44FA70BE9DA8F004937CC /* NSApplication-NTXSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D44FA50BE9DA8F004937CC /* NSApplication-NTXSupport.m */; };
 		F4E5B97817EC6173007DA5BC /* stdioDirector.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E5B97617EC6173007DA5BC /* stdioDirector.m */; };
 /* End PBXBuildFile section */
@@ -88,27 +87,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F4D44FE50BE9E14C004937CC /* CopyFiles */ = {
+		F4D44FE50BE9E14C004937CC /* Copy Platform Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = Platforms;
 			dstSubfolderSpec = 7;
 			files = (
-				F4A5F21E17CF61CF0004B6DB /* MessagePad in CopyFiles */,
-				F4A5F21F17CF61D20004B6DB /* Newton 2.0 in CopyFiles */,
-				F4A5F22017CF61D50004B6DB /* Newton 2.1 in CopyFiles */,
+				F4A5F21E17CF61CF0004B6DB /* MessagePad in Copy Platform Files */,
+				F4A5F21F17CF61D20004B6DB /* Newton 2.0 in Copy Platform Files */,
+				F4A5F22017CF61D50004B6DB /* Newton 2.1 in Copy Platform Files */,
 			);
+			name = "Copy Platform Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F4FA703309A2034600B62DDB /* CopyFiles */ = {
+		F4FA703309A2034600B62DDB /* Copy Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				F42394F017BE7CCD000E4701 /* Sparkle.framework in CopyFiles */,
-				F4A5F23817D533450004B6DB /* NTK.framework in CopyFiles */,
+				F42394F017BE7CCD000E4701 /* Sparkle.framework in Copy Frameworks */,
+				F4A5F23817D533450004B6DB /* NTK.framework in Copy Frameworks */,
 			);
+			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -128,7 +129,7 @@
 		F42394D617BE6480000E4701 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		F42394DA17BE6B65000E4701 /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		F42394DB17BE6B65000E4701 /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
-		F42394E217BE6E73000E4701 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = ../Sparkle/Sparkle.framework; sourceTree = "<group>"; };
+		F42394E217BE6E73000E4701 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Sparkle/Sparkle.framework; sourceTree = "<group>"; };
 		F42394E417BE70C7000E4701 /* MNPSerialEndpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MNPSerialEndpoint.h; path = Comms/MNPSerialEndpoint.h; sourceTree = "<group>"; };
 		F42394E717BE7317000E4701 /* Endpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Endpoint.h; path = Comms/Endpoint.h; sourceTree = "<group>"; };
 		F42394E917BE736E000E4701 /* NTKProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NTKProtocol.h; path = Comms/NTKProtocol.h; sourceTree = "<group>"; };
@@ -167,7 +168,7 @@
 		F4A5F21B17CF618D0004B6DB /* MessagePad */ = {isa = PBXFileReference; lastKnownFileType = file; path = MessagePad; sourceTree = "<group>"; };
 		F4A5F21C17CF618D0004B6DB /* Newton 2.0 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Newton 2.0"; sourceTree = "<group>"; };
 		F4A5F21D17CF618D0004B6DB /* Newton 2.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = "Newton 2.1"; sourceTree = "<group>"; };
-		F4A5F23417CF9E320004B6DB /* NTK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NTK.framework; path = "../../../../NTX-eqnutbdlebkuybducwevtijjzgit/Build/Products/Debug/NTK.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F4A5F23417CF9E320004B6DB /* NTK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NTK.framework; path = NTK/NTK.framework; sourceTree = SOURCE_ROOT; };
 		F4A927940945EC6400F746B2 /* NTX-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; lineEnding = 0; path = "NTX-Info.plist"; sourceTree = "<group>"; };
 		F4A927950945EC6400F746B2 /* NTX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NTX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4ABC2421805526B0043F3EA /* MNPSerialEndpoint-experimental.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "MNPSerialEndpoint-experimental.m"; path = "Comms/MNPSerialEndpoint-experimental.m"; sourceTree = "<group>"; };
@@ -438,9 +439,9 @@
 				F4A927600945EC6400F746B2 /* Resources */,
 				F4A927840945EC6400F746B2 /* Sources */,
 				F4A9278A0945EC6400F746B2 /* Frameworks */,
-				F4FA703309A2034600B62DDB /* CopyFiles */,
+				F4FA703309A2034600B62DDB /* Copy Frameworks */,
 				F4D44DAC0BE89EEE004937CC /* CopyFiles */,
-				F4D44FE50BE9E14C004937CC /* CopyFiles */,
+				F4D44FE50BE9E14C004937CC /* Copy Platform Files */,
 			);
 			buildRules = (
 			);
@@ -530,7 +531,6 @@
 				F4D44FA70BE9DA8F004937CC /* NSApplication-NTXSupport.m in Sources */,
 				F423950917BF81F0000E4701 /* Utilities.mm in Sources */,
 				F42394DF17BE6B65000E4701 /* Preferences.m in Sources */,
-				F4C4C1CB1A28CE79002B8821 /* NRProgressBox.m in Sources */,
 				F42394F417BE7E20000E4701 /* MNPSerialEndpoint.m in Sources */,
 				F42394F917BE8147000E4701 /* CRC.m in Sources */,
 				F4A58FFA18BE1FD2008B0832 /* NTXDocument.mm in Sources */,
@@ -690,8 +690,8 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/../Sparkle",
-					"/Users/simon/Library/Developer/Xcode/DerivedData/NewtonToolkit-dnbzjyljndgrfxgdtbbfiqamjquo/Build/Products/Debug",
+					"$(SRCROOT)/Sparkle",
+					"$(SRCROOT)/NTK",
 				);
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -710,8 +710,8 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/../Sparkle",
-					"/Users/simon/Library/Developer/Xcode/DerivedData/NewtonToolkit-dnbzjyljndgrfxgdtbbfiqamjquo/Build/Products/Debug",
+					"$(SRCROOT)/Sparkle",
+					"$(SRCROOT)/NTK",
 				);
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				INFOPLIST_FILE = "NTX-Info.plist";
