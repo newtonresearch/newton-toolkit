@@ -733,7 +733,7 @@ extern NSArray * gTypeNames;
 			}
 			else
 			{
-				ArrayInsert(items, item, ++index);
+				ArrayInsert(items, item, index++);
 			}
 		}
 	}
