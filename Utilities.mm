@@ -9,7 +9,7 @@
 #import "Utilities.h"
 #import "NTK/PackageParts.h"
 
-extern Ref MakeStringOfLength(const UniChar * str, size_t numChars);
+extern "C" Ref MakeStringOfLength(const UniChar * str, size_t numChars);
 
 NSString * gDesktopName;
 
