@@ -167,7 +167,7 @@
 		F4A5F21B17CF618D0004B6DB /* MessagePad */ = {isa = PBXFileReference; lastKnownFileType = file; path = MessagePad; sourceTree = "<group>"; };
 		F4A5F21C17CF618D0004B6DB /* Newton 2.0 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Newton 2.0"; sourceTree = "<group>"; };
 		F4A5F21D17CF618D0004B6DB /* Newton 2.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = "Newton 2.1"; sourceTree = "<group>"; };
-		F4A5F23417CF9E320004B6DB /* NTK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NTK.framework; path = "../../../../NTX-eqnutbdlebkuybducwevtijjzgit/Build/Products/Debug/NTK.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F4A5F23417CF9E320004B6DB /* NTK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NTK.framework; path = NTK/NTK.framework; sourceTree = SOURCE_ROOT; };
 		F4A927940945EC6400F746B2 /* NTX-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; lineEnding = 0; path = "NTX-Info.plist"; sourceTree = "<group>"; };
 		F4A927950945EC6400F746B2 /* NTX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NTX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4ABC2421805526B0043F3EA /* MNPSerialEndpoint-experimental.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "MNPSerialEndpoint-experimental.m"; path = "Comms/MNPSerialEndpoint-experimental.m"; sourceTree = "<group>"; };
@@ -691,7 +691,7 @@
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/Sparkle",
-					"/Users/simon/Library/Developer/Xcode/DerivedData/NewtonToolkit-dnbzjyljndgrfxgdtbbfiqamjquo/Build/Products/Debug",
+					"$(SRCROOT)/NTK",
 				);
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -711,7 +711,7 @@
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/Sparkle",
-					"/Users/simon/Library/Developer/Xcode/DerivedData/NewtonToolkit-dnbzjyljndgrfxgdtbbfiqamjquo/Build/Products/Debug",
+					"$(SRCROOT)/NTK",
 				);
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				INFOPLIST_FILE = "NTX-Info.plist";
