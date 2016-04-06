@@ -69,7 +69,6 @@
 		F4C4C1C21A262B18002B8821 /* DVTViewNavigators_10_10.pdf in Resources */ = {isa = PBXBuildFile; fileRef = F4C4C1BD1A262B18002B8821 /* DVTViewNavigators_10_10.pdf */; };
 		F4C4C1C31A262B18002B8821 /* DVTViewUtilities_10_10.pdf in Resources */ = {isa = PBXBuildFile; fileRef = F4C4C1BF1A262B18002B8821 /* DVTViewUtilities_10_10.pdf */; };
 		F4C4C1CA1A28CE79002B8821 /* NRProgressBox.h in Headers */ = {isa = PBXBuildFile; fileRef = F4C4C1C81A28CE79002B8821 /* NRProgressBox.h */; };
-		F4C4C1CB1A28CE79002B8821 /* NRProgressBox.m in Sources */ = {isa = PBXBuildFile; fileRef = F4C4C1C91A28CE79002B8821 /* NRProgressBox.m */; };
 		F4D44FA70BE9DA8F004937CC /* NSApplication-NTXSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D44FA50BE9DA8F004937CC /* NSApplication-NTXSupport.m */; };
 		F4E5B97817EC6173007DA5BC /* stdioDirector.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E5B97617EC6173007DA5BC /* stdioDirector.m */; };
 /* End PBXBuildFile section */
@@ -532,7 +531,6 @@
 				F4D44FA70BE9DA8F004937CC /* NSApplication-NTXSupport.m in Sources */,
 				F423950917BF81F0000E4701 /* Utilities.mm in Sources */,
 				F42394DF17BE6B65000E4701 /* Preferences.m in Sources */,
-				F4C4C1CB1A28CE79002B8821 /* NRProgressBox.m in Sources */,
 				F42394F417BE7E20000E4701 /* MNPSerialEndpoint.m in Sources */,
 				F42394F917BE8147000E4701 /* CRC.m in Sources */,
 				F4A58FFA18BE1FD2008B0832 /* NTXDocument.mm in Sources */,

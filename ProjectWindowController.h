@@ -7,7 +7,7 @@
 */
 
 #import "SettingsViewController.h"
-#import "NRProgressBox.h"
+//#import "NRProgressBox.h"
 #import "stdioDirector.h"
 
 
@@ -56,7 +56,7 @@
 	// inspector
 	IBOutlet NTXEditorView		* inspectorView;
 	// progress
-	IBOutlet NRProgressBox		* progressBox;
+	IBOutlet NSView /*NRProgressBox*/		* progressBox;
 
 	NSDictionary * newtonTxAttrs;
 	NSDictionary * userTxAttrs;
