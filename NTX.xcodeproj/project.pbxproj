@@ -128,7 +128,7 @@
 		F42394D617BE6480000E4701 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		F42394DA17BE6B65000E4701 /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		F42394DB17BE6B65000E4701 /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
-		F42394E217BE6E73000E4701 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = ../Sparkle/Sparkle.framework; sourceTree = "<group>"; };
+		F42394E217BE6E73000E4701 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Sparkle/Sparkle.framework; sourceTree = "<group>"; };
 		F42394E417BE70C7000E4701 /* MNPSerialEndpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MNPSerialEndpoint.h; path = Comms/MNPSerialEndpoint.h; sourceTree = "<group>"; };
 		F42394E717BE7317000E4701 /* Endpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Endpoint.h; path = Comms/Endpoint.h; sourceTree = "<group>"; };
 		F42394E917BE736E000E4701 /* NTKProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NTKProtocol.h; path = Comms/NTKProtocol.h; sourceTree = "<group>"; };
@@ -690,7 +690,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/../Sparkle",
+					"$(SRCROOT)/Sparkle",
 					"/Users/simon/Library/Developer/Xcode/DerivedData/NewtonToolkit-dnbzjyljndgrfxgdtbbfiqamjquo/Build/Products/Debug",
 				);
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -710,7 +710,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/../Sparkle",
+					"$(SRCROOT)/Sparkle",
 					"/Users/simon/Library/Developer/Xcode/DerivedData/NewtonToolkit-dnbzjyljndgrfxgdtbbfiqamjquo/Build/Products/Debug",
 				);
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
