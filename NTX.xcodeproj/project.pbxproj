@@ -14,7 +14,7 @@
 		F42394D717BE6480000E4701 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F42394D517BE6480000E4701 /* InfoPlist.strings */; };
 		F42394DF17BE6B65000E4701 /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = F42394DB17BE6B65000E4701 /* Preferences.m */; };
 		F42394E317BE6E73000E4701 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42394E217BE6E73000E4701 /* Sparkle.framework */; };
-		F42394F017BE7CCD000E4701 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = F42394E217BE6E73000E4701 /* Sparkle.framework */; };
+		F42394F017BE7CCD000E4701 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = F42394E217BE6E73000E4701 /* Sparkle.framework */; };
 		F42394F417BE7E20000E4701 /* MNPSerialEndpoint.m in Sources */ = {isa = PBXBuildFile; fileRef = F42394F317BE7E20000E4701 /* MNPSerialEndpoint.m */; };
 		F42394F917BE8147000E4701 /* CRC.m in Sources */ = {isa = PBXBuildFile; fileRef = F42394F617BE8147000E4701 /* CRC.m */; };
 		F42394FA17BE8147000E4701 /* Endpoint.m in Sources */ = {isa = PBXBuildFile; fileRef = F42394F717BE8147000E4701 /* Endpoint.m */; };
@@ -42,11 +42,11 @@
 		F4A58FFD18C777C9008B0832 /* nativecode.iconset in Resources */ = {isa = PBXBuildFile; fileRef = F4A58FFC18C777C9008B0832 /* nativecode.iconset */; };
 		F4A58FFF18C7828A008B0832 /* ScriptDocument.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4A58FFE18C7828A008B0832 /* ScriptDocument.mm */; };
 		F4A5F20B17CF4E740004B6DB /* NTXEditorView.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4D450EE0BEE49A2004937CC /* NTXEditorView.mm */; };
-		F4A5F21E17CF61CF0004B6DB /* MessagePad in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4A5F21B17CF618D0004B6DB /* MessagePad */; };
-		F4A5F21F17CF61D20004B6DB /* Newton 2.0 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4A5F21C17CF618D0004B6DB /* Newton 2.0 */; };
-		F4A5F22017CF61D50004B6DB /* Newton 2.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4A5F21D17CF618D0004B6DB /* Newton 2.1 */; };
+		F4A5F21E17CF61CF0004B6DB /* MessagePad in Copy Platform Files */ = {isa = PBXBuildFile; fileRef = F4A5F21B17CF618D0004B6DB /* MessagePad */; };
+		F4A5F21F17CF61D20004B6DB /* Newton 2.0 in Copy Platform Files */ = {isa = PBXBuildFile; fileRef = F4A5F21C17CF618D0004B6DB /* Newton 2.0 */; };
+		F4A5F22017CF61D50004B6DB /* Newton 2.1 in Copy Platform Files */ = {isa = PBXBuildFile; fileRef = F4A5F21D17CF618D0004B6DB /* Newton 2.1 */; };
 		F4A5F23517CF9E320004B6DB /* NTK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4A5F23417CF9E320004B6DB /* NTK.framework */; };
-		F4A5F23817D533450004B6DB /* NTK.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4A5F23417CF9E320004B6DB /* NTK.framework */; };
+		F4A5F23817D533450004B6DB /* NTK.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = F4A5F23417CF9E320004B6DB /* NTK.framework */; };
 		F4A5F23F17D63E300004B6DB /* EditorCommands in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4D44FA90BE9DCA9004937CC /* EditorCommands */; };
 		F4A5F24017D63E330004B6DB /* GlobalData.newtonscript in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4D44FAA0BE9DCA9004937CC /* GlobalData.newtonscript */; };
 		F4A5F24117D63E360004B6DB /* GlobalFunctions.newtonscript in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4D44FAB0BE9DCA9004937CC /* GlobalFunctions.newtonscript */; };
@@ -88,27 +88,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F4D44FE50BE9E14C004937CC /* CopyFiles */ = {
+		F4D44FE50BE9E14C004937CC /* Copy Platform Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = Platforms;
 			dstSubfolderSpec = 7;
 			files = (
-				F4A5F21E17CF61CF0004B6DB /* MessagePad in CopyFiles */,
-				F4A5F21F17CF61D20004B6DB /* Newton 2.0 in CopyFiles */,
-				F4A5F22017CF61D50004B6DB /* Newton 2.1 in CopyFiles */,
+				F4A5F21E17CF61CF0004B6DB /* MessagePad in Copy Platform Files */,
+				F4A5F21F17CF61D20004B6DB /* Newton 2.0 in Copy Platform Files */,
+				F4A5F22017CF61D50004B6DB /* Newton 2.1 in Copy Platform Files */,
 			);
+			name = "Copy Platform Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F4FA703309A2034600B62DDB /* CopyFiles */ = {
+		F4FA703309A2034600B62DDB /* Copy Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				F42394F017BE7CCD000E4701 /* Sparkle.framework in CopyFiles */,
-				F4A5F23817D533450004B6DB /* NTK.framework in CopyFiles */,
+				F42394F017BE7CCD000E4701 /* Sparkle.framework in Copy Frameworks */,
+				F4A5F23817D533450004B6DB /* NTK.framework in Copy Frameworks */,
 			);
+			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -438,9 +440,9 @@
 				F4A927600945EC6400F746B2 /* Resources */,
 				F4A927840945EC6400F746B2 /* Sources */,
 				F4A9278A0945EC6400F746B2 /* Frameworks */,
-				F4FA703309A2034600B62DDB /* CopyFiles */,
+				F4FA703309A2034600B62DDB /* Copy Frameworks */,
 				F4D44DAC0BE89EEE004937CC /* CopyFiles */,
-				F4D44FE50BE9E14C004937CC /* CopyFiles */,
+				F4D44FE50BE9E14C004937CC /* Copy Platform Files */,
 			);
 			buildRules = (
 			);
