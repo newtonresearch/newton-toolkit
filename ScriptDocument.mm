@@ -27,8 +27,7 @@ extern Ref		ParseFile(const char * inFilename);
 
 - (id) init
 {
-	if (self = [super init])
-	{
+	if (self = [super init]) {
 		textStorage = nil;
 	}
 	return self;
@@ -42,7 +41,7 @@ extern Ref		ParseFile(const char * inFilename);
 
 - (BOOL) readFromURL: (NSURL *) url ofType: (NSString *) typeName error: (NSError **) outError
 {
-	[[self undoManager] disableUndoRegistration];
+	[self.undoManager disableUndoRegistration];
 
 	NSDictionary * docAttrs = nil;
 
@@ -50,7 +49,7 @@ extern Ref		ParseFile(const char * inFilename);
 	NSFont * txFont = [NSFont fontWithName:@"Menlo" size:11.0];
 	// calculate tab width
 	NSFont * charWidthFont = [txFont screenFontWithRenderingMode:NSFontDefaultRenderingMode];
-	NSInteger tabWidth = 3;	// [[NSUserDefaults standardUserDefaults] integerForKey:TabWidth];
+	NSInteger tabWidth = 3;	// [NSUserDefaults.standardUserDefaults integerForKey:@"TabWidth"];
 	CGFloat charWidth = [@" " sizeWithAttributes:[NSDictionary dictionaryWithObject:charWidthFont forKey:NSFontAttributeName]].width;
 	if (charWidth == 0)
 		charWidth = [charWidthFont maximumAdvancement].width;
@@ -64,25 +63,21 @@ extern Ref		ParseFile(const char * inFilename);
 																										nil];
 
 	NSError * __autoreleasing error = nil;
-	if (textStorage == nil)
-	{
+	if (textStorage == nil) {
 		NSDictionary * options = [NSDictionary dictionaryWithObjectsAndKeys:	NSPlainTextDocumentType, NSDocumentTypeDocumentOption,
 																									userTxAttrs, NSDefaultAttributesDocumentOption,
 																									nil];
 		textStorage = [[NSTextStorage alloc] initWithURL:url options:options documentAttributes:NULL error:&error];
-	}
-	else
-	{
+	} else {
 		NSString * newContents = [[NSString alloc] initWithContentsOfURL:url usedEncoding:NULL error:&error];
-		if (newContents)
-		{
+		if (newContents) {
 
-			[[textStorage mutableString] setString:newContents];
-			[textStorage addAttributes:userTxAttrs range:NSMakeRange(0, [newContents length])];
+			[textStorage.mutableString setString:newContents];
+			[textStorage addAttributes:userTxAttrs range:NSMakeRange(0, newContents.length)];
 		}
 	}
 
-	[[self undoManager] enableUndoRegistration];
+	[self.undoManager enableUndoRegistration];
 	return error == NULL;
 }
 
@@ -93,7 +88,7 @@ extern Ref		ParseFile(const char * inFilename);
 
 - (BOOL) writeToURL: (NSURL *) url ofType: (NSString *) typeName error: (NSError **) outError
 {
-	[[textStorage string] writeToURL:url atomically:NO encoding:NSUTF8StringEncoding error:outError];
+	[textStorage.string writeToURL:url atomically:NO encoding:NSUTF8StringEncoding error:outError];
 }
 
 
@@ -120,10 +115,11 @@ extern Ref		ParseFile(const char * inFilename);
 
 - (int) evaluate
 {
+//	always save before building -- there must be a better way to do this generically
 	NSError * __autoreleasing err = nil;
-	[self writeToURL:[self fileURL] ofType:@"com.newton.script" error:&err];
+	[self writeToURL:self.fileURL ofType:@"com.newton.script" error:&err];
 
-	ParseFile([[self fileURL] fileSystemRepresentation]);
+	ParseFile(self.fileURL.fileSystemRepresentation);
 	return noErr;
 }
 
@@ -137,9 +133,9 @@ extern Ref		ParseFile(const char * inFilename);
 
 - (NSString *) exportToText
 {
-	NSError * __autoreleasing err;
-	NSString * filename = [[self fileURL] lastPathComponent];
-	NSString * body = [NSString stringWithContentsOfURL:[self fileURL] encoding:NSUTF8StringEncoding error:&err];
+	NSError * __autoreleasing err = nil;
+	NSString * filename = self.fileURL.lastPathComponent;
+	NSString * body = [NSString stringWithContentsOfURL:self.fileURL encoding:NSUTF8StringEncoding error:&err];
 	return [NSString stringWithFormat:	@"// Beginning of text file %@\n"
 													@"%@\n"
 													@"// End of text file %@\n\n", filename, body, filename];

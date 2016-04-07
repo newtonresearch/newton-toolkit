@@ -7,11 +7,11 @@
 */
 
 #import <Cocoa/Cocoa.h>
-#import "EditViewController.h"
+#import "EditorViewController.h"
 
 extern const CGFloat LargeNumberForText;
 
-@interface NTXScriptViewController : NTXEditViewController
+@interface NTXScriptViewController : NTXEditorViewController
 {
 	NSTextStorage * _textStorage;
 	NSScrollView * scrollView;

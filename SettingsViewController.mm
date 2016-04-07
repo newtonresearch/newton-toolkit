@@ -41,41 +41,39 @@ extern NSString *	MakeNSString(RefArg inStr);
 	Initialize.
 ----------------------------------------------------------------------------- */
 
-- (id) initWithNibName: (NSString *)nibNameOrNil bundle: (NSBundle *)nibBundleOrNil
+- (void)viewDidLoad
 {
-	if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])
+	[super viewDidLoad];
+
+	settings = [[NSArray alloc] initWithContentsOfURL:[NSBundle.mainBundle URLForResource:@"projectsettings" withExtension:@"plist"]];
+
+	// build platform menu
+	[platformMenu removeAllItems];
+	// read platform filenames
+	NSArray * platformURLs = [NSBundle.mainBundle URLsForResourcesWithExtension:nil subdirectory:@"Platforms"];
+	for (NSURL * url in platformURLs)
 	{
-		settings = [[NSArray alloc] initWithContentsOfURL:[[NSBundle mainBundle] URLForResource:@"projectsettings" withExtension:@"plist"]];
-
-		// build platform menu
-		[platformMenu removeAllItems];
-		// read platform filenames
-		NSArray * platformURLs = [[NSBundle mainBundle] URLsForResourcesWithExtension:nil subdirectory:@"Platforms"];
-		for (NSURL * url in platformURLs)
-		{
-			NSString * platformName = [url lastPathComponent];
-			NSMenuItem * platformItem = [[NSMenuItem alloc] initWithTitle:platformName action:NULL keyEquivalent:@""];
-			[platformMenu addItem: platformItem];
-		}
-
-		// set menu font
-		menuFont = [NSFont fontWithName:@"LucidaGrande" size:11.0];
-
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[outlineView expandItem:nil expandChildren:YES];
-		});
+		NSString * platformName = [url lastPathComponent];
+		NSMenuItem * platformItem = [[NSMenuItem alloc] initWithTitle:platformName action:NULL keyEquivalent:@""];
+		[platformMenu addItem: platformItem];
 	}
-	return self;
+
+	// set menu font
+	menuFont = [NSFont fontWithName:@"LucidaGrande" size:11.0];
+
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[outlineView expandItem:nil expandChildren:YES];
+	});
 }
 
 
 /* -----------------------------------------------------------------------------
 	When the panel is hidden, save settings to project file.
------------------------------------------------------------------------------ */
+-----------------------------------------------------------------------------
 
-- (void) willHide
+- (void)viewWillDisappear
 {
-}
+}*/
 
 
 #pragma mark NSOutlineViewDelegate protocol

@@ -7,7 +7,7 @@
 */
 
 #import <Cocoa/Cocoa.h>
-#import "EditViewController.h"
+#import "EditorViewController.h"
 
 @interface NTXPopupCell : NSPopUpButtonCell
 //- (void) drawImageWithFrame:(NSRect)cellFrame inView:(NSView *)controlView;
@@ -16,12 +16,8 @@
 
 
 @class NTXProjectDocument;
-@interface NTXSettingsViewController : NTXEditViewController
+@interface NTXSettingsViewController : NTXEditorViewController
 {
-//	MODEL
-//	NTXProjectDocument * document;
-
-//	VIEW
 	NSArray * settings;
 	IBOutlet NSOutlineView * outlineView;
 	NSFont * menuFont;
@@ -29,5 +25,5 @@
 	IBOutlet NSMenu * partMenu;
 	IBOutlet NSMenu * platformMenu;
 }
-@property (weak) NTXProjectDocument * document;
+@property(weak) NTXProjectDocument * document;
 @end
