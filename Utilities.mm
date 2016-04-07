@@ -9,7 +9,7 @@
 #import "Utilities.h"
 #import "NTK/PackageParts.h"
 
-extern Ref MakeStringOfLength(const UniChar * str, size_t numChars);
+extern Ref MakeStringOfLength(const UniChar * str, ArrayIndex numChars);
 
 NSString * gDesktopName;
 
@@ -94,7 +94,7 @@ MakeString(NSString * inStr)
 	RefVar s;
 	UniChar buf[128];
 	UniChar * str = buf;
-	unsigned int strLen = [inStr length];
+	ArrayIndex strLen = [inStr length];
 	if (strLen > 128)
 		str = (UniChar *) malloc(strLen*sizeof(UniChar));
 	[inStr getCharacters: str];
@@ -190,7 +190,7 @@ ApplicationSupportFolder(void)
 {
 	NSFileManager * fmgr = [NSFileManager defaultManager];
 	NSURL * baseURL = [fmgr URLForDirectory: NSApplicationSupportDirectory inDomain: NSUserDomainMask appropriateForURL: nil create: YES error: nil];
-	NSURL * appFolder = [baseURL URLByAppendingPathComponent: @"Newton Inspector"];
+	NSURL * appFolder = [baseURL URLByAppendingPathComponent: @"Newton Toolkit"];
 	// if folder doesn’t exist, create it
 	NSError * __autoreleasing err = nil;
 	[fmgr createDirectoryAtPath: [appFolder path] withIntermediateDirectories: NO attributes: nil error: &err];
@@ -230,6 +230,6 @@ ApplicationLogFile(void)
 	// if folder doesn’t exist, create it
 //	[fmgr createDirectoryAtPath: [url path] withIntermediateDirectories: NO attributes: nil error:(NSError **) nil];
 	// create /Library/Logs/NewtonConnection.log
-	return [url URLByAppendingPathComponent: @"NewtonInspector.log"];
+	return [url URLByAppendingPathComponent: @"NewtonToolkit.log"];
 }
 
