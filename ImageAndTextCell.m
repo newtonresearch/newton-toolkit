@@ -64,8 +64,7 @@
 // -------------------------------------------------------------------------------
 - (id)init
 {
-	if (self = [super init])
-	{
+	if (self = [super init]) {
 		// we want a smaller font
 		[self setFont:[NSFont systemFontOfSize:[NSFont smallSystemFontSize]]];
 	}
@@ -87,8 +86,7 @@
 // -------------------------------------------------------------------------------
 - (void)setImage:(NSImage*)anImage
 {
-	if (anImage != image)
-	{
+	if (anImage != image) {
 		image = anImage;
 		[image setSize:NSMakeSize(kIconImageSize, kIconImageSize)];
 	}
@@ -155,8 +153,7 @@
 {
 	NSRect newCellFrame = cellFrame;
 
-	if (image != nil)
-	{
+	if (image != nil) {
 		// the cell has an image: draw the normal item cell
 		NSSize imageSize;
 		NSRect imageFrame;
@@ -164,8 +161,7 @@
 		imageSize = [image size];
 		NSDivideRect(newCellFrame, &imageFrame, &newCellFrame, imageSize.width, NSMinXEdge);
 
-		if ([self drawsBackground])
-		{
+		if ([self drawsBackground]) {
 			[[self backgroundColor] set];
 			NSRectFill(imageFrame);
 		}
