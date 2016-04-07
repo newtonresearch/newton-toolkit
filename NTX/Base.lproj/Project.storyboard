@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="6751" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="inJ-cq-jtf">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
+    </dependencies>
+    <scenes>
+        <!--Window Controller-->
+        <scene sceneID="CbL-bO-NyZ">
+            <objects>
+                <windowController storyboardIdentifier="Document Window Controller" id="inJ-cq-jtf" customClass="NTXProjectWindowController" sceneMemberID="viewController">
+                    <window key="window" title="Project" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="Project" animationBehavior="default" id="aob-xc-kJD">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="256" y="960" width="640" height="256"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+                        <value key="minSize" type="size" width="640" height="256"/>
+                        <toolbar key="toolbar" implicitIdentifier="F415C595-B4F4-4B26-BC68-A99C2B06D6F1" autosavesConfiguration="NO" allowsUserCustomization="NO" showsBaselineSeparator="NO" displayMode="iconOnly" sizeMode="regular" id="R1N-EI-VKS">
+                            <allowedToolbarItems>
+                                <toolbarItem implicitItemIdentifier="NSToolbarShowColorsItem" id="OBm-dJ-rZT"/>
+                                <toolbarItem implicitItemIdentifier="NSToolbarShowFontsItem" id="BDO-0p-XLC"/>
+                                <toolbarItem implicitItemIdentifier="NSToolbarPrintItem" id="Fpv-Er-94C"/>
+                                <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="1eL-py-hnC"/>
+                                <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="KJ6-0p-dBV"/>
+                                <toolbarItem implicitItemIdentifier="29FBEB62-6A9A-4EBF-9A49-8AE224A5C2D8" label="Visibility" paletteLabel="Visibility" toolTip="Collapse Split View" id="ckg-je-s7h">
+                                    <size key="minSize" width="63" height="28"/>
+                                    <size key="maxSize" width="104" height="30"/>
+                                    <segmentedControl key="view" verticalHuggingPriority="750" id="xEI-Jb-Kz8">
+                                        <rect key="frame" x="0.0" y="14" width="73" height="27"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="momentary" id="q9y-5n-tVd">
+                                            <font key="font" metaFont="system"/>
+                                            <segments>
+                                                <segment image="DVTViewNavigators_10_10" width="30"/>
+                                                <segment image="DVTViewDebugArea_10_10" width="32" tag="1"/>
+                                            </segments>
+                                        </segmentedCell>
+                                    </segmentedControl>
+                                    <connections>
+                                        <action selector="toggleCollapsed:" target="emp-aw-Wbh" id="sDB-Be-c0c"/>
+                                    </connections>
+                                </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="5B982F6E-1C5D-4548-9BCC-586CF68E869D" label="Connection" paletteLabel="Connection" toolTip="Connection status" image="Disconnected" id="9o8-a1-gON">
+                                    <size key="minSize" width="36" height="28"/>
+                                    <size key="maxSize" width="36" height="30"/>
+                                    <button key="view" id="e6h-GE-dgL">
+                                        <rect key="frame" x="16" y="14" width="36" height="28"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Disconnected" imagePosition="only" alignment="center" alternateImage="Connected" state="on" borderStyle="border" inset="2" id="sl8-tL-6nG">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <binding destination="inJ-cq-jtf" name="enabled" keyPath="ntkNub" id="WeV-La-Ebf">
+                                                <dictionary key="options">
+                                                    <string key="NSValueTransformerName">NSIsNotNil</string>
+                                                </dictionary>
+                                            </binding>
+                                        </connections>
+                                    </button>
+                                    <connections>
+                                        <binding destination="inJ-cq-jtf" name="enabled" keyPath="ntkNub" id="Gba-Ru-tSb">
+                                            <dictionary key="options">
+                                                <string key="NSValueTransformerName">NSIsNotNil</string>
+                                            </dictionary>
+                                        </binding>
+                                    </connections>
+                                </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="A1BE00E1-E1C8-4AB7-98E9-8B17A7849AC9" label="Progress" paletteLabel="Progress" tag="-1" id="o60-4F-ayr">
+                                    <nil key="toolTip"/>
+                                    <size key="minSize" width="460" height="24"/>
+                                    <size key="maxSize" width="468" height="60"/>
+                                    <box key="view" autoresizesSubviews="NO" transparent="YES" title="Progress" boxType="custom" borderType="none" titlePosition="noTitle" id="WzV-L4-P8x" customClass="NRProgressBox">
+                                        <rect key="frame" x="0.0" y="14" width="464" height="24"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                        <view key="contentView">
+                                            <rect key="frame" x="0.0" y="0.0" width="464" height="24"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                        </view>
+                                        <color key="borderColor" name="controlShadowColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="fillColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </box>
+                                </toolbarItem>
+                            </allowedToolbarItems>
+                            <defaultToolbarItems>
+                                <toolbarItem reference="9o8-a1-gON"/>
+                                <toolbarItem reference="KJ6-0p-dBV"/>
+                                <toolbarItem reference="o60-4F-ayr"/>
+                                <toolbarItem reference="KJ6-0p-dBV"/>
+                                <toolbarItem reference="ckg-je-s7h"/>
+                            </defaultToolbarItems>
+                        </toolbar>
+                    </window>
+                    <connections>
+                        <outlet property="progressBox" destination="WzV-L4-P8x" id="frI-CO-gPP"/>
+                        <segue destination="kVZ-ks-shz" kind="relationship" relationship="window.shadowedContentViewController" id="ONT-CA-mun"/>
+                    </connections>
+                </windowController>
+                <customObject id="emp-aw-Wbh" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="73" y="390"/>
+        </scene>
+        <!--Source Split View Controller-->
+        <scene sceneID="OVN-wZ-09Y">
+            <objects>
+                <splitViewController id="kVZ-ks-shz" customClass="NTXSourceSplitViewController" sceneMemberID="viewController">
+                    <splitViewItems>
+                        <splitViewItem canCollapse="YES" holdingPriority="251" id="ERi-1r-7Sj"/>
+                        <splitViewItem id="GV9-yy-VAK"/>
+                    </splitViewItems>
+                    <splitView key="splitView" autosaveName="SourceList" dividerStyle="thin" vertical="YES" id="fXh-iO-dkS">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <connections>
+                            <outlet property="delegate" destination="kVZ-ks-shz" id="VjU-ks-FuS"/>
+                        </connections>
+                    </splitView>
+                    <connections>
+                        <outlet property="sourceListItem" destination="ERi-1r-7Sj" id="M88-iW-ak0"/>
+                        <outlet property="view" destination="fXh-iO-dkS" id="bzM-hc-EqC"/>
+                        <segue destination="M3q-Kd-b30" kind="relationship" relationship="splitItems" id="jNc-xg-Cpv"/>
+                        <segue destination="BMv-W5-Nbg" kind="relationship" relationship="splitItems" id="0LK-7s-WIp"/>
+                    </connections>
+                </splitViewController>
+                <customObject id="bhl-95-Fnq" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="75" y="809"/>
+        </scene>
+        <!--Source List-->
+        <scene sceneID="cWJ-u9-cL7">
+            <objects>
+                <viewController title="Source List" storyboardIdentifier="Source" id="M3q-Kd-b30" customClass="NTXSourceListViewController" sceneMemberID="viewController">
+                    <view key="view" horizontalHuggingPriority="251" horizontalCompressionResistancePriority="751" id="d3s-Sa-T6Q">
+                        <rect key="frame" x="0.0" y="0.0" width="306" height="284"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <scrollView focusRingType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ccq-Er-QF1">
+                                <rect key="frame" x="-1" y="22" width="308" height="263"/>
+                                <clipView key="contentView" drawsBackground="NO" id="j6i-QC-SLW">
+                                    <rect key="frame" x="1" y="1" width="148" height="398"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <outlineView focusRingType="none" appearanceType="vibrantLight" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="sourceList" columnReordering="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="16" outlineTableColumn="3ao-QZ-Q78" id="96I-uK-4Zd">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <size key="intercellSpacing" width="3" height="2"/>
+                                            <color key="backgroundColor" name="_sourceListBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                            <tableColumns>
+                                                <tableColumn identifier="NameColumn" width="303" minWidth="16" maxWidth="1000" id="3ao-QZ-Q78">
+                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                                                        <font key="font" metaFont="smallSystem"/>
+                                                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                    </tableHeaderCell>
+                                                    <textFieldCell key="dataCell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="rgJ-8y-Zr6" customClass="ImageAndTextCell">
+                                                        <font key="font" metaFont="smallSystem"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
+                                                </tableColumn>
+                                            </tableColumns>
+                                            <connections>
+                                                <outlet property="dataSource" destination="M3q-Kd-b30" id="NPp-tv-hzr"/>
+                                                <outlet property="delegate" destination="M3q-Kd-b30" id="qx6-4Q-FDc"/>
+                                            </connections>
+                                        </outlineView>
+                                    </subviews>
+                                    <nil key="backgroundColor"/>
+                                </clipView>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="100" id="fQY-P8-Fd0"/>
+                                </constraints>
+                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="BJa-xK-Nzh">
+                                    <rect key="frame" x="1" y="119" width="238" height="15"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="0.56969833055886965" horizontal="NO" id="2aA-Ig-Da7">
+                                    <rect key="frame" x="224" y="17" width="15" height="102"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                            <box autoresizesSubviews="NO" borderWidth="0.0" title="Box" boxType="custom" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="dSD-rq-m6a">
+                                <rect key="frame" x="0.0" y="0.0" width="306" height="22"/>
+                                <view key="contentView">
+                                    <rect key="frame" x="0.0" y="0.0" width="306" height="22"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <popUpButton autoresizesSubviews="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TWw-dN-2NL">
+                                            <rect key="frame" x="8" y="2" width="18" height="18"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="18" id="2WE-GM-8XK"/>
+                                                <constraint firstAttribute="width" constant="18" id="mHs-sD-N5j"/>
+                                            </constraints>
+                                            <popUpButtonCell key="cell" type="square" alternateTitle="+" bezelStyle="shadowlessSquare" alignment="left" lineBreakMode="truncatingTail" transparent="YES" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" autoenablesItems="NO" altersStateOfSelectedItem="NO" id="Awt-Ry-uoB">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="menu"/>
+                                                <menu key="menu" showsStateColumn="NO" autoenablesItems="NO" id="WO9-5F-UyM">
+                                                    <items>
+                                                        <menuItem title="New Text File…" id="aKf-31-ZHG">
+                                                            <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
+                                                            <connections>
+                                                                <action selector="newTextDocument:" target="YxP-fn-iij" id="jof-gr-FjM"/>
+                                                            </connections>
+                                                        </menuItem>
+                                                        <menuItem isSeparatorItem="YES" id="hw7-AM-Pje"/>
+                                                        <menuItem title="Add Files to Project…" id="zrm-UM-kQg">
+                                                            <connections>
+                                                                <action selector="addFiles:" target="YxP-fn-iij" id="HCf-7U-E0q"/>
+                                                            </connections>
+                                                        </menuItem>
+                                                    </items>
+                                                </menu>
+                                            </popUpButtonCell>
+                                        </popUpButton>
+                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="EZo-is-IWw">
+                                            <rect key="frame" x="8" y="2" width="18" height="18"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="18" id="jkL-8G-Kk6"/>
+                                                <constraint firstAttribute="width" constant="18" id="tJv-kD-XNj"/>
+                                            </constraints>
+                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSAddTemplate" id="Vsg-0p-IbR"/>
+                                        </imageView>
+                                    </subviews>
+                                </view>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="22" id="Mkw-c5-Yh0"/>
+                                    <constraint firstItem="EZo-is-IWw" firstAttribute="leading" secondItem="dSD-rq-m6a" secondAttribute="leading" constant="8" id="XAJ-rv-aIo"/>
+                                    <constraint firstAttribute="bottom" secondItem="EZo-is-IWw" secondAttribute="bottom" constant="2" id="dgG-YR-7gH"/>
+                                    <constraint firstItem="TWw-dN-2NL" firstAttribute="centerX" secondItem="EZo-is-IWw" secondAttribute="centerX" id="mnj-l5-vW2"/>
+                                    <constraint firstItem="TWw-dN-2NL" firstAttribute="centerY" secondItem="EZo-is-IWw" secondAttribute="centerY" id="qmv-Vw-iyC"/>
+                                </constraints>
+                                <color key="borderColor" name="windowFrameColor" catalog="System" colorSpace="catalog"/>
+                                <color key="fillColor" red="0.94117647059999998" green="0.94117647059999998" blue="0.94117647059999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </box>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="ccq-Er-QF1" secondAttribute="trailing" constant="-1" id="6Sc-H8-JBn"/>
+                            <constraint firstItem="ccq-Er-QF1" firstAttribute="top" secondItem="d3s-Sa-T6Q" secondAttribute="top" constant="-1" id="8QU-eD-CLk"/>
+                            <constraint firstItem="ccq-Er-QF1" firstAttribute="leading" secondItem="d3s-Sa-T6Q" secondAttribute="leading" constant="-1" id="DQW-sH-jSI"/>
+                            <constraint firstAttribute="bottom" secondItem="dSD-rq-m6a" secondAttribute="bottom" id="GH9-Pl-zor"/>
+                            <constraint firstItem="dSD-rq-m6a" firstAttribute="leading" secondItem="d3s-Sa-T6Q" secondAttribute="leading" id="PQR-wX-Hul"/>
+                            <constraint firstAttribute="trailing" secondItem="dSD-rq-m6a" secondAttribute="trailing" id="rSH-jE-vwp"/>
+                            <constraint firstAttribute="bottom" secondItem="ccq-Er-QF1" secondAttribute="bottom" constant="22" id="syL-Hp-nGJ"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="sidebarView" destination="96I-uK-4Zd" id="5a7-mZ-Ys4"/>
+                    </connections>
+                </viewController>
+                <customObject id="YxP-fn-iij" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-114" y="1288"/>
+        </scene>
+        <!--Inspector Split View Controller-->
+        <scene sceneID="7mI-n2-tNM">
+            <objects>
+                <splitViewController storyboardIdentifier="Content" id="BMv-W5-Nbg" customClass="NTXInspectorSplitViewController" sceneMemberID="viewController">
+                    <splitViewItems>
+                        <splitViewItem id="IUN-LN-SYs"/>
+                        <splitViewItem canCollapse="YES" holdingPriority="251" id="FbL-98-hrU"/>
+                    </splitViewItems>
+                    <splitView key="splitView" autosaveName="Content" id="uL0-f5-bn6" customClass="NTXSplitView">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <connections>
+                            <outlet property="delegate" destination="BMv-W5-Nbg" id="8Zi-sL-Hcg"/>
+                        </connections>
+                    </splitView>
+                    <connections>
+                        <outlet property="inspectorItem" destination="FbL-98-hrU" id="t9W-8T-tbE"/>
+                        <outlet property="view" destination="uL0-f5-bn6" id="8Nv-uh-Ji3"/>
+                        <segue destination="l24-e1-ihV" kind="relationship" relationship="splitItems" id="Tx0-aT-ewi"/>
+                        <segue destination="gzp-rH-4cj" kind="relationship" relationship="splitItems" id="iN4-Ez-hgQ"/>
+                    </connections>
+                </splitViewController>
+                <customObject id="3gF-le-uhI" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="319" y="1296"/>
+        </scene>
+        <!--Editor Content-->
+        <scene sceneID="Pyz-KG-YtZ">
+            <objects>
+                <viewController title="Editor Content" id="l24-e1-ihV" customClass="NTXContentViewController" sceneMemberID="viewController">
+                    <view key="view" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" id="x6J-R6-OvD">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </view>
+                </viewController>
+                <customObject id="PZl-Rv-a33" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="980" y="1122"/>
+        </scene>
+        <!--Settings-->
+        <scene sceneID="O3S-dW-M5g">
+            <objects>
+                <viewController title="Settings" storyboardIdentifier="Settings" id="Hd9-SF-cXf" customClass="NTXSettingsViewController" sceneMemberID="viewController">
+                    <box key="view" autoresizesSubviews="NO" focusRingType="none" title="Build Settings" boxType="custom" borderType="none" id="C2x-kD-jT3" customClass="NRBox">
+                        <rect key="frame" x="0.0" y="0.0" width="444" height="296"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <view key="contentView">
+                            <rect key="frame" x="0.0" y="0.0" width="444" height="296"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <scrollView focusRingType="none" autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TPn-pd-AjW">
+                                    <rect key="frame" x="0.0" y="0.0" width="444" height="266"/>
+                                    <clipView key="contentView" focusRingType="none" id="FFv-hQ-M4t">
+                                        <rect key="frame" x="1" y="1" width="658" height="308"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                        <subviews>
+                                            <outlineView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="22" rowSizeStyle="small" indentationPerLevel="8" indentationMarkerFollowsCell="NO" outlineTableColumn="QlV-rL-DHy" id="dh3-Xs-0Wd">
+                                                <rect key="frame" x="0.0" y="0.0" width="442" height="24"/>
+                                                <autoresizingMask key="autoresizingMask"/>
+                                                <size key="intercellSpacing" width="3" height="2"/>
+                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                                <tableColumns>
+                                                    <tableColumn identifier="title" editable="NO" width="224" minWidth="16" maxWidth="1000" id="QlV-rL-DHy">
+                                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
+                                                        </tableHeaderCell>
+                                                        <textFieldCell key="dataCell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" editable="YES" allowsUndo="NO" alignment="left" title="Setting" usesSingleLineMode="YES" id="Czb-e4-Wp9">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                    </tableColumn>
+                                                    <tableColumn identifier="value" width="212" minWidth="40" maxWidth="1000" id="D5Y-It-ArU">
+                                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
+                                                        </tableHeaderCell>
+                                                        <textFieldCell key="dataCell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" title="Text" id="TuC-G5-ogk">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                    </tableColumn>
+                                                </tableColumns>
+                                                <connections>
+                                                    <outlet property="dataSource" destination="Hd9-SF-cXf" id="HaL-f2-8SK"/>
+                                                    <outlet property="delegate" destination="Hd9-SF-cXf" id="upi-Mg-hak"/>
+                                                </connections>
+                                            </outlineView>
+                                        </subviews>
+                                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </clipView>
+                                    <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="scF-RR-hb9">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                    </scroller>
+                                    <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="Iha-Gc-ciI">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                    </scroller>
+                                </scrollView>
+                            </subviews>
+                        </view>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="TPn-pd-AjW" secondAttribute="bottom" id="APE-5d-i6E"/>
+                            <constraint firstItem="TPn-pd-AjW" firstAttribute="leading" secondItem="C2x-kD-jT3" secondAttribute="leading" id="cee-BM-EJz"/>
+                            <constraint firstItem="TPn-pd-AjW" firstAttribute="top" secondItem="C2x-kD-jT3" secondAttribute="top" constant="30" id="knr-Ru-OI3"/>
+                            <constraint firstAttribute="trailing" secondItem="TPn-pd-AjW" secondAttribute="trailing" id="ozg-tE-DuK"/>
+                        </constraints>
+                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </box>
+                    <connections>
+                        <outlet property="booleanMenu" destination="TFa-zO-ANI" id="Tam-VU-VLk"/>
+                        <outlet property="outlineView" destination="dh3-Xs-0Wd" id="cCI-w3-tvq"/>
+                        <outlet property="partMenu" destination="R1v-VU-rsp" id="iJo-FA-8Or"/>
+                        <outlet property="platformMenu" destination="GZm-08-K3U" id="pTz-bw-h9E"/>
+                    </connections>
+                </viewController>
+                <menu title="PartType" showsStateColumn="NO" autoenablesItems="NO" id="R1v-VU-rsp">
+                    <items>
+                        <menuItem title="Application" id="FWz-Uf-WpH"/>
+                        <menuItem title="Book" id="dpg-aa-WzE"/>
+                        <menuItem title="Auto Part" id="udS-Vg-S8C"/>
+                        <menuItem title="Store Part" id="ODS-Cr-qH9"/>
+                        <menuItem title="Stream File" id="FKt-4Q-iHk"/>
+                        <menuItem title="Custom Part" id="mjD-z9-iTR"/>
+                    </items>
+                </menu>
+                <menu title="Boolean" autoenablesItems="NO" id="TFa-zO-ANI">
+                    <items>
+                        <menuItem title="Yes" id="ZHn-dq-5xV"/>
+                        <menuItem title="No" id="4qj-h0-UDO"/>
+                    </items>
+                </menu>
+                <menu title="Platform" showsStateColumn="NO" autoenablesItems="NO" id="GZm-08-K3U">
+                    <items>
+                        <menuItem title="MessagePad" id="8aZ-3D-wMc"/>
+                        <menuItem title="Newton 2.0" id="Rwn-C0-Ddz"/>
+                        <menuItem title="Newton 2.1" id="P9j-ra-ioT"/>
+                    </items>
+                </menu>
+                <customObject id="owZ-Wd-zp0" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1534" y="1122"/>
+        </scene>
+        <!--Inspector View Controller-->
+        <scene sceneID="meA-Oy-R7W">
+            <objects>
+                <viewController storyboardIdentifier="Inspector" id="gzp-rH-4cj" customClass="InspectorViewController" sceneMemberID="viewController">
+                    <scrollView key="view" focusRingType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="4y3-6d-8qV">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <clipView key="contentView" focusRingType="none" id="NMY-0O-7IH">
+                            <rect key="frame" x="1" y="1" width="223" height="133"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <textView focusRingType="none" importsGraphics="NO" richText="NO" findStyle="panel" allowsUndo="YES" verticallyResizable="YES" id="wiZ-iS-1al" customClass="NTXEditorView">
+                                    <rect key="frame" x="0.0" y="0.0" width="223" height="298"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <size key="minSize" width="448" height="298"/>
+                                    <size key="maxSize" width="463" height="10000000"/>
+                                    <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <size key="minSize" width="448" height="298"/>
+                                    <size key="maxSize" width="463" height="10000000"/>
+                                    <connections>
+                                        <outlet property="delegate" destination="gzp-rH-4cj" id="0DI-bR-K6T"/>
+                                    </connections>
+                                </textView>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="NOw-Ve-aw9">
+                            <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="z2Z-d8-rg9">
+                            <rect key="frame" x="224" y="1" width="15" height="133"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
+                    <connections>
+                        <outlet property="inspectorView" destination="wiZ-iS-1al" id="f2q-px-fBt"/>
+                    </connections>
+                </viewController>
+                <customObject id="jqT-UN-Dvn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="980" y="1475.5"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Connected" width="37" height="31"/>
+        <image name="DVTViewDebugArea_10_10" width="18" height="14"/>
+        <image name="DVTViewNavigators_10_10" width="18" height="14"/>
+        <image name="Disconnected" width="30" height="23"/>
+        <image name="NSAddTemplate" width="11" height="11"/>
+    </resources>
+</document>

@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
+	<string>en_GB</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -83,7 +83,7 @@
 			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>com.newon.pkg</string>
+				<string>com.newton.package</string>
 			</array>
 			<key>LSTypeIsPackage</key>
 			<integer>0</integer>
@@ -153,12 +153,14 @@
 	<string>17</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tools</string>
-	<key>NSMainNibFile</key>
-	<string>MainMenu</string>
+	<key>NSMainStoryboardFile</key>
+	<string>Main</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>OSUSoftwareUpdateTrack</key>
-	<string></string>
+	<key>SUFeedURL</key>
+	<string>http://newtonresearch.org/toolkit/version.xml</string>
+	<key>SUPublicDSAKeyFile</key>
+	<string>dsa_pub.pem</string>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
@@ -262,6 +264,22 @@
 				<key>public.filename-extension</key>
 				<array>
 					<string>ntkc</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeDescription</key>
+			<string>Newt Package</string>
+			<key>UTTypeIconFile</key>
+			<string>pkg</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>pkg</string>
 				</array>
 			</dict>
 		</dict>
