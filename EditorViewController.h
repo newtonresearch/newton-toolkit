@@ -1,7 +1,7 @@
 /*
-	File:		EditViewController.h
+	File:		EditorViewController.h
 
-	Abstract:	Interface for NTXEditViewController class.
+	Abstract:	Interface for NTXEditorViewController class.
 
 	Written by:		Newton Research, 2011.
 */
@@ -10,19 +10,15 @@
 
 
 /* -----------------------------------------------------------------------------
-	N T X E d i t V i e w C o n t r o l l e r
-	Controller for the editor view.
+	N T X E d i t o r V i e w C o n t r o l l e r
+	Every document in an NTX project has an editor. This is its view controller.
 ----------------------------------------------------------------------------- */
 
-@interface NTXEditViewController : NSViewController
+@interface NTXEditorViewController : NSViewController
 {
 //	BOOL isRegisteredForDraggedTypes;
 }
 @property(readonly) NSView * containerView;
-
-- (void) willShow;
-- (void) willHide;
-
 @end
 
 
@@ -38,7 +34,7 @@
 	Just show the image for this source item type.
 ----------------------------------------------------------------------------- */
 
-@interface NTXIconViewController : NTXEditViewController
+@interface NTXIconViewController : NTXEditorViewController
 @property(strong) NSImage * image;
 @end
 

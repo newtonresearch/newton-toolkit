@@ -14,7 +14,7 @@
 #import "Comms.h"
 #import "NCBuffer.h"
 
-#define kDebugOn 0
+#define kDebugOn 1
 
 #ifdef __cplusplus
 extern "C" {

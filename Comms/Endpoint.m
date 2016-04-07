@@ -5,6 +5,7 @@
 
 	Written by:	Newton Research Group, 2011.
 */
+#import <Cocoa/Cocoa.h>
 
 #import "Endpoint.h"
 #import "DockErrors.h"
@@ -19,7 +20,7 @@
 	D a t a
 ----------------------------------------------------------------------------- */
 
-BOOL gTraceIO = NO;
+BOOL gTraceIO = YES;
 
 /* -----------------------------------------------------------------------------
 	N C E n d p o i n t
@@ -129,15 +130,16 @@ BOOL gTraceIO = NO;
 	if (count > 0)
 	{
 
-#if kDebugOn
-if (gTraceIO)
-{
-int i;
-REPprintf("<<");
-for (i = 0; i < count; ++i) REPprintf(" %02X", rxPageBuf[i]);
-REPprintf("\n");
+//#if kDebugOn
+//if (gTraceIO)
+//{
+NSMutableString * str = [NSMutableString stringWithCapacity:count*3];
+for (int i = 0; i < count; ++i) {
+	[str appendFormat:@" %02X", rxPageBuf[i]];
 }
-#endif
+NSLog(@"<<%@",str);
+//}
+//#endif
 
 		[rxData setLength:0];
 		err = [self read:rxPageBuf length:count into:rxData];
@@ -208,10 +210,11 @@ REPprintf("\n");
 #if kDebugOn
 if (gTraceIO)
 {
-int i;
-REPprintf(">>");
-for (i = 0; i < count; ++i) REPprintf(" %02X", txPageBuf.ptr[i]);
-REPprintf("\n");
+NSMutableString * str = [NSMutableString stringWithCapacity:count*3];
+for (int i = 0; i < count; ++i) {
+	[str appendFormat:@" %02X", txPageBuf.ptr[i]];
+}
+NSLog(@">>%@",str);
 }
 #endif
 
@@ -464,8 +467,9 @@ REPprintf("\n");
 		}
 		else
 		{
-			tv.tv_sec = [ep timeout];
-			tv.tv_usec = 0;
+			// allow 100ms latency in timeout
+			tv.tv_sec = ep.timeout - 1;
+			tv.tv_usec = 900000;
 
 			FD_ZERO(&rfds);
 			FD_SET(ep.fd, &rfds);

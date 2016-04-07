@@ -490,8 +490,8 @@ FindSerialPorts(io_iterator_t * matchingServices)
 {
 	if (self = [super init])
 	{
-		/*int err = */[NTXPreferenceController preferredSerialPort: &devPath bitRate: &baudRate];
-		doHandshaking = [[NSUserDefaults standardUserDefaults] integerForKey: @"SerialHandshake"];
+		/*int err = */[NTXPreferenceController preferredSerialPort:&devPath bitRate:&baudRate];
+		doHandshaking = [NSUserDefaults.standardUserDefaults integerForKey:@"SerialHandshake"];
 
 		isLive = NO;
 		isNegotiating = NO;

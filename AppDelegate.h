@@ -8,7 +8,12 @@
 
 #import <Cocoa/Cocoa.h>
 #import "PreferenceKeys.h"
-#import "NSApplication-NTXSupport.h"
+
+
+@protocol NTXSleepProtocol
+- (BOOL) applicationCanSleep;
+- (void) applicationWillSleep;
+@end
 
 
 /* -----------------------------------------------------------------------------
@@ -21,19 +26,18 @@
 @property(strong) NSString * currentPlatform;
 // Toolkit app communication
 @property(strong) NTXToolkitProtocolController * ntkNub;
-//@property(strong) NTXWindowController * theWindowController;
 
 // Application
-- (BOOL) applicationCanSleep;
+- (BOOL)applicationCanSleep;
 
 // Toolkit
-- (void) setPlatform: (NSString *) inPlatform;
+- (void)setPlatform:(NSString *)inPlatform;
 
-// File menu actions
 // Build menu actions
-- (IBAction) connectInspector: (id) sender;
-- (IBAction) installToolkit: (id) sender;
-- (IBAction) takeScreenshot: (id) sender;
+- (IBAction)installToolkit:(id)sender;
+- (IBAction)takeScreenshot:(id)sender;
+- (IBAction)disconnect:(id)sender;
 
-- (void) download: (NSURL *) inURL;
+// UI
+- (void)showScreenshot:(NSImage *)inShot;
 @end

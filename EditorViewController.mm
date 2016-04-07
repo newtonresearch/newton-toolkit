@@ -1,31 +1,22 @@
 /*
-	File:		EditViewController.mm
+	File:		EditorViewController.mm
 
-	Abstract:	Implementation of NTXEditViewController subclasses.
+	Abstract:	Implementation of NTXEditorViewController subclasses.
 
 	Written by:		Newton Research, 2014.
 */
 
-#import "EditViewController.h"
+#import "EditorViewController.h"
 
 
 /* -----------------------------------------------------------------------------
-	N T X E d i t V i e w C o n t r o l l e r
+	N T X E d i t o r V i e w C o n t r o l l e r
 ----------------------------------------------------------------------------- */
 
-@implementation NTXEditViewController
+@implementation NTXEditorViewController
 
 - (NSView *) containerView
 { return self.view; }
-
-- (void) willShow
-{
-//	isRegisteredForDraggedTypes = NO;
-}
-
-- (void) willHide
-{
-}
 
 @end
 

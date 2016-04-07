@@ -9,7 +9,7 @@
 */
 
 #import "MNPSerialEndpoint.h"
-#import "Preferences.h"
+#import "GeneralPrefsViewController.h"
 #import "DockErrors.h"
 
 #define ERRBASE_SERIAL					(-18000)	// Newton SerialTool errors
@@ -218,8 +218,8 @@ FindSerialPorts(io_iterator_t * matchingServices)
 {
 	if (self = [super init])
 	{
-		/*int err = */[NTXPreferenceController preferredSerialPort: &devPath bitRate: &baudRate];
-		doHandshaking = [[NSUserDefaults standardUserDefaults] integerForKey: @"SerialHandshake"];
+		/*int err = */[GeneralPrefsViewController preferredSerialPort:&devPath bitRate:&baudRate];
+		doHandshaking = [NSUserDefaults.standardUserDefaults integerForKey:@"SerialHandshake"];
 
 		timerT401 = 0;
 		timerT403 = 0;
@@ -342,13 +342,11 @@ FindSerialPorts(io_iterator_t * matchingServices)
 
 - (void) handleTickTimer
 {
-	if (timerT401 > 0)
-	{
+	if (timerT401 > 0) {
 		if (--timerT401 == 0)
 			[self ackTimeOut];
 	}
-	if (timerT403 > 0)
-	{
+	if (timerT403 > 0) {
 		if (--timerT403 == 0)
 			[self inactiveTimeOut];
 	}
@@ -398,9 +396,9 @@ FindSerialPorts(io_iterator_t * matchingServices)
 - (void) inactiveTimeOut
 {
 	// no activity for the last 3 seconds -- say we’re alive by re-acking last LT frame
-NSLog(@"tickle!");
 	[self startT403];	// reset inactivity timer
 	[self xmitLA];
+NSLog(@"tickle!");
 }
 
 
