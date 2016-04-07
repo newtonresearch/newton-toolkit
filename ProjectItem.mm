@@ -41,7 +41,7 @@ NSArray * gTypeNames;
 
 + (void) initialize
 {
-	NSURL * rsrcURL = [[NSBundle mainBundle] URLForResource:@"projectfiletype" withExtension:@"plist"];
+	NSURL * rsrcURL = [NSBundle.mainBundle URLForResource:@"projectfiletype" withExtension:@"plist"];
 	gTypeNames = [[NSArray alloc] initWithContentsOfURL: rsrcURL];
 }
 
@@ -54,8 +54,7 @@ NSArray * gTypeNames;
 
 - (id) init
 {
-	if (self = [super init])
-	{
+	if (self = [super init]) {
 		_url = nil;
 		_type = kMetafileType;	// default file type => unused
 		_document = nil;
@@ -72,10 +71,9 @@ NSArray * gTypeNames;
 	Return:	self
 ----------------------------------------------------------------------------- */
 
-- (id) initWithURL:(NSURL *)inURL type:(NSUInteger)inType
+- (id) initWithURL:(NSURL *)inURL type:(NSInteger)inType
 {
-	if (self = [super init])
-	{
+	if (self = [super init]) {
 		_url = inURL;
 		_type = inType;
 		_document = nil;
@@ -94,8 +92,7 @@ NSArray * gTypeNames;
 
 - (NTXDocument *) document
 {
-	if (_document == nil)
-	{
+	if (_document == nil) {
 //		document = [[NSDocumentController sharedController] openDocumentWithContentsOfURL:url display:NO completionHandler:NULL];
 //			is the official way to open a document, but we need to associate the right file type with the URL -- with legacy projects we can’t be sure the path has the right extension
 //			so imitate that method
@@ -107,10 +104,12 @@ NSArray * gTypeNames;
 		NSError * __autoreleasing err = nil;
 		_document = [documentController makeDocumentWithContentsOfURL:self.url ofType:typeName error:&err];
 //			does [document initWithContentsOfURL:url ofType:typeName error:&err];
-//		check err
-		[documentController addDocument: _document];
-		[_document makeWindowControllers];
-//		[document showWindows];		// documents don’t have separate windows
+//		check err -- document may not exist at that URL
+		if (_document) {
+			[documentController addDocument: _document];
+			[_document makeWindowControllers];
+//			[_document showWindows];		// documents don’t have separate windows
+		}
 	}
 	return _document;
 }
@@ -153,6 +152,22 @@ NSArray * gTypeNames;
 
 - (void) setName:(NSString *)name
 {
+	if (self.url == nil) {
+		// file doesn’t exist: create it
+		[self.document saveDocumentWithDelegate:self didSaveSelector:@selector(document:didSave:contextInfo:) contextInfo:NULL];
+
+		/*
+		NSSavePanel * chooser = [NSSavePanel savePanel];
+		chooser.nameFieldStringValue = name;
+		chooser.allowedFileTypes = [NSArray arrayWithObject:NTXProjectFileType];
+		if ([chooser runModal] == NSFileHandlingPanelOKButton) {
+			// save image
+			if ([tiffData writeToURL:chooser.URL atomically:NO])
+		}
+		*/
+		return;
+	}
+
 	NSURL * destination = [[self.url URLByDeletingLastPathComponent] URLByAppendingPathComponent:name];
 	// rename file
 	// could use -[NSDocument moveToURL:completionHandler:] ? this would replace any existing file
@@ -162,6 +177,9 @@ NSArray * gTypeNames;
 		self.url = destination;
 	// should handle error cases: filename is already in use, for example
 }
+
+- (void)document:(NSDocument *)document didSave:(BOOL)didSaveSuccessfully contextInfo:(void *)contextInfo
+{}
 
 
 #pragma mark NSPasteboardWriting support
@@ -219,8 +237,7 @@ NSArray * gTypeNames;
 - (id) initWithPasteboardPropertyList: (id) propertyList ofType: (NSString *) inType
 {
 	// See if an NSURL can be created from this type
-	if (UTTypeConformsTo((__bridge CFStringRef)inType, kUTTypeURL))
-	{
+	if (UTTypeConformsTo((__bridge CFStringRef)inType, kUTTypeURL)) {
 		// It does, so create a URL and use that to initialize our properties
 		self = [super init];
 		self.url = [[NSURL alloc] initWithPasteboardPropertyList:propertyList ofType:inType];
@@ -233,14 +250,12 @@ NSArray * gTypeNames;
 			self.isContainer = NO;
 */
 
-	}
-	else if ([inType isEqualToString:NSPasteboardTypeString])
-	{
+	} else if ([inType isEqualToString:NSPasteboardTypeString]) {
 	  self = [super init];
 	  self.name = propertyList;
-	}
-	else
+	} else {
 	  NSAssert(NO, @"internal error: type not supported");
+	}
 	return self;
 }
 
@@ -256,8 +271,7 @@ NSArray * gTypeNames;
 
 - (id) initWithProject:(NTXProjectDocument *)inProject
 {
-	if (self = [super init])
-	{
+	if (self = [super init]) {
 		self.url = [inProject fileURL];
 		self.type = kProjectFileType;
 		_document = (NTXDocument *)inProject;

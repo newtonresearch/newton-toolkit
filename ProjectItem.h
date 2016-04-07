@@ -3,7 +3,7 @@
 
 	Abstract:	An NTXProjectItem is the Cocoa representation of an item extracted from projectRef.projectItems.items[].
 					It contains enough information to be represented in the source list.
-					The NSDocument* field is instantiated lazily, when needed.
+					The NTXDocument* field is instantiated lazily, when needed.
 
 	Written by:		Newton Research, 2012.
 */
@@ -22,15 +22,15 @@
 	NTXDocument * _document;					// we provide the getter so we need the ivar
 }
 @property(strong) NSURL * url;				// the URL of the document, stored in the project
-@property(assign) NSUInteger type;
+@property(assign) NSInteger type;
+@property(assign) BOOL isMainLayout;		// only valid if type == layout
 @property(readonly) NTXDocument * document;	//	the document this item represents; it is lazily created from the URL when the item is selected
 // derived for UI
 @property(assign) NSString * name;			// [url lastPathComponent]
 @property(readonly) NSImage * image;		// looked up from type
-@property(assign) BOOL isMainLayout;
 @property(assign) BOOL isContainer;			// looked up from type (using private NTX code)
 
-- (id) initWithURL:(NSURL *)inURL type:(NSUInteger)inType;
+- (id) initWithURL:(NSURL *)inURL type:(NSInteger)inType;	// by default isMainLayout=NO
 @end
 
 

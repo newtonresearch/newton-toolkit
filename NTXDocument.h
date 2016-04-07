@@ -7,7 +7,7 @@
 */
 
 #import <Cocoa/Cocoa.h>
-#import "EditViewController.h"
+#import "EditorViewController.h"
 
 /* -----------------------------------------------------------------------------
 	N T X D o c u m e n t
@@ -16,7 +16,8 @@
 ----------------------------------------------------------------------------- */
 
 @interface NTXDocument : NSDocument
-@property(strong) NTXEditViewController * viewController;
+@property(strong) NTXEditorViewController * viewController;
+@property(readonly) NSString * symbol;
 
 - (int) evaluate;					// return error code
 - (NSString *) exportToText;	// return text representation
@@ -82,6 +83,14 @@
 ----------------------------------------------------------------------------- */
 
 @interface NTXPackageDocument : NTXDocument
+@property(readonly) NSString * name;
+@property(readonly) NSString * size;
+@property(readonly) NSString * ident;
+@property(readonly) NSString * version;
+@property(readonly) NSString * copyright;
+@property(readonly) NSString * creationDate;
+@property(readonly) BOOL isCopyProtected;
+@property(readonly) NSMutableArray/*<PkgPart>*/ * parts;
 @end
 
 
@@ -90,6 +99,7 @@
 ----------------------------------------------------------------------------- */
 
 @interface NTXStreamDocument : NTXDocument
+@property(readonly) NSAttributedString * text;
 @end
 
 
@@ -98,5 +108,11 @@
 ----------------------------------------------------------------------------- */
 
 @interface NTXNativeCodeDocument : NTXDocument
+@property(readonly) NSString * name;
+@property(readonly) NSString * cpu;
+@property(readonly) NSString * size;
+@property(readonly) NSString * relocations;
+@property(readonly) NSString * debugFile;
+@property(readonly) NSAttributedString * entryPoints;
 @end
 

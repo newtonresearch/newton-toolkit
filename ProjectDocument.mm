@@ -12,188 +12,54 @@
 
 #import <CoreServices/CoreServices.h>
 
+#import "AppDelegate.h"
+#import "ToolkitProtocolController.h"
 #import "ProjectDocument.h"
+#import "MacRsrcProject.h"
+#import "PackagePart.h"
 #import "ProjectWindowController.h"
 #import "Utilities.h"
 #import "NTXDocument.h"
+#import "NTK/ObjectHeap.h"
+#import "NTK/ROMData.h"
 
 extern "C" Ref		FIntern(RefArg inRcvr, RefArg inStr);
 extern "C" Ref		ArrayInsert(RefArg ioArray, RefArg inObj, ArrayIndex index);
-extern	  Ref		MakeStringOfLength(const UniChar * str, size_t numChars);
+extern	  Ref		MakeStringOfLength(const UniChar * str, ArrayIndex numChars);
+extern	  Ref		MakeStringFromUTF8String(const char * inStr);
+extern	  Ref		ParseString(RefArg inStr);
+
+extern NSString *	MakeNSSymbol(RefArg inSym);
+
+extern Ref *		RSgConstantsFrame;
 
 
+#pragma mark - NTXProjectDocument
 /* -----------------------------------------------------------------------------
-	T Y P E S
-	Mac project resource definitions.
+	N T X P r o j e c t D o c u m e n t
 ----------------------------------------------------------------------------- */
-
-struct RsrcHeader
-{
-	uint32_t	dataOffset;
-	uint32_t	mapOffset;
-	uint32_t	dataLength;
-	uint32_t	mapLength;
-//	char		reserved[112];
-//	char		applicationSpecificData[128];
-} __attribute__((packed));
-
-struct RsrcData
-{
-	uint32_t	dataLength;
-	char		data[];
-} __attribute__((packed));
-
-struct RsrcMap
-{
-	char		header[16];
-	uint32_t nextMap;			// Handle to next resource map
-	uint16_t	fRefNum;
-	uint16_t	attributes;
-	uint16_t	typeListOffset;	// Offset to Type list (from beginning of resource map in bytes)
-	uint16_t	nameListOffset;	// Offset to Name list (from beginning of resource map in bytes)
-	char		data[];
-} __attribute__((packed));
-
-struct RsrcRef
-{
-	uint16_t id;
-	uint16_t name;
-	uint32_t offset;
-	uint32_t handle;
-} __attribute__((packed));
-
-struct RsrcItem
-{
-	uint32_t	type;
-	uint16_t	count;				// Number of this type -1
-	uint16_t	offset;				// Offset to Reference List for Type
-} __attribute__((packed));
-
-struct RsrcList
-{
-	uint16_t	count;				// Number of items -1
-	RsrcItem	item[];
-} __attribute__((packed));
-
-// Resource attributes:
-/*
-bit 7 (reserved)
-bit 6 resSysHeap
-bit5 resPurgeable
-bit 4 resLocked
-bit 3 resProtected
-bit 2 resPreload
-bit 1 resChanged
-bit 0 (reserved)
-*/
-
-struct RsrcPJPF
-{
-	uint32_t		size;
-	Str32Field	applicationName;		// A Pascal string containing the name of the application in the built package. It corresponds to the “Name” edit text item of the Output Settings panel of the Project Settings dialog.
-	Str32Field	iconName;				// A Pascal string containing the name of the 'PICT' resource used for the application’s icon.
-	Str32Field	platform;				// A Pascal string containing the platform name.
-	Str32Field	packageName;			// A Pascal string containing the name of the package. It corresponds to the “Name” edit text item of the Package Settings panel of the Project Settings dialog.
-	Str32Field	applicationSymbol;	// A Pascal string containing the symbol of the application in the built package. It corresponds to the “Symbol” edit text item of the Output Settings panel of the Project Settings dialog.
-	Str32Field	version;					// A Pascal string containing the version typed into the “Version” edit text item of the Package Settings panel of the Project Settings dialog. This string must be convertible to an integer between 0 and 9999.
-	Str63			copyright;				// A Pascal string containing the version typed into the “Copyright” edit text item of the Package Settings panel of the Project Settings dialog
-	uint8_t		optimizeSpeed;			// A boolean controlling code generation. It corresponds to the “Use Compression” check box of the Package Settings panel of the Project Settings dialog. Note that the boolean value stored is the opposite of setting of the check box.
-	uint8_t		copyProtected;			// A boolean controlling package generation. It corresponds to the “Copy Protected” check box of the Package Settings panel of the Project Settings dialog.
-	uint8_t		deleteOnDownload;		// A boolean controlling package downloading. It corresponds to the “Delete Old Package on Download” check box of the Package Settings panel of the Project Settings dialog.
-	uint8_t		debugBuild;				// A boolean indicating whether or not the package will be built with debugging features. It corresponds to the “Compile for Debugging” check box of the Project Settings panel of the Project Settings dialog.
-	uint8_t		autoClose;				// A boolean specifying whether or not the application should close when another “auto close” application is launched. It corresponds to the “Auto Close” check box of the Output Settings panel of the Project Settings dialog.
-	uint8_t		padding1;
-	Str63			iconFile;				// A Pascal string containing the name of the file containing the 'PICT' resource used for the application’s icon.
-	uint8_t		customPart;				// A boolean indicating that the “Custom Part” radio button of the Output Settings panel of the Project Settings dialog is set.
-	uint8_t		padding2;
-	OSType		partType;				// A value indicating the type of package built. It can be one of the following values: 'form' 'book' 'auto' 'soup'
-	Str255		topFrameExpression;	// A Pascal string containing the expression typed into the “Result” edit text item of the Output Settings panel of the Project Settings dialog.
-	uint8_t		makeStream;				// A boolean indicating that the “Stream File” radio button of the Output Settings panel of the Project Settings dialog is set.
-	uint8_t		dispatchOnly;			// A boolean controlling package generation. It corresponds to the “Auto Remove Package” check box of the Package Settings panel of the Project Settings dialog.
-	uint8_t		newton20Only;			// A boolean controlling code generation. It corresponds to the “Newton 2.0 Platform Only” check box of the Project Settings panel of the Project Settings dialog.
-	uint8_t		padding3;
-	uint8_t		compileForProfiling;	// A boolean controlling code generation. It corresponds to the “Compile for Profiling” check box of the Project Settings panel of the Project Settings dialog.
-	uint8_t		compileForSpeed;		// A boolean controlling code generation. It corresponds to the “Profile Native Functions” check box of the Project Settings panel of the Project Settings dialog. Note that the boolean value stored is the opposite of setting of the check box.
-	uint8_t		detailedSystemCalls;	// A boolean controlling profiling. Currently hard-coded to FALSE, and can’t be changed by the user.
-	uint8_t		padding4;
-	uint16_t		memory;					// An integer controlling profiling. Currently hard-coded to 4K, it can’t be changed by the user.
-	uint8_t		percent;					// An integer controlling profiling. Currently set to 4 (indicating 100%), but unused.
-	uint8_t		detailedUserFunctions;// A boolean controlling profiling. Currently hard-coded to TRUE, and can’t be changed by the user.
-	Str63			language;				// A Pascal string containing the specified language. It corresponds to the “Language” edit text item of the Project Settings panel of the Project Settings dialog.
-	uint8_t		ignoreNative;			// A boolean indicating how the NewtonScript “native” keyword should be handled. It corresponds to the “Ignore Native Keyword” check box of the Project Settings panel of the Project Settings dialog.
-	uint8_t		checkGlobalFunctions;// A boolean specifying whether or not global functions should be checked against a list of known global functions during compile time. It corresponds to the “Check Global Function Calls” check box of the Project Settings panel of the Project Settings dialog.
-	uint8_t		oldBuildRules;			// A boolean specifying compatibility mode for projects created by Macintosh NTK 1.0. It corresponds to the “NTK 1.0 Build Rules” check box of the Project Settings panel of the Project Settings dialog.
-	uint8_t		useStepChildren;		// A boolean specifying how child views should be handled. It corresponds to the “Use stepChildren Slot” check box of the Project Settings panel of the Project Settings dialog.
-	uint8_t		suppressByteCodes;	// A boolean controlling code generation. It corresponds to the “Suppress Byte Code” check box of the Project Settings panel of the Project Settings dialog.
-	uint8_t		fasterFunctions;		// A boolean controlling code generation. It corresponds to the “Faster Functions (2.0 Only)” check box of the Project Settings panel of the Project Settings dialog.
-	uint8_t		fasterSoups;			// A boolean controlling code generation. It corresponds to the “New- Style Stores (2.0 Only)” check box of the Output Settings panel of the Project Settings dialog.
-	uint8_t		fourByteAlignment;	// A boolean controlling package generation. It corresponds to the “Tighter Object Packing (2.0 Only)” check box of the Project Settings panel of the Project Settings dialog.
-	uint8_t		zippyCompression;		// A boolean controlling package generation. It corresponds to the “Faster Compression (2.0 Only)” check box of the Package Settings panel of the Project Settings dialog.
-	uint8_t		padding5;
-} __attribute__((packed));
-
-
-/* -----------------------------------------------------------------------------
-	FSSpecs are invalid for 64 bit, but we are reading a legacy struct.
------------------------------------------------------------------------------ */
-
-struct FSSpecX
-{
-	int16_t		vRefNum;
-	int32_t		parID;
-	Str63			name;
-} __attribute__((packed));
-
-struct FSInfoX
-{
-	int16_t		strType;				// Extended Info End = -1; Directory Name = 0; Directory IDs = 1; Absolute Path = 2; AppleShare Zone Name = 3; AppleShare Server Name = 4; AppleShare User Name = 5; Driver Name = 6; Revised AppleShare info = 9; AppleRemoteAccess dialup info = 10;  others for Mac OS X
-									// 02 => full classic Mac OS path
-									// 0E => Unicode filename prefixed by uint16_t length
-									// 0F => Unicode volume name prefixed by uint16_t length
-									// 12 => full Mac OS X path
-									// 13 => path separator character
-	uint16_t		strLen;
-	char			str[];
-} __attribute__((packed));
-
-struct FSAliasX
-{
-	uint32_t		typeName;
-	uint16_t		aliasSize;
-	uint16_t		version;				// current(!) version = 2
-	uint16_t		kind;
-	uint8_t		volNameLen;			// p-string
-	char			volName[27];
-	uint32_t		volCreationDate;	// seconds since 1904
-	uint16_t		volSignature;
-	uint16_t		volType;				// Fixed HD = 0; Network Disk = 1; 400kB FD = 2;800kB FD = 3; 1.4MB FD = 4; Other Ejectable Media = 5
-	uint32_t		parentDirId;
-	Str63			fileName;			// p-string
-	uint32_t		fileNo;
-	uint32_t		fileCreationDate;
-	uint32_t		fileType;
-	uint32_t		fileCreator;
-	uint16_t		nlvlFrom;
-	uint16_t		nlvlTo;
-	uint32_t		volAttributes;
-	uint16_t		volId;
-	int8_t		reserved1[10];
-	FSInfoX		extendedInfo[];
-} __attribute__((packed));
 
 /*------------------------------------------------------------------------------
-	Make a new string object from a Pascal string.
-	Args:		str		the P string
-	Return:	Ref		the NS string
+	Define global constant for build.
+	Args:		inSym			global var
+				inVal			its value
+	Return:	--
 ------------------------------------------------------------------------------*/
+extern "C" {
+Ref	FDefineGlobalConstant(RefArg inRcvr, RefArg inTag, RefArg inObj);
+Ref	FUnDefineGlobalConstant(RefArg inRcvr, RefArg inTag);
+}
 
-Ref
-MakeStringFromPString(const uint8_t * str)
+void
+DefConst(const char * inSym, RefArg inVal)
 {
-	ArrayIndex strLen = *str;
-	RefVar	obj(AllocateBinary(SYMA(string), (strLen + 1) * sizeof(UniChar)));
-	ConvertToUnicode(str+1, (UniChar *) BinaryData(obj), strLen);
-	return obj;
+	FDefineGlobalConstant(RA(NILREF), MakeSymbol(inSym), inVal);
+}
+
+void
+UnDefConst(const char * inSym)
+{
+	FUnDefineGlobalConstant(RA(NILREF), MakeSymbol(inSym));
 }
 
 
@@ -212,178 +78,20 @@ MakePathString(RefArg inPath)
 
 
 /*------------------------------------------------------------------------------
-	Convert a UTF8 string to a string object.
-	The Newton ROM doesn’t do UTF encoding.
-	Args:		inStr
-	Return:	string object
+	Convert a date object to Newton Date type.
+	Args:		inDate		the date object
+	Return:	number of minutes since 1904
 ------------------------------------------------------------------------------*/
+#define kMinutesSince1904 34714080
+#define kSecondsSince1904 2082844800
 
-Ref
-MakeStringFromUTF8String(const char * inStr)
+Date
+MakeDateType(NSDate * inDate)
 {
-	UniChar str16[256];
-	NSString * str = [NSString stringWithUTF8String:inStr];
-	NSInteger strLen = str.length;
-	if (strLen > 255)
-		strLen = 255;
-	[str getCharacters:str16 range:NSMakeRange(0,strLen)];
-	return MakeStringOfLength(str16, strLen);
+NSLog(@"MakeDateType(%@) -> %u", [inDate description], kSecondsSince1904 + (Date)inDate.timeIntervalSince1970);
+	return kSecondsSince1904 + (Date)inDate.timeIntervalSince1970;
 }
 
-
-/*------------------------------------------------------------------------------
-	Read file type code of file at Mac OS 7 path.
-	Args:		inPath		the path string object
-	Return:	four-char-code
-------------------------------------------------------------------------------*/
-
-uint32_t
-FileTypeCode(const char * inPath)
-{
-	attrlist reqAttrs;
-	memset(&reqAttrs, 0, sizeof(reqAttrs));
-	reqAttrs.bitmapcount = ATTR_BIT_MAP_COUNT;
-	reqAttrs.fileattr = ATTR_FILE_FILETYPE;
-	struct {
-		uint32_t size;
-		uint32_t fileTypeCode;
-		uint32_t padding;
-	} attrBuf;
-
-	int err = getattrlist(inPath, &reqAttrs, &attrBuf, sizeof(attrBuf), 0L);
-	return err ? 'TEXT' : ntohl(attrBuf.fileTypeCode);
-}
-
-
-#pragma mark - NTXReader
-/* -----------------------------------------------------------------------------
-	N T X R e a d e r
-	An object to read legacy Mac project resource data.
------------------------------------------------------------------------------ */
-
-@interface NTXReader : NSObject
-{
-	FILE * fref;
-	int rsrcLen;
-	char * rsrcImage;
-	char * rsrcData;
-	RsrcMap * rsrcMap;
-	RsrcList * rsrcTypeList;
-}
-@property(copy) NSURL * url;
-@property(readonly) int read4Bytes;
-@property(readonly) int read2Bytes;
-@property(readonly) int readByte;
-- (void) read: (NSUInteger) inCount into: (char *) inBuffer;
-- (void *) readResource: (OSType) inType number: (uint16_t) inNumber;
-@end
-
-@implementation NTXReader
-
-- (id) initWithURL: (NSURL *) inURL
-{
-	if (self = [super init])
-	{
-		rsrcImage = NULL;
-		rsrcData = NULL;
-		self.url = inURL;
-
-		const char * filePath = self.url.fileSystemRepresentation;
-		// get size of resource fork
-		rsrcLen = getxattr(filePath, XATTR_RESOURCEFORK_NAME, NULL, 0, 0, 0);
-		if (rsrcLen == 0)
-			self = nil;
-		fref = fopen(filePath, "rb");
-		if (fref == NULL)
-			self = nil;
-	}
-	return self;
-}
-
-- (void) dealloc
-{
-	if (rsrcImage)
-		free(rsrcImage);
-	if (fref)
-		fclose(fref);
-}
-
-
-- (int) read4Bytes
-{
-	uint32_t v;
-	fread(&v, 1, 4, fref);
-	return ntohl(v);
-}
-
-
-- (int) read2Bytes
-{
-	uint16_t v;
-	fread(&v, 1, 2, fref);
-	return ntohs(v);
-}
-
-
-- (int) readByte
-{
-	uint8_t v;
-	fread(&v, 1, 1, fref);
-	return v;
-}
-
-- (void) read: (NSUInteger) inCount into: (char *) inBuffer
-{
-	fread(inBuffer, 1, inCount, fref);
-}
-
-
-// will have to do byte-swapping in here
-- (void *) readResource: (OSType) inType number: (uint16_t) inNumber
-{
-	if (rsrcImage == NULL)
-	{
-		// allocate sufficient length
-		rsrcImage = (char *)malloc(rsrcLen);
-		// Read the resource fork image
-		getxattr([[self.url path] fileSystemRepresentation], XATTR_RESOURCEFORK_NAME, rsrcImage, rsrcLen, 0, 0);
-
-		// point to the resource map
-		rsrcMap = (RsrcMap *)(rsrcImage + ntohl(((RsrcHeader *)rsrcImage)->mapOffset));
-		// point to the typelist
-		rsrcTypeList = (RsrcList *)((char *)rsrcMap + ntohs(rsrcMap->typeListOffset));
-		// point to the resource data
-		rsrcData = rsrcImage + ntohl(((RsrcHeader *)rsrcImage)->dataOffset);
-	}
-
-	// walk the resource type list
-	RsrcItem * r = rsrcTypeList->item;
-	for (int i = 0, icount = ntohs(rsrcTypeList->count); i <= icount; ++i, ++r)
-	{
-		if (ntohl(r->type) == inType)
-		{
-			// we have resources of the required type
-			RsrcRef * rr = (RsrcRef *)((char *)rsrcTypeList + ntohs(r->offset));
-			for (int j = 0, jcount = ntohs(r->count); j <= jcount; j++, rr++)
-			{
-				if (ntohs(rr->id) == inNumber)
-				{
-					// we have a resource with the required number
-					return rsrcData + ntohl(rr->offset);
-				}
-			}
-		}
-	}
-	return NULL;
-}
-
-@end
-
-
-#pragma mark - NTXProjectDocument
-/* -----------------------------------------------------------------------------
-	N T X P r o j e c t D o c u m e n t
------------------------------------------------------------------------------ */
 
 /* -----------------------------------------------------------------------------
 	Types of file we recognise.
@@ -393,13 +101,13 @@ NSString * const NTXLayoutFileType = @"com.newton.layout";
 NSString * const NTXScriptFileType = @"com.newton.script";
 NSString * const NTXStreamFileType = @"com.newton.stream";
 NSString * const NTXCodeFileType = @"com.newton.nativecode";
-NSString * const NTXPackageFileType = @"com.newton.pkg";
+NSString * const NTXPackageFileType = @"com.newton.package";
 
 
 @implementation NTXProjectDocument
 
-- (Ref) projectRef { return projectRef; }
-- (void) setProjectRef: (Ref) inRef { projectRef = inRef; }
+- (Ref) projectRef { return _projectRef; }
+- (void) setProjectRef: (Ref) inRef { _projectRef = inRef; }
 
 
 /* -----------------------------------------------------------------------------
@@ -420,12 +128,11 @@ NSString * const NTXPackageFileType = @"com.newton.pkg";
 
 - (id) init
 {
-	if (self = [super init])
-	{
+	if (self = [super init]) {
 	//	stream in default project settings
-		NSURL * url = [[NSBundle mainBundle] URLForResource: @"ProjectRoot" withExtension: @"stream"];
-		CStdIOPipe pipe([[url path] fileSystemRepresentation], "r");
-		self.projectRef = UnflattenRef(pipe);
+		NSURL * url = [NSBundle.mainBundle URLForResource: @"ProjectRoot" withExtension: @"stream"];
+		CStdIOPipe pipe(url.fileSystemRepresentation, "r");
+		_projectRef = UnflattenRef(pipe);
 	}
 	return self;
 }
@@ -437,25 +144,42 @@ NSString * const NTXPackageFileType = @"com.newton.pkg";
 
 - (void) makeWindowControllers
 {
-	self.progress = [[NSProgress alloc] initWithParent:nil userInfo:nil];
+	NTXProjectWindowController * windowController = [[NSStoryboard storyboardWithName:@"Project" bundle:nil] instantiateInitialController];
+	[self addWindowController: windowController];
+	self.windowController = windowController;
 
-	NTXProjectWindowController * myController = [[NTXProjectWindowController alloc] initWithWindowNibName: @"ProjectWindow"];
-	[self addWindowController: myController];
+	newton_try
+	{
+		RefVar windowRect = GetFrameSlot(self.projectRef, MakeSymbol("windowRect"));
+		if (NOTNIL(windowRect)) {
+			// windowRect is a frame: { top:x, left:x, bottom:x, right:x }
+			int windowTop = RINT(GetFrameSlot(windowRect, SYMA(top)));
+			int windowLeft = RINT(GetFrameSlot(windowRect, SYMA(left)));
+			int windowBottom = RINT(GetFrameSlot(windowRect, SYMA(bottom)));
+			int windowRight = RINT(GetFrameSlot(windowRect, SYMA(right)));
+			// to which we add the split positions: { sourceSplit:x, debugSplit:x }  0 => split is not shown
+			;	// set window’s bounds/splits accordingly
+		}
+	}
+	newton_catch_all
+	{
+	}
+	end_try;
 
-	NTXSettingsViewController * ourController = [[NTXSettingsViewController alloc] initWithNibName: @"ProjectSettings" bundle: nil];
-	ourController.document = self;
-	self.viewController = ourController;
+	// create a view controller for our settings
+	NTXSettingsViewController * settingsController = [[NSStoryboard storyboardWithName:@"Project" bundle:nil] instantiateControllerWithIdentifier:@"Settings"];
+	settingsController.document = self;
+	self.viewController = settingsController;
 }
 
 
 /* -----------------------------------------------------------------------------
-	A chance for more initialization.
+	Report feedback in our window’s progress box.
 ----------------------------------------------------------------------------- */
 
-- (void) windowControllerDidLoadNib: (NSWindowController *) inController
+- (void)report:(NSString *)inFeedback
 {
-	[super windowControllerDidLoadNib: inController];
-	// Add any code here that needs to be executed once the windowController has loaded the document's window.
+	self.windowController.progress.localizedDescription = inFeedback;
 }
 
 
@@ -470,21 +194,20 @@ NSString * const NTXPackageFileType = @"com.newton.pkg";
 	NewtonErr err = noErr;
 	newton_try
 	{
-		NTXReader * data;
-		if ([[url pathExtension] isEqualToString:@"ntk"] && (data = [[NTXReader alloc] initWithURL:url]) != nil)
+		NTXRsrcProject * data;
+		if ([[url pathExtension] isEqualToString:@"ntk"] && (data = [[NTXRsrcProject alloc] initWithURL:url]) != nil) {
 		// the file has a resource fork so assume it’s a Mac NTK project
-			projectRef = [self import:data];
-		else
-		{
-			CStdIOPipe pipe([[url path] fileSystemRepresentation], "r");
-			projectRef = UnflattenRef(pipe);
+			_projectRef = data.projectRef;
+		} else {
+			CStdIOPipe pipe(url.fileSystemRepresentation, "r");
+			_projectRef = UnflattenRef(pipe);
 		}
 
 		[self buildSourceList:url];
 	}
 	newton_catch_all
 	{
-		err = (NewtonErr)(unsigned long)CurrentException()->data;;
+		err = (NewtonErr)(long)CurrentException()->data;;
 	}
 	end_try;
 
@@ -501,8 +224,8 @@ NSString * const NTXPackageFileType = @"com.newton.pkg";
 
 	NTXProjectItem * projectItem;
 
-	RefVar items(GetFrameSlot(projectRef, MakeSymbol("projectItems")));
-	items = GetFrameSlot(items, MakeSymbol("items"));
+	RefVar projectItemsRef(GetFrameSlot(_projectRef, MakeSymbol("projectItems")));
+	RefVar items = GetFrameSlot(projectItemsRef, MakeSymbol("items"));
 
 	// add projectItems to our list
 	NSMutableArray * projItems = [[NSMutableArray alloc] initWithCapacity:Length(items)];
@@ -512,33 +235,24 @@ NSString * const NTXPackageFileType = @"com.newton.pkg";
 	FOREACH(items, projItem)
 		int filetype;
 		RefVar fileRef(GetFrameSlot(projItem, MakeSymbol("file")));
-		if (NOTNIL(fileRef))
-		{
-			if (EQ(ClassOf(fileRef), MakeSymbol("fileReference")))
-			{
+		if (NOTNIL(fileRef)) {
+			if (EQ(ClassOf(fileRef), MakeSymbol("fileReference"))) {
 				NSString * path;
 				RefVar pathRef;
 				// preferred path is in 'fullPath as per NTK 1.6.2
 				pathRef = GetFrameSlot(fileRef, MakeSymbol("fullPath"));
-				if (NOTNIL(pathRef))
-				{
+				if (NOTNIL(pathRef)) {
 					NSString * pathStr = MakePathString(pathRef);
 					itemURL = [NSURL fileURLWithPath:MakePathString(pathRef) isDirectory:NO];
-				}
-				else
-				{
+				} else {
 					// try 'relativePath as per NTK 1.6.2
 					pathRef = GetFrameSlot(fileRef, MakeSymbol("relativePath"));
-					if (NOTNIL(pathRef))
-					{
+					if (NOTNIL(pathRef)) {
 						itemURL = [inProjectURL URLByAppendingPathComponent:MakePathString(pathRef)];
-					}
-					else
-					{
+					} else {
 						// fall back to 'deltaFromProject
 						pathRef = GetFrameSlot(fileRef, MakeSymbol("deltaFromProject"));
-						if (NOTNIL(pathRef))
-						{
+						if (NOTNIL(pathRef)) {
 							itemURL = [inProjectURL URLByAppendingPathComponent:MakePathString(pathRef)];
 							// NTK Formats says this can also be a full path!
 						}
@@ -553,12 +267,10 @@ NSString * const NTXPackageFileType = @"com.newton.pkg";
 					projectItem.isMainLayout = YES;
 				[projItems addObject: projectItem];
 // if groupLen > 0 then begin groupLen--; if groupLen == 0 then unstack sidebarItems end
-			}
-			else if (EQ(ClassOf(fileRef), MakeSymbol("fileGroup")))
-			{
+			} else if (EQ(ClassOf(fileRef), MakeSymbol("fileGroup"))) {
 // if groupLen > 0 then error -- terminate current group early: unstack sidebarItems
 				NSString * groupName = MakeNSString(GetFrameSlot(fileRef, MakeSymbol("name")));
-//					groupLen = RINT(GetFrameSlot(fileRef, MakeSymbol("length")));
+//				groupLen = RINT(GetFrameSlot(fileRef, MakeSymbol("length")));
 				projectItem = [[NTXProjectItem alloc] initWithURL:[NSURL URLWithString:groupName] type:kGroupType];
 				[projItems addObject: projectItem];
 // if groupLen > 0 then begin stack sidebarItems; create new sidebarItems end
@@ -566,8 +278,65 @@ NSString * const NTXPackageFileType = @"com.newton.pkg";
 		}
 	END_FOREACH;
 
-	// windowController is observing changes so will update source list
-	self.projectItems = projItems;
+	Ref selection;
+	NSInteger selItem = NOTNIL(selection = GetFrameSlot(projectItemsRef, MakeSymbol("selectedItem"))) ? RINT(selection) : -1;
+	NSInteger sortOrder = NOTNIL(selection = GetFrameSlot(projectItemsRef, MakeSymbol("sortOrder"))) ? RINT(selection) : -1;
+
+	self.projectItems = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInteger:selItem], @"selectedItem",
+																								 [NSNumber numberWithInteger:sortOrder], @"sortOrder",
+																								 projItems, @"items", nil];
+}
+
+
+/* -----------------------------------------------------------------------------
+	Update the projectItems array from the current source list.
+	projectRef: {
+		...
+		projectItems: {		<-- this is the frame we want
+			selectedItem: nil,	// NTX extension
+			sortOrder: 0,
+			items: [
+				{ file: { class:'fileReference, fullPath:"/Users/simon/Projects/newton-toolkit/Test/Demo/Playground.ns" },
+				  type: 5,
+				  isMainLayout: nil },
+				  ...
+			]
+		}
+	}
+----------------------------------------------------------------------------- */
+
+- (void) updateProjectItems
+{
+	NSArray * sourceItems = [self.projectItems objectForKey:@"items"];
+	// create items array
+	RefVar fileItems(MakeArray(sourceItems.count));
+	// create proto file item frame -- we’re going to update the fullPath slot
+	RefVar protoFileRef(AllocateFrame());
+	SetClass(protoFileRef, MakeSymbol("fileReference"));
+	SetFrameSlot(protoFileRef, MakeSymbol("fullPath"), RA(NILREF));
+
+	ArrayIndex i = 0;
+	for (NTXProjectItem * sourceItem in sourceItems) {
+		RefVar fileRef(Clone(protoFileRef));
+		SetFrameSlot(fileRef, MakeSymbol("fullPath"), MakeStringFromUTF8String(sourceItem.url.fileSystemRepresentation));
+
+		RefVar item(AllocateFrame());
+		SetFrameSlot(item, MakeSymbol("file"), fileRef);
+		SetFrameSlot(item, SYMA(type), MAKEINT(sourceItem.type));
+		SetFrameSlot(item, MakeSymbol("isMainLayout"), MAKEBOOLEAN(sourceItem.isMainLayout));
+		SetArraySlot(fileItems, i++, item);
+	}
+
+	if (NOTNIL(_projectRef)) {
+		// create projectItems frame
+		RefVar projItems(AllocateFrame());
+		NSInteger selectedItem = [(NSNumber *)[self.projectItems objectForKey:@"selectedItem"] integerValue];
+		SetFrameSlot(projItems, MakeSymbol("selectedItem"), (selectedItem >= 0) ? MAKEINT(selectedItem) : NILREF);
+		SetFrameSlot(projItems, MakeSymbol("sortOrder"), MAKEINT(0));
+		SetFrameSlot(projItems, MakeSymbol("items"), fileItems);
+		// update project frame
+		SetFrameSlot(_projectRef, MakeSymbol("projectItems"), projItems);
+	}
 }
 
 
@@ -580,65 +349,44 @@ NSString * const NTXPackageFileType = @"com.newton.pkg";
 - (BOOL) writeToURL: (NSURL *) url ofType: (NSString *) typeName error: (NSError **) outError
 {
 	NewtonErr err = noErr;
+	[self updateProjectItems];
 
 	if ([typeName isEqualTo:@"public.plain-text"])
 	{
-		/* -----------------------------------------------------------------------------
-			Export a text representation of the project into a file named <projectName>.text
-			First line is:
-				// Text of project <projectName> written on <date> at <time>
-			followed by files in the source list - each document implements -exportToText: to do this
-			Text files are output verbatim, bracketed by:
-				// Beginning of text file <fileName>
-				// End of text file <fileName>
-			Stream files are defined:
-				DefConst('|streamFile_<fileName>|, ReadStreamFile("<fileName>"));
-				|streamFile_<fileName>|:?install();
-			Layout files are bracketed by:
-				// Beginning of file <fileName>
-				// End of file <fileName>
-			-each view is output as
-				<viewName> := \n{<slots>}
-			-anonymous views are named <parentName>_v<viewClassAsInt>_<seqWithinFile>
-			-child views are added:
-				AddStepForm(<parentName>, <viewName>);
-			-and declared if necessary:
-				StepDeclare(<parentName>, <viewName>, '<viewName>);
-			-before and after scripts:
-				// After Script for <viewName>
-			-final declaration of topmost view:
-				constant |layout_<viewName>| := <viewName>;
-
-			Show progress -- "Dumping to text" && each file being processed.
-		----------------------------------------------------------------------------- */
-		NSURL * destination = [[url URLByDeletingPathExtension] URLByAppendingPathExtension:@"text"];
+		//	export a text representation of the project into a file named <projectName>.text
+		NSURL * destination = [url.URLByDeletingPathExtension URLByAppendingPathExtension:@"text"];
 
 		NSString * filename = [destination lastPathComponent];
 		NSString * when = [NSDateFormatter localizedStringFromDate:[NSDate date] dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterShortStyle];
 		NSString * exportedText = [NSString stringWithFormat:@"// Text of project %@ written on %@\n\n", filename, when];
 
-		for (NTXProjectItem * item in self.projectItems)
+		for (NTXProjectItem * item in [self.projectItems objectForKey:@"items"])
 		{
-//			NSString * status = [NSString stringWithFormat:@"Dumping to text %@", item.name];
-NSLog(@"Dumping to text %@", item.name);
+			[self report:[NSString stringWithFormat:@"Exporting %@ to text", item.name]];
 			exportedText = [exportedText stringByAppendingString:[item.document exportToText]];
 		}
 
 		NSError * __autoreleasing err = nil;
-		[exportedText writeToURL:destination atomically:YES encoding:NSUTF8StringEncoding error:&err];
+		if ([exportedText writeToURL:destination atomically:YES encoding:NSUTF8StringEncoding error:&err]) {
+			[self report:@"Export successful"];
+		} else {
+			[self report:[NSString stringWithFormat:@"Export failed: %@", err.localizedDescription]];
+		}
 	}
 	else
 	{
-		// save settings and source list
-		CStdIOPipe pipe([[url path] fileSystemRepresentation], "w");
+		// update windowRect & split positions
+//		RefVar windowRect = GetFrameSlot(self.projectRef, MakeSymbol("windowRect"));
 
+		// save settings and source list
+		CStdIOPipe pipe(url.fileSystemRepresentation, "w");
 		newton_try
 		{
-			FlattenRef(projectRef, pipe);
+			FlattenRef(_projectRef, pipe);
 		}
 		newton_catch_all
 		{
-			err = (NewtonErr)(unsigned long)CurrentException()->data;;
+			err = (NewtonErr)(long)CurrentException()->data;;
 		}
 		end_try;
 
@@ -651,99 +399,99 @@ NSLog(@"Dumping to text %@", item.name);
 }
 
 
+#pragma mark - Build menu actions
+
 /* -----------------------------------------------------------------------------
-	Return the index of the selected source list item.
-	We remember this across ProjectDocument close/open.
-	** This is an NTX extension to the WindowsNTK project format. **
+	Enable main menu items as per app logic.
+		Build
+			Build Package		always
+			Download Package	if we are tethered
+			Export Package		always
+
+	Args:		inItem
+	Return:	YES => enable
 ----------------------------------------------------------------------------- */
 
-- (NSInteger) selectedItem
+- (BOOL) validateUserInterfaceItem: (id <NSValidatedUserInterfaceItem>) inItem
 {
-	RefVar items, selection;
-	if (NOTNIL(projectRef)
-	&&  NOTNIL(items = GetFrameSlot(projectRef, MakeSymbol("projectItems")))
-	&&  NOTNIL(selection = GetFrameSlot(items, MakeSymbol("selectedItem"))))
-	{
-		return RINT(selection);
+	if (inItem.action == @selector(downloadPackage:)) {
+		NTXController * appController = (NTXController *)NSApplication.sharedApplication.delegate;
+		return appController.ntkNub.isTethered;
 	}
-	return 0;
-}
-
-
-- (void) setSelectedItem: (NSInteger) inSelection
-{
-	RefVar items;
-	if (NOTNIL(projectRef)
-	&&  NOTNIL(items = GetFrameSlot(projectRef, MakeSymbol("projectItems"))))
-	{
-		SetFrameSlot(items, MakeSymbol("selectedItem"), MAKEINT(inSelection));
-	}
+	return YES;
 }
 
 
 /* -----------------------------------------------------------------------------
-	Add files to the project.
-	Add them to the document’s projectItems array then refresh the sourcelist
-	to keep it in sync.
-	(We need to do that after adding/moving/deleting files in the sourcelist.)
-	Args:		inFiles
-				index			-1 => append inFiles
+	Build the current project.
+	Args:		sender
 	Return:	--
 ----------------------------------------------------------------------------- */
-extern NSArray * gTypeNames;
 
-- (void) addFiles:(NSArray *)inFiles afterIndex:(NSInteger)index
+- (IBAction) buildPackage: (id) sender
 {
-	RefVar items;
-	if (NOTNIL(projectRef)
-	&&  NOTNIL(items = GetFrameSlot(projectRef, MakeSymbol("projectItems")))
-	&&  NOTNIL(items = GetFrameSlot(items, MakeSymbol("items"))))
-	{
-		RefVar item(AllocateFrame());
-		RefVar fileRef(AllocateFrame());
-		int filetype;
+	[self build];
+}
 
-		SetClass(fileRef, MakeSymbol("fileReference"));
-		for (NSURL * url in inFiles)
-		{
-			NSLog(@"Adding %s", url.fileSystemRepresentation);
 
-			// translate url extension to filetype
-			CFStringRef extn = (__bridge CFStringRef)url.pathExtension;
-			filetype = 0;
-			CFStringRef fileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, extn, NULL);
-			for (NSString * type in gTypeNames)
-			{
-				if (UTTypeConformsTo(fileUTI, (__bridge CFStringRef)[NSString stringWithFormat:@"com.newton.%@", type]))
-					break;
-				++filetype;
-			}
-			if (filetype == gTypeNames.count)
-				;	// we didn’t recognise the type of file!
+/* -----------------------------------------------------------------------------
+	Build the current project and download it to Newton device.
+	Args:		sender
+	Return:	--
+----------------------------------------------------------------------------- */
 
-			SetFrameSlot(fileRef, MakeSymbol("fullPath"), MakeStringFromUTF8String(url.fileSystemRepresentation));
-
-			SetFrameSlot(item, MakeSymbol("file"), fileRef);
-			SetFrameSlot(item, MakeSymbol("type"), MAKEINT(filetype));
-
-			if (index < 0)
-			{
-				// append to end of list
-				AddArraySlot(items, item);
-			}
-			else
-			{
-				ArrayInsert(items, item, ++index);
-			}
+- (IBAction) downloadPackage: (id) sender
+{
+	NSURL * pkg = [self build];
+	if (pkg) {
+		NTXController * appController = (NTXController *)[NSApp delegate];
+		NTXToolkitProtocolController * nub = appController.ntkNub;
+		if (nub != nil && nub.isTethered) {
+			[nub installPackage:pkg];
 		}
 	}
-	[self buildSourceList:self.fileURL];
+}
+
+
+/* -----------------------------------------------------------------------------
+	Export the current project to text.
+	Args:		sender
+	Return:	--
+----------------------------------------------------------------------------- */
+
+- (IBAction) exportPackage: (id) sender
+{
+	NSError * __autoreleasing err = nil;
+	[self writeToURL:self.fileURL ofType:@"public.plain-text" error:&err];
 }
 
 
 #pragma mark -
 /* -----------------------------------------------------------------------------
-	Evaluate all the sources.
+	Compile all the sources.
+
+	When compiling a file:
+	stream
+		unflatten it -> topFrame
+		if topFrame actually is a frame, and topFrame.install exists and is a function, call it
+		create constant streamFile_<filename>
+
+	package
+		add part(s) in package to self.parts
+
+	NewtonScript text
+		evaluate it
+
+	layout
+		assert _proto or viewClass exists
+		execute beforeScript, if it exists
+		process layout
+		execute afterScript, if it exists
+		create constant streamFile_<filename>
+
+	resource
+		TBD
+
 	Args:		--
 	Return:	--
 				The result will be in gVarFrame somewhere.
@@ -751,443 +499,740 @@ extern NSArray * gTypeNames;
 
 - (void) evaluate
 {
-	for (NTXProjectItem * item in self.projectItems)
-	{
+	for (NTXProjectItem * item in [self.projectItems objectForKey:@"items"]) {
 		[item.document evaluate];
 	}
-
-#if 0
-		switch (filetype)
-		{
-		case kLayoutFileType:
-			// create constant |layout_<filename>| := <viewref>;
-			break;
-
-		case kBitmapFileType:
-			break;
-//		case kMetafileType:		unused
-		case kSoundFileType:
-//		case kBookFileType:		deprecated
-			break;
-
-		case kScriptFileType:
-		// NewtonScript source -- just parse it
-			ParseFile([[filepath path] fileSystemRepresentation]);
-			break;
-
-		case kPackageFileType:
-			// does not get exported to text at all
-			break;
-
-		case kStreamFileType:
-			// create constant |streamFile_<filename>| then install it, eg
-			// DefConst('|streamFile_plainC|, ReadStreamFile("plainC"));
-			// |streamFile_plainC|:?install();
-			break;
-
-		case kNativeCodeFileType:
-			// DefConst('<filename>, <frameOfCodeFile>);
-			// for some reason this is commented out /*..*/ when exported to text
-			break;
-		}
-#endif
 }
 
 
 /* -----------------------------------------------------------------------------
-	Build the source into the output part type specified in
-	outputSettings.partType.
-	stream =>
-		evaluate all files
-		result is (outputSettings.topFrameExpression)
-		write that in NSOF to <projectURL>.newtonstream
-	auto | store | custom part =>
-		evaluate all files
-		result is partData
-		create package directory info
-		write to <projectURL>.newtonpkg
-	application | book
-		ditto but packaging is specific to that output type
+	Build the source into the output part type specified in outputSettings.partType.
+
+	Install and Remove scripts are mapped by NTK -> devInstall|RemoveScript.
+	A DeletionScript() can optionally be set in the partFrame, to be called when icon scrubbed.
+
+=== auto parts ===
+	top-level partFrame might have:
+	{ text: "Demo",
+	  icon: {...},
+	  iconPro: {...},
+	  partData: {...}
+	}
+	but that’s all optional and must be set explicitly by the dev.
+	MUST have both InstallScript and RemoveScript (Newton Toolkit User’s Guide 4-28)
+	although later (4-44) it says auto-remove parts don’t have their RemoveScript called.
+	NTK munges the partFrame:
+		Rename InstallScript -> devInstallScript.
+		Rename RemoveScript -> devRemoveScript.
+		InstallScript := func(partFrame, removeFrame) begin
+			removeFrame := EnsureInternal({RemoveScript:partFrame.devRemoveScript});
+			partFrame:devInstallScript(partFrame, removeFrame);	// dev can add extra slots to removeFrame
+			removeFrame
+		end;
+
+	removeFrame:RemoveScript() is called automatically after installation.
+	auto parts are not persistent, so no need to nil out Install|Remove scripts
+
+=== form parts ===
+	top-level partFrame is:
+	{ app: '|Demo:simple|,
+	  text: "Demo",
+	  icon: {...},
+	  iconPro: {...},
+	  theForm: {...}
+	}
+	Install|Remove scripts are optional. text and icon slots ditto.
+	NTK munges the partFrame:
+		Rename InstallScript -> devInstallScript.
+		Rename RemoveScript -> devRemoveScript.
+		InstallScript := func(partFrame) begin
+			local extras := vars.extras;
+			if IsArray(extras) then begin
+				foreach one in extras do begin
+					if one.app = partFrame.app then begin
+						GetRoot():Notify(kNotifyAlert, "Extras Drawer", "The application you just installed conflicts with another application. Please contact the application vendor for an updated version.");
+						break
+					end
+				end
+			end;
+			if HasSlot(partFrame, 'devInstallScript) then begin
+				partFrame:?devInstallScript();
+				RemoveSlot(partFrame, 'devInstallScript)
+			end;
+			partFrame.InstallScript := nil
+		end;
+
+		RemoveScript := func(removeFrame) begin
+			if HasSlot(removeFrame, 'devRemoveScript) then
+				removeFrame:devRemoveScript()
+			// no point making it nil, package is going anyway
+		end;
+
+	it always does this even if there are no Install|Remove scripts
+
+=== book parts ===
+	top-level partFrame is:
+	{ book: { version: 2,
+				 isbn: "xx:12345678",
+				 ...
+				 contents: [...] }
+	}
+	No Install|Remove scripts.
+
+
+=== font parts ===
+	top-level partFrame is:
+	{ Monaco: { name: "Monaco", ...}
+	}
+	We’re never going to generate fonts.
+
+=== store, custom parts ===
+	No Install|Remove scripts.
+
 	Args:		--
-	Return:	URL of package file so it can be downloaded if necessary
+	Return:	URL of package file so it can be downloaded to tethered device
+				if necessary
 ----------------------------------------------------------------------------- */
 
-- (NSURL *) build
+- (NSURL *)build
 {
-	NSURL * pkgURL = nil;
-	RefVar outputSettings(GetFrameSlot(projectRef, MakeSymbol("outputSettings")));
-	int partType = RINT(GetFrameSlot(outputSettings, MakeSymbol("partType")));
-	switch (partType)
+	// sync our projectItems with source list
+	[self updateProjectItems];
+
+	// get settings frames
+	RefVar projectSettings(GetFrameSlot(_projectRef, MakeSymbol("projectSettings")));
+	RefVar profilerSettings(GetFrameSlot(_projectRef, MakeSymbol("profilerSettings")));
+	RefVar packageSettings(GetFrameSlot(_projectRef, MakeSymbol("packageSettings")));
+	RefVar outputSettings(GetFrameSlot(_projectRef, MakeSymbol("outputSettings")));
+
+	// set a separate build heap
+	int buildHeapSize = [NSUserDefaults.standardUserDefaults integerForKey:@"BuildHeapSize"] * KByte;
+	CObjectHeap * buildHeap = new CObjectHeap(buildHeapSize);
+	CObjectHeap * saveHeap = gHeap;
+	gHeap = buildHeap;
+
+	NewtonErr err = noErr;
+	newton_try
 	{
-	case kOutputStreamFile:
-		{
-			// evaluate all sources
-			[self evaluate];
-			// get the result
-			RefVar resultSlot(GetFrameSlot(outputSettings, MakeSymbol("topFrameExpression")));
-			RefVar result(GetFrameSlot(RA(gVarFrame), FIntern(RA(NILREF), resultSlot)));
-			// flatten to stream file
-			NSURL * streamURL = [[[self fileURL] URLByDeletingPathExtension] URLByAppendingPathExtension:@"newtonstream"];
-			// this is not a package -- do not set pkgURL
-			CStdIOPipe pipe([[streamURL path] fileSystemRepresentation], "w");
-			FlattenRef(result, pipe);
-		}
-		break;
+		// set build constants
+		DefConst("kAppName", GetFrameSlot(outputSettings, MakeSymbol("applicationName")));			// string
+		DefConst("kAppSymbol", FIntern(RA(NILREF), GetFrameSlot(outputSettings, MakeSymbol("applicationSymbol"))));	// symbol
+		DefConst("kAppString", GetFrameSlot(outputSettings, MakeSymbol("applicationSymbol")));		// string
+		DefConst("kPackageName", GetFrameSlot(packageSettings, MakeSymbol("packageName")));		// string
+		DefConst("kDebugOn", GetFrameSlot(projectSettings, MakeSymbol("debugBuild")));					// boolean
+		DefConst("kProfileOn", GetFrameSlot(profilerSettings, MakeSymbol("compileForProfiling")));		// boolean
+		DefConst("kIgnoreNativeKeyword", GetFrameSlot(projectSettings, MakeSymbol("ignoreNative")));		// boolean
+		DefConst("home", MakeStringFromUTF8String(self.fileURL.URLByDeletingLastPathComponent.fileSystemRepresentation));	// string
+		DefConst("language", GetFrameSlot(projectSettings, MakeSymbol("language")));		// string
+		// as build progresses it may add globals:
+		//	PT_<filename>
+		//	layout_<filename>
+		//	streamFile_<filename>
+		// partFrame, InstallScript, RemoveScript
 
-	case kOutputApplication:
-	case kOutputBook:
-		{
-			// for now, just evaluate all sources -- assume they will print something interesting
-			[self evaluate];
-		}
-		break;
+		// say what we’re doing
+		RefVar packageNameStr(GetFrameSlot(packageSettings, MakeSymbol("packageName")));
+		[self report:[NSString stringWithFormat:@"Building package %@", MakeNSString(packageNameStr)]];
 
-	case kOutputAutoPart:
-	case kOutputStorePart:
-	case kOutputCustomPart:
-		break;
+		// clear parts array
+		self.parts = [[NSMutableArray alloc] init];
+
+		// build parts with appropriate pointer ref alignment
+		int alignment = NOTNIL(GetFrameSlot(packageSettings, MakeSymbol("fourByteAlignment"))) ? 4 : 8;
+
+		int partType = RINT(GetFrameSlot(outputSettings, SYMA(partType)));
+		switch (partType)
+		{
+		case kOutputStreamFile:
+			{
+				// this one’s a bit different -- it doesn’t generate a package
+				// evaluate all sources
+				[self evaluate];
+
+				// get the result
+				RefVar resultSlot(GetFrameSlot(outputSettings, MakeSymbol("topFrameExpression")));
+				RefVar result(GetFrameSlot(RA(gVarFrame), FIntern(RA(NILREF), resultSlot)));
+				// flatten to stream file
+				NSURL * streamURL = [self.fileURL.URLByDeletingPathExtension URLByAppendingPathExtension:@"newtonstream"];
+				CStdIOPipe pipe(streamURL.fileSystemRepresentation, "w");
+				FlattenRef(result, pipe);
+			}
+			break;
+
+		case kOutputApplication:
+			{
+				// evaluate all sources
+				[self evaluate];
+				// if there was an exception/error then bail now
+
+				RefVar partFrame(AllocateFrame());
+				// set the usual slots
+				SetFrameSlot(partFrame, SYMA(text), GetFrameSlot(RA(gConstantsFrame), MakeSymbol("kAppName")));
+				SetFrameSlot(partFrame, SYMA(app), GetFrameSlot(RA(gConstantsFrame), MakeSymbol("kAppSymbol")));
+				//icon
+				//theForm
+
+				// copy global InstallScript and RemoveScript, if they exist, to the part frame
+				RefVar devGlobal;
+				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(InstallScript));
+				if (NOTNIL(devGlobal))
+					SetFrameSlot(partFrame, SYMA(devInstallScript), devGlobal);
+				SetFrameSlot(partFrame, SYMA(InstallScript), gConstNSData->formInstallScript);
+
+				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(RemoveScript));
+				if (NOTNIL(devGlobal))
+					SetFrameSlot(partFrame, SYMA(devRemoveScript), devGlobal);
+				SetFrameSlot(partFrame, SYMA(RemoveScript), gConstNSData->formRemoveScript);
+
+				// copy slots from global partFrame, if it exists, to the part frame
+				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(partFrame));
+				if (IsFrame(devGlobal)) {
+					FOREACH_WITH_TAG(devGlobal, tag, value)
+						SetFrameSlot(partFrame, tag, value);
+					END_FOREACH;
+				}
+				[self.parts addObject:[[NTXPackagePart alloc] initWith:partFrame type:"form" alignment:alignment]];
+			}
+			break;
+
+		case kOutputAutoPart:
+			{
+				// evaluate all sources
+				[self evaluate];
+
+				RefVar partFrame(AllocateFrame());
+				RefVar devGlobal;
+				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(InstallScript));
+				if (NOTNIL(devGlobal)) {
+					SetFrameSlot(partFrame, SYMA(devInstallScript), devGlobal);
+					SetFrameSlot(partFrame, SYMA(InstallScript), gConstNSData->autoInstallScript);
+				}
+				// else should probably warn user
+				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(RemoveScript));
+				if (NOTNIL(devGlobal))
+					SetFrameSlot(partFrame, SYMA(devRemoveScript), devGlobal);
+				// copy global partData, if it exists, to the part frame .partData
+				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(partData));
+				if (NOTNIL(devGlobal))
+					SetFrameSlot(partFrame, SYMA(partData), devGlobal);
+				[self.parts addObject:[[NTXPackagePart alloc] initWith:partFrame type:"auto" alignment:alignment]];
+			}
+			break;
+
+		case kOutputBook:
+	//		TBD
+			break;
+
+		case kOutputStorePart:
+			{
+	//		create global theStore
+				// evaluate all sources (which presumably write to theStore)
+				[self evaluate];
+
+	// create 2 parts
+	// 1: kNOSPart {} type=0
+				RefVar partFrame(AllocateFrame());
+				[self.parts addObject:[[NTXPackagePart alloc] initWith:partFrame type:NULL alignment:alignment]];
+
+	// 2: kRawPart+kNotifyFlag type=soup
+	//   info=copy of part0 info
+	//   raw data=PSS objects
+				[self.parts addObject:[[NTXPackagePart alloc] initWithRawData:NULL size:0 type:"soup"]];
+			}
+			break;
+
+		case kOutputCustomPart:
+			{
+				// evaluate all sources
+				[self evaluate];
+
+				// result: top level frame is (outputSettings.topFrameExpression)
+				RefVar topFrameSlot(GetFrameSlot(outputSettings, MakeSymbol("topFrameExpression")));
+				RefVar partFrame(GetFrameSlot(RA(gVarFrame), FIntern(RA(NILREF), topFrameSlot)));
+				RefVar customPartType(GetFrameSlot(outputSettings, MakeSymbol("customPartType")));
+				char customPartTypeStr[8];
+				ConvertFromUnicode(GetUString(customPartType), customPartTypeStr);
+				[self.parts addObject:[[NTXPackagePart alloc] initWith:partFrame type:customPartTypeStr alignment:alignment]];
+			}
+			break;
+		}
 	}
+	newton_catch_all
+	{
+		err = (NewtonErr)(long)CurrentException()->data;
+		self.parts = nil;
+	}
+	end_try;
+
+	// package up the part and write out the package file
+	NSURL * pkgURL = nil;
+	if (self.parts != nil && self.parts.count > 0) {
+		// build package directory, part entries, etc
+		NSData * pkgData = [self buildPackageData];
+		if (pkgData) {
+			// write to package file
+			NSError * __autoreleasing err = nil;
+			pkgURL = [self.fileURL.URLByDeletingPathExtension URLByAppendingPathExtension:@"newtonpkg"];
+			if ([pkgData writeToURL:pkgURL options:0 error:&err]) {
+				[self report:@"Build successful"];
+			} else {
+				[self report:[NSString stringWithFormat:@"Failed to save package: %@", err.localizedDescription]];
+			}
+		}
+	}
+
+	// can finally dispose the build heap
+	gHeap = saveHeap;
+	delete buildHeap;
+
+	if (err)
+		[self report:[NSString stringWithFormat:@"Build failed: %d", err]];
 	return pkgURL;
 }
 
-#if 0
+
 /* -----------------------------------------------------------------------------
 	Package Format
-		see Newton Formats, 1-4
-		also PackageManager.cc : CPrivatePackageIterator
-			directory -- header + part entries + directory data
-			relocation info (optional)
-			part data
+	Baasically:
+		header
+			directory struct
+			array of part entry structs
+			directory data
+		relocation info (optional)
+		part data
+	see Newton Formats, 1-4
+	also PackageManager.cc : CPrivatePackageIterator
 
-#import "PackageTypes.h"
-#import "PackageParts.h"
+	when building, we need to:
+		build array of parts
+			main part 0 is result of build
+			other parts are contained in packages in the project
 
-set up struct PackageDirectory
-{
-	char		signature[8];		//	'package0' or 'package1'
-	ULong		id;
-	ULong		flags;				//	defined below
-	ULong		version;				//	arbitrary number
-	InfoRef	copyright;			//	Unicode copyright notice - optional
-	InfoRef	name;					//	Unicode package name - unique
-	ULong		size;					//	total size of package including this directory
-	Date		creationDate;
-	Date		modifyDate;
-	ULong		reserved3;
-	ULong		directorySize;		//	size of this directory including part entries & data
-	ULong		numParts;			//	number of parts in the package
-	PartEntry parts[];
-};
-
+	NOTE
+		we’re going to need to big-endian all this
 
 ----------------------------------------------------------------------------- */
+const char * const kPackageMagicNumber = "package01";
 
-
-/** Create a new binary object that contains the object tree in package format.
- *
- * This function creates a binary object, containing the representaion of
- * a whole hierarchy of objects in the Newton package format. The binary
- * data can be written directly to disk to create a Newton readable .pkg file.
- * 
- * NewtWritePkg was tested on hierarchies created by NewtReadPackage, reading
- * a random bunch of .pkg files containing Newton Script applications. The 
- * packages created were identiacla to the original packages.
- *
- * @todo	NewtWritePkg does not support a relocation table yet which may 
- *			be needed to save native function of a higher complexity.
- * @todo	Error handling is not yet implemented.
- * @todo	Named magic poiners are not supported yet.
- * @todo	Only NOS parts are currently supported. We still must implement
- *			Protocol parts and Raw parts. 
- *
- * @param rpkg	[in] object hierarchy describing the package
- *
- * @retval	binary object with package
- */
-newtRef NewtWritePkg(newtRefArg package)
+- (NSData *)buildPackageData
 {
-	pkg_stream_t	pkg;
-	int32_t			num_parts, i, ix;
-	newtRef			parts, result;
+	RefVar pkgSettings(GetFrameSlot(_projectRef, MakeSymbol("packageSettings")));
+	RefVar copyrightStr(GetFrameSlot(pkgSettings, MakeSymbol("copyright")));
+	RefVar packageNameStr(GetFrameSlot(pkgSettings, MakeSymbol("packageName")));
 
-	// setup pkg_stream_t
-	memset(&pkg, 0, sizeof(pkg));
+	ArrayIndex copyrightStrLen = Length(copyrightStr);
+	ArrayIndex nameStrLen = Length(packageNameStr);
 
-#	ifdef HAVE_LIBICONV
-	{	char *encoding = NewtDefaultEncoding();
-		pkg.to_utf16 = iconv_open("UTF-16BE", encoding);
+//	alloc directory as NSMutableData; can later -writeToURL:
+	NSMutableData * pkgData = [[NSMutableData alloc] initWithLength:sizeof(PackageDirectory)];
+// fill in directory
+	PackageDirectory * dir = (PackageDirectory *)pkgData.mutableBytes;
+	memcpy(dir->signature, kPackageMagicNumber, sizeof(dir->signature));
+	memcpy(&dir->id, "xxxx", sizeof(dir->id));
+
+	dir->flags = 0;
+	if (NOTNIL(GetFrameSlot(pkgSettings, MakeSymbol("dispatchOnly")))) dir->flags |= kAutoRemoveFlag;
+	if (NOTNIL(GetFrameSlot(pkgSettings, MakeSymbol("copyProtected")))) dir->flags |= kCopyProtectFlag;
+	if ( ISNIL(GetFrameSlot(pkgSettings, MakeSymbol("optimizeSpeed")))) dir->flags |= kNoCompressionFlag;
+	if (NOTNIL(GetFrameSlot(pkgSettings, MakeSymbol("zippyCompression")))) dir->flags |= kUseFasterCompressionFlag;
+
+	RefVar versionStr(GetFrameSlot(pkgSettings, MakeSymbol("version")));
+	char verStrBuf[16];
+	ConvertFromUnicode((UniChar *)BinaryData(versionStr), verStrBuf);
+	// convert to int
+	dir->version = atoi(verStrBuf);
+	dir->copyright.offset = 0;
+	dir->copyright.length = copyrightStrLen;
+	dir->name.offset = copyrightStrLen;
+	dir->name.length = nameStrLen;
+	dir->size = 0;								//	total size of package including this directory
+	dir->creationDate = MakeDateType([NSDate date]);
+	dir->modifyDate = 0;
+	dir->directorySize = 0;					//	size of this directory including part entries & data
+	dir->numParts = self.parts.count;
+
+//	create part entries
+	for (NTXPackagePart * part in self.parts) {
+		// append part entry
+		[pkgData appendBytes:part.entry length:sizeof(PartEntry)];
 	}
-#	endif /* HAVE_LIBICONV */
 
-	// find the array of parts that we will write
-	ix = NewtFindSlotIndex(package, NSSYM(parts));
-	if (ix>=0) {
-		parts = NewtGetFrameSlot(package, ix);
-		num_parts = NewtFrameLength(parts);
-		pkg.header_size = sizeof(pkg_header_t) + num_parts * sizeof(pkg_part_t);
-
-		// start setting up the header with whatever we know
-			// sig
-		PkgWriteData(&pkg, 0, "package0", 8);
-		pkg.data[7] = (uint8_t)('0' + PkgGetSlotInt(package, NSSYM(pkg_version), 0));
-			// type
-		PkgWriteU32(&pkg, 8, PkgGetSlotInt(package, NSSYM(type), 0x78787878)); // "xxxx"
-			// flags
-		PkgWriteU32(&pkg, 12, PkgGetSlotInt(package, NSSYM(flags), 0));
-			// version
-		PkgWriteU32(&pkg, 16, PkgGetSlotInt(package, NSSYM(version), 0));
-			// copyright
-		PgkWriteVarData(&pkg, 20, package, NSSYM(copyright));
-			// name
-		PgkWriteVarData(&pkg, 24, package, NSSYM(name));
-			// date
-		PkgWriteU32(&pkg, 32, time(0L)+2082844800);
-			// reserved2
-		PkgWriteU32(&pkg, 36, 0); 
-			// reserved3
-		PkgWriteU32(&pkg, 40, 0); 
-			// numParts
-		PkgWriteU32(&pkg, 48, num_parts);
-
-		// calculate the size of the header so we can correctly set our refs in the parts
-		for (i=0; i<num_parts; ++i) {
-			newtRef part = NewtGetArraySlot(parts, i);
-			PgkWriteVarData(&pkg, sizeof(pkg_header_t) + i*sizeof(pkg_part_t) + 24, part, NSSYM(info));
-		}
-
-		// the original file has this (c) message embedded
-		{	
-#ifdef _MSC_VER
-			char msg[] = "Newtonª ToolKit Package © 1992-1997, Apple Computer, Inc.";
+//	add variable length part info
+// firstly, copyright and name Unicode strings
+#if defined(hasByteSwapping)
+	[pkgData appendBytes:"" length:1];
+	[pkgData appendBytes:GetUString(copyrightStr) length:copyrightStrLen-1];
+	[pkgData appendBytes:"" length:1];
+	[pkgData appendBytes:GetUString(packageNameStr) length:nameStrLen-1];
 #else
-			char msg[] = "Newtonï½ª ToolKit Package ï½© 1992-1997, Apple Computer, Inc.";
-#endif
-			PkgWriteData(&pkg, pkg.header_size + pkg.var_data_size, msg, sizeof(msg));
-			pkg.var_data_size += sizeof(msg);
-		}
-
-		pkg.part_offset = pkg.directory_size = PkgAlign(&pkg, pkg.header_size + pkg.var_data_size);
-			// directorySize
-		PkgWriteU32(&pkg, 44, pkg.directory_size);
-
-		// create all parts
-		for (i=0; i<num_parts; ++i) {
-			newtRef part = NewtGetArraySlot(parts, i);
-			pkg.part_header_offset = sizeof(pkg_header_t) + i*sizeof(pkg_part_t);
-			PkgWritePart(&pkg, part);
-		}
-	}
-
-	// finish filling in the header
-		// size
-	PkgWriteU32(&pkg, 28, pkg.size);
-
-	result = NewtMakeBinary(NSSYM(package), pkg.data, pkg.size, false);
-
-	// clean up our allocations
-	if (pkg.data) 
-		free(pkg.data);
-
-#	ifdef HAVE_LIBICONV
-		iconv_close(pkg.to_utf16);
-#	endif /* HAVE_LIBICONV */
-
-	return result;
-}
+	[pkgData appendBytes:GetUString(copyrightStr) length:copyrightStrLen];
+	[pkgData appendBytes:GetUString(packageNameStr) length:nameStrLen];
 #endif
 
-#pragma mark -
-/* -----------------------------------------------------------------------------
-	Import Mac project.
-	Convert resource/data forks to project frame ref.
-	Args:		--
-	Return:	project ref
------------------------------------------------------------------------------ */
-
-- (Ref) import: (NTXReader *) data
-{
-	//	stream in default project settings
-	NSURL * url = [[NSBundle mainBundle] URLForResource: @"ProjectRoot" withExtension: @"stream"];
-	CStdIOPipe pipe([[url path] fileSystemRepresentation], "r");
-	RefVar proj(UnflattenRef(pipe));
-
-	// assume files are in the same folder as the project -- we could try to find them but frankly life’s too short
-	NSURL * basePath = [data.url URLByDeletingLastPathComponent];
-
-	// read the data fork which contains the project items
-	ULong format = data.read4Bytes;				// always 103
-	ArrayIndex itemCount = data.read2Bytes;
-	ArrayIndex sortOrder = data.read4Bytes;	// ignored -- we use only build order
-
-	RefVar projItems(GetFrameSlot(proj, MakeSymbol("projectItems")));
-
-	RefVar fileItems(MakeArray(0));
-	RefVar protoFileItem(AllocateFrame());
-	SetClass(protoFileItem, MakeSymbol("fileReference"));
-	SetFrameSlot(protoFileItem, MakeSymbol("fullPath"), RA(NILREF));
-	for (ArrayIndex i = 0; i < itemCount; ++i)
-	{
-		char * filename = NULL;
-		// read aliases -- add to projectRef.projectItems.items
-		ULong itemLen = data.read4Bytes;
-		if (itemLen == sizeof(FSSpecX))
-		{
-			// we must convert a filespec
-			FSSpecX fspec;
-			[data read:itemLen into:(char *)&fspec];
-			filename = (char *)&fspec.name[0];
-		}
-		else
-		{
-			// this is an alias
-			if (itemLen > KByte)
-				printf("ALIAS BUFFER OVERFLOW!\n");
-			char aliasData[KByte];
-			[data read:itemLen into:aliasData];
-			FSAliasX * alias = (FSAliasX *)aliasData;
-			filename = (char *)&alias->fileName[0];
-		}
-		if (filename)
-		{
-			const char * filePath;
-			char cstr[64];
-			size_t filenameLen = *(uint8_t *)filename;
-			strncpy(cstr, filename+1, filenameLen);
-			cstr[filenameLen] = 0;
-			filePath = [[basePath URLByAppendingPathComponent:[NSString stringWithCString:cstr encoding:NSMacOSRomanStringEncoding]] fileSystemRepresentation];
-			int fileType = 0;
-			//convert to index
-			switch (FileTypeCode(filePath))
-			{
-			case 'FLFM':
-				fileType = kLayoutFileType;
-				break;
-			case 'TIFF':
-				fileType = kBitmapFileType;
-				break;
-			case 'SND ':
-				fileType = kSoundFileType;
-				break;
-			case 'TEXT':
-				fileType = kScriptFileType;
-				break;
-			case 'PKG ':
-				fileType = kPackageFileType;
-				break;
-			case 'STRM':
-				fileType = kStreamFileType;
-				break;
-			case 'CODE':	// really?
-				fileType = kNativeCodeFileType;
-				break;
-			}
-
-//			SetFrameSlot(protoFileItem, MakeSymbol("fullPath"), MakeStringFromCString(filePath));	// filePath is UTF8 encoded which MakeStringFromCString() can’t really handle
-			SetFrameSlot(protoFileItem, MakeSymbol("fullPath"), MakeStringFromUTF8String(filePath));
-
-			RefVar fileItem(AllocateFrame());
-			SetFrameSlot(fileItem, MakeSymbol("file"), Clone(protoFileItem));
-			SetFrameSlot(fileItem, SYMA(type), MAKEINT(fileType));
-			AddArraySlot(fileItems, fileItem);
-		}
+	ULong partInfoOffset = copyrightStrLen + nameStrLen;
+	ULong partDataOffset = 0;
+	for (NTXPackagePart * part in self.parts) {
+		[pkgData appendBytes:part.info length:part.infoLen];
+		[part updateInfoOffset:&partInfoOffset dataOffset:&partDataOffset];
 	}
-	ArrayIndex mainLayout = data.read2Bytes;	// 1-based -- applies to specified sort order, not necessarily build order
-															// so should sort fileItems to get this right
-	if (mainLayout != 0 && --mainLayout < Length(fileItems))
-	{
-		RefVar mainItem(GetArraySlot(fileItems, mainLayout));
-		SetFrameSlot(mainItem, MakeSymbol("isMainLayout"), TRUEREF);
+
+// long-align pkgData
+	NSUInteger misalignment = pkgData.length & 3;
+	if (misalignment)
+		[pkgData increaseLengthBy:4-misalignment];
+
+// backpatch dir.directorySize
+	dir = (PackageDirectory *)pkgData.mutableBytes;	// data may have moved
+	dir->directorySize = pkgData.length;
+
+// ignore relocation data for now -- we don’t do native funcs
+//	for (NTXPackagePart * part in parts) {
+//		[pkgData appendBytes:part.relocationData length:part.relocationDataLen];
+//	}
+
+//	add part data
+	for (NTXPackagePart * part in self.parts) {
+		// long-align pkgData
+		misalignment = pkgData.length & 3;
+		if (misalignment)
+			[pkgData increaseLengthBy:4-misalignment];
+		[part buildPartData:pkgData.length];
+		[pkgData appendBytes:part.data length:part.dataLen];
 	}
-	SetFrameSlot(projItems, MakeSymbol("items"), fileItems);
 
-	// read the resource fork which contains the project settings
-	RsrcPJPF * rsrc = (RsrcPJPF *)[data readResource:'PJPF' number:9999];
-// XFAIL(rsrc == NULL)
+// backpatch dir.size
+	dir = (PackageDirectory *)pkgData.mutableBytes;	// data may have moved
+	dir->size = pkgData.length;
 
-	// set up the settings frames
-	RefVar projectSettings(GetFrameSlot(proj, MakeSymbol("projectSettings")));
-	SetFrameSlot(projectSettings, MakeSymbol("platform"), MakeStringFromPString(rsrc->platform));
-	SetFrameSlot(projectSettings, MakeSymbol("language"), MakeStringFromPString(rsrc->language));
-	SetFrameSlot(projectSettings, MakeSymbol("debugBuild"), MAKEBOOLEAN(rsrc->debugBuild));
-	SetFrameSlot(projectSettings, MakeSymbol("ignoreNative"), MAKEBOOLEAN(rsrc->ignoreNative));
-	SetFrameSlot(projectSettings, MakeSymbol("checkGlobalFunctions"), MAKEBOOLEAN(rsrc->checkGlobalFunctions));
-	SetFrameSlot(projectSettings, MakeSymbol("oldBuildRules"), MAKEBOOLEAN(rsrc->oldBuildRules));
-	SetFrameSlot(projectSettings, MakeSymbol("useStepChildren"), MAKEBOOLEAN(rsrc->useStepChildren));
-	SetFrameSlot(projectSettings, MakeSymbol("suppressByteCodes"), MAKEBOOLEAN(rsrc->suppressByteCodes));
-	SetFrameSlot(projectSettings, MakeSymbol("fasterFunctions"), MAKEBOOLEAN(rsrc->fasterFunctions));
+#if defined(hasByteSwapping)
+	dir->id = BYTE_SWAP_LONG(dir->id);
+	dir->flags = BYTE_SWAP_LONG(dir->flags);
+	dir->version = BYTE_SWAP_LONG(dir->version);
+	dir->copyright.offset = BYTE_SWAP_SHORT(dir->copyright.offset);
+	dir->copyright.length = BYTE_SWAP_SHORT(dir->copyright.length);
+	dir->name.offset = BYTE_SWAP_SHORT(dir->name.offset);
+	dir->name.length = BYTE_SWAP_SHORT(dir->name.length);
+	dir->size = BYTE_SWAP_LONG(dir->size);
+	dir->creationDate = BYTE_SWAP_LONG(dir->creationDate);
+	dir->modifyDate = BYTE_SWAP_LONG(dir->modifyDate);
+	dir->directorySize = BYTE_SWAP_LONG(dir->directorySize);
+	dir->numParts = BYTE_SWAP_LONG(dir->numParts);
+#endif
 
-	RefVar outputSettings(GetFrameSlot(proj, MakeSymbol("outputSettings")));
-	SetFrameSlot(outputSettings, MakeSymbol("applicationName"), MakeStringFromPString(rsrc->applicationName));
-	SetFrameSlot(outputSettings, MakeSymbol("applicationSymbol"), MakeStringFromPString(rsrc->applicationSymbol));
-
-	int partType;
-	const char * partTypeStr;
-	char partTypeStrBuf[5];
-	switch (ntohl(rsrc->partType))
-	{
-	case 'form':
-		partType = kOutputApplication;
-		partTypeStr = "form";
-		break;
-	case 'book':
-		partType = kOutputBook;
-		partTypeStr = "book";
-		break;
-	case 'auto':
-		partType = kOutputAutoPart;
-		partTypeStr = "auto";
-		break;
-	case 'soup':
-		partType = kOutputStorePart;
-		partTypeStr = "soup";
-		break;
-	default:
-		partTypeStr = "UNKN";
-		if (rsrc->makeStream)
-			partType = kOutputStreamFile;
-		else
-		{
-			partType = kOutputCustomPart;
-			if (rsrc->customPart)
-			{
-				partTypeStrBuf[0] = rsrc->partType >> 24;
-				partTypeStrBuf[1] = rsrc->partType >> 16;
-				partTypeStrBuf[2] = rsrc->partType >>  8;
-				partTypeStrBuf[3] = rsrc->partType;
-				partTypeStrBuf[4] = 0;
-				partTypeStr = partTypeStrBuf;
-			}
-		}
- 	}
-	SetFrameSlot(outputSettings, MakeSymbol("partType"), MAKEINT(partType));
-	SetFrameSlot(outputSettings, MakeSymbol("customPartType"), MakeStringFromCString(partTypeStr));
-//	iconFile
-	SetFrameSlot(outputSettings, MakeSymbol("topFrameExpression"), MakeStringFromPString(rsrc->topFrameExpression));
-	SetFrameSlot(outputSettings, MakeSymbol("autoClose"), MAKEBOOLEAN(rsrc->autoClose));
-	SetFrameSlot(outputSettings, MakeSymbol("fasterSoups"), MAKEBOOLEAN(rsrc->fasterSoups));
-	
-	RefVar packageSettings(GetFrameSlot(proj, MakeSymbol("packageSettings")));
-	SetFrameSlot(packageSettings, MakeSymbol("packageName"), MakeStringFromPString(rsrc->packageName));
-	SetFrameSlot(packageSettings, MakeSymbol("version"), MakeStringFromPString(rsrc->version));
-	SetFrameSlot(packageSettings, MakeSymbol("copyright"), MakeStringFromPString(rsrc->copyright));
-	SetFrameSlot(packageSettings, MakeSymbol("optimizeSpeed"), MAKEBOOLEAN(rsrc->optimizeSpeed));
-	SetFrameSlot(packageSettings, MakeSymbol("copyProtected"), MAKEBOOLEAN(rsrc->copyProtected));
-	SetFrameSlot(packageSettings, MakeSymbol("deleteOnDownload"), MAKEBOOLEAN(rsrc->deleteOnDownload));
-	SetFrameSlot(packageSettings, MakeSymbol("dispatchOnly"), MAKEBOOLEAN(rsrc->dispatchOnly));
-	SetFrameSlot(packageSettings, MakeSymbol("newton20Only"), MAKEBOOLEAN(rsrc->newton20Only));
-	SetFrameSlot(packageSettings, MakeSymbol("fourByteAlignment"), MAKEBOOLEAN(rsrc->fourByteAlignment));
-	SetFrameSlot(packageSettings, MakeSymbol("zippyCompression"), MAKEBOOLEAN(rsrc->zippyCompression));
-
-	RefVar profilerSettings(GetFrameSlot(proj, MakeSymbol("profilerSettings")));
-	SetFrameSlot(profilerSettings, MakeSymbol("memory"), MAKEINT(rsrc->memory));
-	SetFrameSlot(profilerSettings, MakeSymbol("percent"), MAKEINT(rsrc->percent));
-	SetFrameSlot(profilerSettings, MakeSymbol("compileForProfiling"), MAKEBOOLEAN(rsrc->compileForProfiling));
-	SetFrameSlot(profilerSettings, MakeSymbol("compileForSpeed"), MAKEBOOLEAN(rsrc->compileForSpeed));
-	SetFrameSlot(profilerSettings, MakeSymbol("detailedSystemCalls"), MAKEBOOLEAN(rsrc->detailedSystemCalls));
-	SetFrameSlot(profilerSettings, MakeSymbol("detailedUserFunctions"), MAKEBOOLEAN(rsrc->detailedUserFunctions));
- 
-	return proj;
+// return immutable package data
+	return [NSData dataWithData:pkgData];
 }
 
 @end
 
+
+#pragma mark - NTXPackagePart
+/* -----------------------------------------------------------------------------
+	N T X P a c k a g e P a r t
+----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+	Calculate space needed for 32-bit Ref.
+	Args:		inRef				the ref
+				ioMap				set of Refs already visited
+				inAlignment		4 or 8-byte alignment
+	Return:	memory requirement of 32-bit Ref
+----------------------------------------------------------------------------- */
+#include "unordered_set"
+typedef std::unordered_set<Ref> RefScanMap;
+
+size_t
+ScanRef(Ref inRef, RefScanMap &ioMap, int inAlignment)
+{
+	if (ISREALPTR(inRef)) {
+		if (ioMap.count(inRef) > 0) {
+			// ignore this object if it has already been scanned
+			return 0;
+		}
+		ioMap.insert(inRef);
+
+		ArrayObject * obj = (ArrayObject *)ObjectPtr(inRef);
+		// we call it an ArrayObject, but all objects share the header/class which is all we’re really interested in
+		size_t refSize = sizeof(ArrayObject32);
+		// for frames, class is actually the map which needs fixing too
+		refSize += ScanRef(obj->objClass, ioMap, inAlignment);
+
+		//	if it’s a frame / array, step through each slot / element adding space for those
+		if ((obj->flags & kObjSlotted) != 0) {
+			Ref * refPtr = obj->slot;
+			for (ArrayIndex count = (obj->size - sizeof(ArrayObject)) / sizeof(Ref); count > 0; --count, ++refPtr) {
+				refSize += sizeof(Ref32) + ScanRef(*refPtr, ioMap, inAlignment);
+			}
+		} else {
+			refSize += (obj->size - sizeof(BinaryObject));
+		}
+		return ALIGN(refSize, inAlignment);
+	}
+	// else it’s an immediate which requires no additional space
+	return 0;
+}
+
+
+/*------------------------------------------------------------------------------
+	Copy 64-bit Ref object tree to big-endian 32-bit Ref object tree.
+	Source is a pointer ref -> 1-element array -> top part expression.
+
+	Args:		inRef				64-bit Ref
+				inDstPtr			pointer to 32-bit pointer Ref object
+				ioMap				map of 64-bit pointer Ref to 32-bit offset Ref
+				inBaseAddr		base address of package from which refs are offsets
+				inAlignment		4 or 8-byte alignment
+	Return:	32-bit big-endian (package-relative if pointer) ref
+------------------------------------------------------------------------------*/
+#define BYTE_SWAP_SIZE(n) (((n << 16) & 0x00FF0000) | (n & 0x0000FF00) | ((n >> 16) & 0x000000FF))
+#if defined(hasByteSwapping)
+#define CANONICAL_SIZE BYTE_SWAP_SIZE
+#else
+#define CANONICAL_SIZE(n) (n)
+#endif
+
+#if defined(hasByteSwapping)
+bool
+IsObjClass(Ref obj, const char * inClassName)
+{
+	if (ISPTR(obj) && ((SymbolObject *)ObjectPtr(obj))->objClass == kSymbolClass) {
+		const char * subName = SymbolName(obj);
+		for ( ; *subName && *inClassName; subName++, inClassName++) {
+			if (tolower(*subName) != tolower(*inClassName)) {
+				return false;
+			}
+		}
+		return (*inClassName == 0 && (*subName == 0 || *subName == '.'));
+	}
+	return false;
+}
+#endif
+
+
+#include <map>
+typedef std::map<Ref, Ref32> RefOffsetMap;
+
+Ref32
+FixUpRef(Ref inRef, ArrayObject32 * &ioObjPtr, char * inBasePtr, RefOffsetMap &ioMap, int inAlignment)
+{
+	if (ISREALPTR(inRef)) {
+		Ref32 ref;
+		RefOffsetMap::iterator findMapping = ioMap.find(inRef);
+		if (findMapping != ioMap.end()) {
+			// we have already fixed up this ref -- return its package-relative offset ref
+			return findMapping->second;
+		}
+		// map 64-bit pointer ref -> 32-bit big-endian package-relative pointer ref
+		ref = REF((char *)ioObjPtr - inBasePtr);
+		std::pair<Ref, Ref32> mapping = std::make_pair(inRef, CANONICAL_LONG(ref));
+		ioMap.insert(mapping);
+
+		ArrayObject * srcPtr = (ArrayObject *)ObjectPtr(inRef);	// might not actually be an ArrayObject, but header/class are common to all pointer objects
+		// first, remember THIS dst object
+		ArrayObject32 * dstPtr = ioObjPtr;
+
+		ArrayIndex count;
+		size_t dstSize;
+		if ((srcPtr->flags & kObjSlotted)) {
+			//	work out size for 32-bit Ref slots
+			count = (srcPtr->size - sizeof(ArrayObject)) / sizeof(Ref);
+			dstSize = sizeof(ArrayObject32) + count * sizeof(Ref32);
+		} else {
+			// adjust for change in header size
+			dstSize = srcPtr->size - sizeof(ArrayObject) + sizeof(ArrayObject32);
+		}
+		dstPtr->size = CANONICAL_SIZE(dstSize);
+		dstPtr->flags = kObjReadOnly | (srcPtr->flags & kObjMask);
+		dstPtr->gc.stuff = 0;
+
+		//	update/align ioObjPtr to next object
+		ioObjPtr = (ArrayObject32 *)((char *)ioObjPtr + ALIGN(dstSize, inAlignment));
+		// for frames, class is actually the map which needs fixing too; non-slotted refs may need byte-swapping anyway so we always need to do this
+		dstPtr->objClass = FixUpRef(srcPtr->objClass, ioObjPtr, inBasePtr, ioMap, inAlignment);
+
+		if ((srcPtr->flags & kObjSlotted)) {
+			//	iterate over src slots; fix them up
+			Ref * srcRefPtr = srcPtr->slot;
+			Ref32 * dstRefPtr = dstPtr->slot;
+			for ( ; count > 0; --count, ++srcRefPtr, ++dstRefPtr) {
+				*dstRefPtr = FixUpRef(*srcRefPtr, ioObjPtr, inBasePtr, ioMap, inAlignment);
+			}
+		} else {
+			memcpy(dstPtr->slot, srcPtr->slot, dstSize - sizeof(ArrayObject32));
+#if defined(hasByteSwapping)
+			if (srcPtr->objClass == kSymbolClass) {
+				// symbol -- byte-swap hash
+				SymbolObject32 * sym = (SymbolObject32 *)dstPtr;
+				sym->hash = BYTE_SWAP_LONG(sym->hash);
+//NSLog(@"'%s", sym->name);
+			} else if (IsObjClass(srcPtr->objClass, "string")) {
+				// string -- byte-swap UniChar characters
+				UniChar * s = (UniChar *)dstPtr->slot;
+				for (count = (dstSize - sizeof(StringObject32)) / sizeof(UniChar); count > 0; --count, ++s)
+					*s = BYTE_SWAP_SHORT(*s);
+//NSLog(@"\"%@\"", [NSString stringWithCharacters:(const UniChar *)srcPtr->slot length:(dstSize - sizeof(StringObject32)) / sizeof(UniChar)]);
+			} else if (IsObjClass(srcPtr->objClass, "real")) {
+				// real number -- byte-swap 64-bit double
+				uint32_t tmp;
+				uint32_t * dbp = (uint32_t *)dstPtr->slot;
+				tmp = BYTE_SWAP_LONG(dbp[1]);
+				dbp[1] = BYTE_SWAP_LONG(dbp[0]);
+				dbp[0] = tmp;
+			} else if (IsObjClass(srcPtr->objClass, "UniC")) {
+				// EncodingMap -- byte-swap UniChar characters
+				UShort * table = (UShort *)dstPtr->slot;
+				UShort formatId, unicodeTableSize;
+
+				*table = formatId = BYTE_SWAP_SHORT(*table), ++table;
+				if (formatId == 0) {
+					// it’s 8-bit to UniCode
+					*table = unicodeTableSize = BYTE_SWAP_SHORT(*table), ++table;
+					*table = BYTE_SWAP_SHORT(*table), ++table;		// revision
+					*table = BYTE_SWAP_SHORT(*table), ++table;		// tableInfo
+					for (ArrayIndex i = 0; i < unicodeTableSize; ++i, ++table) {
+						*table = BYTE_SWAP_SHORT(*table);
+					}
+				} else if (formatId == 4) {
+					// it’s UniCode to 8-bit
+					*table = BYTE_SWAP_SHORT(*table), ++table;		// revision
+					*table = BYTE_SWAP_SHORT(*table), ++table;		// tableInfo
+					*table = unicodeTableSize = BYTE_SWAP_SHORT(*table), ++table;
+					for (ArrayIndex i = 0; i < unicodeTableSize*3; ++i, ++table) {
+						*table = BYTE_SWAP_SHORT(*table);
+					}
+				}
+			}
+#endif
+		}
+		ref = REF((char *)dstPtr - inBasePtr);
+		return CANONICAL_LONG(ref);
+	}
+	return CANONICAL_LONG(inRef);
+}
+
+
+#define kInfoStr "Newton Toolkit 1.6.4; platform file Newton 2.1 v5"
+#define kInfoStrLen 50
+
+@implementation NTXPackagePart
+
+- (id)initWithRawData:(const void *)content size:(int)contentSize type:(const char *)type
+{
+	if (self = [super init]) {
+		_dirEntry.type = type ? *(ULong *)type : 0;
+		_dirEntry.flags = kRawPart + kNotifyFlag;
+		infoStr = nil;
+		_dirEntry.info.length = self.infoLen;
+		_dirEntry.size = contentSize;
+		partRoot = (ArrayObject32 *)content;
+	}
+	return self;
+}
+
+
+- (id)initWith:(RefArg)content type:(const char *)type alignment:(int)inAlignment
+{
+	if (self = [super init]) {
+		_dirEntry.type = type ? *(ULong *)type : 0;
+		_dirEntry.flags = kNOSPart;
+		infoStr = nil;
+		_dirEntry.info.length = self.infoLen;
+
+/*
+	From “Newton Formats 1.1”, 1-16:
+	The first object in the part is used to locate the part frame.
+	It is required to be an array of class NIL with one slot, which points to the part frame.
+	In OS 2.0, the low-order bit of the second long of this array—normally set to zero in all objects—is used as an alignment flag.
+	If the bit is set, the objects in the part are padded to four-byte boundaries. Otherwise, the objects are padded to eight-byte boundaries.
+	Only eight-byte-aligned parts can be used on Newton OS versions prior to 2.0.
+*/
+		_partData = MakeArray(1);
+		SetClass(_partData, RA(NILREF));
+		SetArraySlot(_partData, 0, content);
+		_alignment = inAlignment;
+
+		// calculate size for 32-bit refs
+		RefScanMap map;
+		_dirEntry.size = ScanRef(_partData, map, _alignment);
+
+		// build part data later
+		partRoot = NULL;
+	}
+	return self;
+}
+
+
+- (void)updateInfoOffset:(ULong *)ioInfoOffset dataOffset:(ULong *)ioDataOffset
+{
+	_dirEntry.info.offset = *ioInfoOffset;  *ioInfoOffset += _dirEntry.info.length;
+	_dirEntry.offset = *ioDataOffset;  *ioDataOffset += _dirEntry.size;
+}
+
+
+- (void)buildPartData:(NSUInteger)inBaseOffset
+{
+	// alloc 32-bit part data
+	partRoot = (ArrayObject32 *)malloc(_dirEntry.size);
+	if (partRoot == NULL) {
+		// report error
+		return;
+	}
+
+	// copy partData array Ref object to 32-bit big-endian .offset-relative-addressed object tree
+	ArrayObject32 * objPtr = partRoot;
+	RefOffsetMap map;
+	FixUpRef(_partData, objPtr, (char *)partRoot - inBaseOffset, map, _alignment);
+
+	if (_alignment == 4) {
+		partRoot->gc.stuff = CANONICAL_LONG(k4ByteAlignmentFlag);
+	}
+}
+
+
+- (PartEntry *)entry
+{
+#if defined(hasByteSwapping)
+	static PartEntry pe = _dirEntry;
+	pe.offset = BYTE_SWAP_LONG(pe.offset);
+	pe.size = BYTE_SWAP_LONG(pe.size);
+	pe.size2 = pe.size;
+	pe.flags = BYTE_SWAP_LONG(pe.flags);
+	pe.info.offset = BYTE_SWAP_SHORT(pe.info.offset);
+	pe.info.length = BYTE_SWAP_SHORT(pe.info.length);
+	pe.compressor.offset = BYTE_SWAP_SHORT(pe.compressor.offset);
+	pe.compressor.length = BYTE_SWAP_SHORT(pe.compressor.length);
+	return &pe;
+#else
+	_dirEntry.size2 = _dirEntry.size;
+	return &_dirEntry;
+#endif
+}
+
+- (const char *)info
+{
+	if (infoStr == nil) {
+		RefVar pf(GetFrameSlot(RA(gConstantsFrame), MakeSymbol("platformVersion")));
+		NSString * platformVerStr1 = MakeNSSymbol(GetFrameSlot(pf, MakeSymbol("platformFile")));
+		NSString * platformVerStr2 = MakeNSSymbol(GetFrameSlot(pf, SYMA(version)));
+		NSString * toolkitVerStr = [NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+		infoStr = [NSString stringWithFormat:@"Newton Toolkit %@; platform file %@ %@", toolkitVerStr, platformVerStr1, platformVerStr2].UTF8String;
+	}
+	return infoStr;
+}
+
+- (NSUInteger)infoLen
+{ return strlen(self.info); }
+
+- (const void *)data
+{ return partRoot; }
+
+- (NSUInteger)dataLen
+{ return _dirEntry.size; }
+
+- (const void *)relocationData
+{ return NULL; }
+
+- (NSUInteger)relocationDataLen
+{ return 0; }
+
+@end
