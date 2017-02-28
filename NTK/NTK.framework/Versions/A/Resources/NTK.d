@@ -10,9 +10,8 @@ dependencies: /Users/simon/Projects/newton-framework/NTK/NTK.cc \
   /Users/simon/Projects/newton-framework/NewtonDebug.h \
   /Users/simon/Projects/newton-framework/NewtonErrors.h \
   /Users/simon/Projects/newton-framework/Frames/ROMResources.h \
-  /Users/simon/Projects/newton-framework/Frames/ROMSymbols.h \
-  /Users/simon/Projects/newton-framework/Frames/SymbolDefs.h \
-  /Users/simon/Projects/newton-framework/Frames/StringDefs.h \
+  /Users/simon/Projects/newton-framework/Frames/RSData.h \
+  /Users/simon/Projects/newton-framework/Frames/RSSymbols.h \
   /Users/simon/Projects/newton-framework/Frames/FrameDefs.h \
   /Users/simon/Projects/newton-framework/Utilities/Unicode.h \
   /Users/simon/Projects/newton-framework/NTK/NTK.h \

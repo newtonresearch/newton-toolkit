@@ -11,5 +11,4 @@ dependencies: \
   /Users/simon/Projects/newton-framework/NewtonDebug.h \
   /Users/simon/Projects/newton-framework/NewtonErrors.h \
   /Users/simon/Projects/newton-framework/NTK/protoProtoEditor.h \
-  /Users/simon/Projects/newton-framework/Frames/ROMSymbols.h \
-  /Users/simon/Projects/newton-framework/Frames/SymbolDefs.h
+  /Users/simon/Projects/newton-framework/Frames/RSSymbols.h

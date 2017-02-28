@@ -39,11 +39,11 @@
 #else
 #define kRefValueBits	 30
 #endif
-#define kRefValueMask	(-1 << kRefTagBits)
+#define kRefValueMask	(~0UL << kRefTagBits)
 #define kRefTagMask		 ~kRefValueMask
 
 #define kRefImmedBits	 2
-#define kRefImmedMask	(-1 << kRefImmedBits)
+#define kRefImmedMask	(~0UL << kRefImmedBits)
 
 enum
 {
@@ -185,6 +185,7 @@ inline				RefVar::operator	long() const
 inline void * operator new(size_t, Ref ** prv) { return prv; }
 
 #define RA(r) (*new(&RS##r) RefVar(&RNILREF))
+#define SYMA(name) RA(SYM##name)
 
 extern	Ref	RNILREF;
 extern	Ref *	RSNILREF;
