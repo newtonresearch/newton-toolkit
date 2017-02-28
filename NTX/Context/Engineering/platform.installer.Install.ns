@@ -1,0 +1,267 @@
+
+// for information only -- the __platform.installer.Remove function
+
+func()
+begin
+UnDefGlobalVar('__platform);
+foreach f, fn in '{platformFunctions} do UnDefGlobalFn(f);
+foreach f in self.weaklingsInstalled do UnDefGlobalFn(f);
+foreach c, cv in '{platformConstants} do UnDefineGlobalConstant(c);
+foreach v, vv in '{platformVariables} do UnDefGlobalVar(v);
+if self.StuffHexRenamed then
+	begin
+	DefGlobalFn('StuffHex, GetGlobalFn('MakeBinaryFromHex));
+	UnDefGlobalFn('MakeBinaryFromHex)
+	end
+end
+
+// for information only -- the __platform.installer.Install function
+
+DefConst('kDump, vars.__platform.installer.Install);
+GetGlobals().xDump := kDump
+
+func()
+begin
+local UnitRef := func(unitName, memberName) begin _UnitManager:Dispatch('UnitReference, [unitName, memberName]) end;
+
+DefGlobalVar('__origFunctions, foreach f, fn deeply in functions collect f);
+DefGlobalVar('__origVars, foreach v, val deeply in vars collect v);
+DefGlobalVar('__platform, __platform);
+foreach f, fn in '{platformFunctions} do DefGlobalFn(f, fn);
+foreach f, fn in '{platformWeakFunctions} do
+	if not GlobalFnExists(f) then
+		begin
+		if not self.weaklingsInstalled then
+			self.weaklingsInstalled := [f];
+		else
+			AddArraySlot(self.weaklingsInstalled, f);
+		if f = 'DefConst and GlobalFnExists('DefineGlobalConstant) then
+			DefGlobalFn('DefConst, GetGlobalFn('DefineGlobalConstant));
+		else
+			DefGlobalFn(f, fn);
+		end;
+foreach c, cv in '{platformConstants} do DefineGlobalConstant(c, cv);
+foreach v, vv in '{platformVariables} do DefGlobalVar(v, vv);
+if GlobalFnExists('SetBounds) then
+	DefPureFn('pureSetBounds, GetGlobalFn('SetBounds));
+if GlobalFnExists('RelBounds) then
+	DefPureFn('pureRelBounds, GetGlobalFn('RelBounds));
+DefPureFn('UnitReference, UnitRef);
+DefPureFn('UR, UnitRef);
+foreach name, fn in '{constantFunctions} do
+	if GlobalFnExists(name) then
+		DefPureFn(name, GetGlobalFn(fn));
+if not GlobalFnExists('MakeBinaryFromHex) then
+	begin
+	DefGlobalFn('MakeBinaryFromHex, GetGlobalFn('StuffHex));
+	UnDefGlobalFn('StuffHex);
+	self.StuffHexRenamed := true
+	end
+end
+
+
+
+GetGlobals().xDump.literals
+ Array:literals #30 Ref(207711825)
+ 0: '__origFunctions
+ 1: 'functions
+ 2: 'Array
+ 3: 'DefGlobalVar
+ 4: '__origVars
+ 5: 'vars
+ 6: '__platform
+ 7: {#32}						// platformFunctions
+ 8: 'DefGlobalFn
+ 9: {#3}							// platformWeakFunctions
+ 10: 'GlobalFnExists
+ 11: 'weaklingsInstalled
+ 12: 'DefConst
+ 13: 'DefineGlobalConstant
+ 14: 'GetGlobalFn
+ 15: {#2056}					// platformConstants
+ 16: {#6}						// platformVariables
+ 17: 'SetBounds
+ 18: 'pureSetBounds
+ 19: 'DefPureFn
+ 20: 'RelBounds
+ 21: 'pureRelBounds
+ 22: 'UnitReference
+ 23: func(#2)					// UnitReference()
+ 24: 'UR
+ 25: {#70}						// constantFunctions
+ 26: 'MakeBinaryFromHex
+ 27: 'StuffHex
+ 28: 'UnDefGlobalFn
+ 29: 'StuffHexRenamed
+
+GetGlobals().xDump.literals[7]	// platformFunctions
+ frame #32 Ref(207712949)
+ vfShadow: func(#1)
+ GetPartFrameSlot: func(#1)
+ GetDateStringSpec: func(#1)
+ fxStepTime: func(#1)
+ fxRows: func(#1)
+ fxSteps: func(#1)
+ MakeDitheredPattern: func(#3)
+ DeclareUnit: func(#4)
+ GetBlue: func(#1)
+ SetPartFrameSlot: func(#2)
+ GetSynthSoundFrameSlow: func(#1)
+ UnpackRGB: func(#1)
+ fxColumns: func(#1)
+ GetGreen: func(#1)
+ GetSound11Deprecated: func(#1)
+ AliasUnit: func(#2)
+ SetBounds: func(#4)
+ PictBounds: func(#3)
+ vfInset: func(#1)
+ GetSynthSoundFrame: func(#1)
+ DefineUnit: func(#2)
+ GetSoundFrame: func(#1)
+ vfRound: func(#1)
+ vfPen: func(#1)
+ PackRGB: func(#3)
+ StdButtonWidth: func(#1)
+ GetRed: func(#1)
+ ButtonBounds: func(#1)
+ tsSize: func(#1)
+ GetSoundDeprecated: func(#1)
+ RelBounds: func(#4)
+ AliasUnitSubset: func(#3)
+
+GetGlobals().xDump.literals[9]	// platformWeakFunctions
+ frame #3 Ref(207724537)
+ DefConst: func(#2)
+ XORPixels: func(#3)
+ MakeExtrasIcons: func(#3)
+
+GetGlobals().xDump.literals[16]	// platformVariables
+ frame #6 Ref(207955329)
+ _GetSoundFrameCache: NIL
+ _GetSynthSoundFrameCache: {#0}
+ _GetSynthSoundFrameSlowCache: {#0}
+ knownglobalfunctions: {#987}
+ GlobalFnHelpStrings: {#1191} 
+ _UnitManager: {#10}
+
+GetGlobals().xDump.literals[23]
+ frame:CodeBlock #6 Ref(208095597)
+func(unitName, memberName) begin
+_UnitManager:Dispatch('UnitReference, [unitName, memberName])
+end
+
+GetGlobals().xDump.literals[25]	// constantFunctions
+ frame #70 Ref(208096101)
+ vfShadow: 'vfShadow
+ SetContains: 'SetContains
+ cosh: 'cosh
+ pow: 'pow
+ SetOverlaps: 'SetOverlaps
+ PrimClassOf: 'PrimClassOf
+ GetDateStringSpec: 'GetDateStringSpec
+ TotalMinutes: 'TotalMinutes
+ length: 'length
+ sinh: 'sinh
+ IsArray: 'IsArray
+ GetVariable: 'GetVariable
+ UnorderedOrEqual: 'UnorderedOrEqual
+ max: 'max
+ band: 'band
+ fxStepTime: 'fxStepTime
+ fxRows: 'fxRows
+ IsImmediate: 'IsImmediate
+ ClassOf: 'ClassOf
+ fxSteps: 'fxSteps
+ abs: 'abs
+ Unordered: 'Unordered
+ bor: 'bor
+ tan: 'tan
+ LessOrGreater: 'LessOrGreater
+ ceiling: 'ceiling
+ UnorderedLessOrEqual: 'UnorderedLessOrEqual
+ atan2: 'atan2
+ UnorderedOrGreater: 'UnorderedOrGreater
+ IsBinary: 'IsBinary
+ stringer: 'stringer
+ getSlot: 'getSlot
+ StrPos: 'StrPos
+ atan: 'atan
+ Real: 'Real
+ exp: 'exp
+ fxColumns: 'fxColumns
+ fabs: 'fabs
+ cos: 'cos
+ ORD: 'ORD
+ PictBounds: 'PictBounds
+ floor: 'floor
+ CHR: 'CHR
+ vfInset: 'vfInset
+ sin: 'sin
+ signum: 'signum
+ log10: 'log10
+ MeasureString: 'MeasureString
+ hasVariable: 'hasVariable
+ log: 'log
+ bxor: 'bxor
+ vfRound: 'vfRound
+ acos: 'acos
+ fmod: 'fmod
+ LessEqualOrGreater: 'LessEqualOrGreater
+ vfPen: 'vfPen
+ StrLen: 'StrLen
+ bnot: 'bnot
+ IsFrame: 'IsFrame
+ UnorderedGreaterOrEqual: 'UnorderedGreaterOrEqual
+ asin: 'asin
+ tanh: 'tanh
+ ButtonBounds: 'ButtonBounds
+ StrFilled: 'StrFilled
+ tsSize: 'tsSize
+ min: 'min
+ sqrt: 'sqrt
+ HasSlot: 'HasSlot
+ UnorderedOrLess: 'UnorderedOrLess
+ IsCharacter: 'IsCharacter
+
+GetGlobals().xDump.instructions
+ binary:instructions #626 Ref(207711185)
+00000|18 71 27 00.1A C7 00 11.A5 7D 27 00.0C C2 1A 8F|.q'......}'.....
+00010|FF FF A7 00.07 20 A6 5F.00 2F 7D 24.C2 A4 7D 20|..... ._./}$..} 
+00020|C2 A3 7F 00.07 7E 7B C3.00 24 B6 00.00 7D 05 7D|.....~{..$...}.}
+00030|06 6F 00 1A.5F 00 3C A7.00 07 00 00.7F 00 07 22|.o.._.<........"
+00040|A7 00 07 22.A5 1B 2A 00.1C 75 27 00.1A C7 00 11|..."..*..u'.....
+00050|A7 00 0A 7F.00 0A 27 00.0C C2 1A 8F.FF FF A7 00|......'.........
+00060|0C 20 A7 00.0B 5F 00 8D.7F 00 0A 24.C2 A7 00 09|. ..._.....$....
+00070|7F 00 0A 20.C2 A7 00 08.7F 00 0C 7F.00 0B 7F 00|... ............
+00080|08 C3 00 24.B7 00 0B 00.00 7F 00 0A.05 7F 00 0A|...$............
+00090|06 6F 00 68.5F 00 9C A7.00 0C 00 00.7F 00 0C 22|.o.h_.........."
+000A0|A7 00 0C 22.A7 00 0A 1B.2A 00 1E 76.1B 2A 00 1F|..."....*..v.*..
+000B0|00 07 22 C7.00 11 A5 5F.00 CB 7D 24.C2 A4 7D 20|.."...._..}$..} 
+000C0|C2 A3 7B 7C.1F 00 08 2A.00 7D 05 7D.06 6F 00 BA|..{|...*.}.}.o..
+000D0|22 22 A5 00.1F 00 09 22.C7 00 11 A5.5F 01 3F 7D|""....."...._.?}
+000E0|24 C2 A4 7D.20 C2 A3 7B.1F 00 0A 29.C5 6F 01 3D|$..} ..{...).o.=
+000F0|03 1F 00 0B.91 C5 6F 01.04 03 1F 00.0B 7B 1A 89|......o......{..
+00100|98 5F 01 0E.03 1F 00 0B.91 7B C7 00.15 00 7B 1F|._.......{....{.
+00110|00 0C C4 6F.01 20 1F 00.0D 1F 00 0A.29 5F 01 21|...o. ......)_.!
+00120|22 6F 01 36.1F 00 0C 1F.00 0D 1F 00.0E 29 1F 00|"o.6.........)..
+00130|08 2A 00 5F.01 3D 7B 7C.1F 00 08 2A.00 7D 05 7D|.*._.={|...*.}.}
+00140|06 6F 00 DF.22 22 A5 00.1F 00 0F 22.C7 00 11 A7|.o..""....."....
+00150|00 0F 5F 01.74 7F 00 0F.24 C2 A7 00.0E 7F 00 0F|.._.t...$.......
+00160|20 C2 A7 00.0D 7F 00 0D.7F 00 0E 1F.00 0D 2A 00| .............*.
+00170|7F 00 0F 05.7F 00 0F 06.6F 01 55 22.22 A7 00 0F|........o.U""...
+00180|00 1F 00 10.22 C7 00 11.A7 00 11 5F.01 AB 7F 00|...."......_....
+00190|11 24 C2 A7.00 10 7F 00.11 20 C2 A7.00 08 7F 00|.$....... ......
+001A0|08 7F 00 10.1B 2A 00 7F.00 11 05 7F.00 11 06 6F|.....*.........o
+001B0|01 8E 22 22.A7 00 11 00.1F 00 11 1F.00 0A 29 6F|..""..........)o
+001C0|01 D1 1F 00.12 1F 00 11.1F 00 0E 29.1F 00 13 2A|...........)...*
+001D0|00 1F 00 14.1F 00 0A 29.6F 01 EA 1F.00 15 1F 00|.......)o.......
+001E0|14 1F 00 0E.29 1F 00 13.2A 00 1F 00.16 1F 00 17|....)...*.......
+001F0|1F 00 13 2A.00 1F 00 18.1F 00 17 1F.00 13 2A 00|...*..........*.
+00200|1F 00 19 22.C7 00 11 A7.00 13 5F 02.36 7F 00 13|..."......_.6...
+00210|24 C2 A4 7F.00 13 20 C2.A7 00 12 7F.00 12 1F 00|$..... .........
+00220|0A 29 6F 02.32 7F 00 12.7C 1F 00 0E.29 1F 00 13|.)o.2...|...)...
+00230|2A 00 7F 00.13 05 7F 00.13 06 6F 02.0D 22 22 A7|*.........o.."".
+00240|00 13 00 1F.00 1A 1F 00.0A 29 C5 6F.02 70 1F 00|.........).o.p..
+00250|1A 1F 00 1B.1F 00 0E 29.1F 00 08 2A.00 1F 00 1B|.......)...*....
+00260|1F 00 1C 29.00 03 1F 00.1D 27 00 1A.99 5F 02 71|...).....'..._.q
+00270|22 02      .           .           .           |".              

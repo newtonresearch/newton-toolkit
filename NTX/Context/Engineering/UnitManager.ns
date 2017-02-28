@@ -1,0 +1,135 @@
+
+// for information only -- the unit manager is platform specific and defined in __platform.platformVariables
+
+_UnitManager := {
+
+declaredUnits: [
+	{	name: Connection,
+		major: 1, minor: 0,
+		alias: Connection,
+		indexes: { desktopConnectionProto: 0 } },
+
+	{	name: ListView,
+		major: 1, minor: 0,
+		alias: ListView,
+		indexes: { protoListView: 0, protoNewAuntButton: 1, protoNewTopicButton: 2, protoNewDaughterButton: 3, listDataDef: 4, listViewDef: 5, checkViewDef: 6, checkDataDef: 7 } }
+	],
+
+Init: func()
+	begin
+	if not GlobalVarExists('language) then
+		Throw('|evt.ex.msg|, "unit functions only allowed at build-time");
+	if not _UnitManager._proto then
+		vars._UnitManager := {	_proto: _UnitManager,
+										declaredUnits: Clone(declaredUnits),
+										exportTable: [],
+										importTable: [] }
+	end,
+
+Dispatch: func(message, args)
+	begin
+	if vars.kSyntaxCheck then
+		return '|syntax check weirdness with UR, ignore|;
+	:Init();
+	Perform(_UnitManager, message, args)
+	end,
+
+GetDeclaredUnit: func(alias)
+	begin
+	local decl := BFetch(declaredUnits, alias, '|sym<|, 'alias);
+	if not decl then
+		Throw('|evt.ex.msg|, "undeclared unit:" && alias);
+	decl
+	end,
+
+DeclareUnit: func(unitName, major, minor, indexes)
+	begin
+	local newDecl := {	name: unitName,
+						major: major,
+						minor: minor,
+						alias: unitName,
+						indexes: indexes };
+	if not BInsert(declaredUnits, newDecl, '|sym<|, 'alias, true) then
+		Throw('|evt.ex.msg|, "redeclaration of unit:" && unitName);
+	nil
+	end,
+
+AliasUnit: func(alias, unitName)
+	begin
+	local decl := :GetDeclaredUnit(unitName);
+	if not decl then
+		Throw('|evt.ex.msg|, "undeclared unit:" && alias);
+	local newDecl := { _proto: decl, alias: alias };
+	if not BInsert(declaredUnits, newDecl, '|sym<|, 'alias, true) then
+		Throw('|evt.ex.msg|, "redeclaration of unit alias:" && alias);
+	newDecl
+	end,
+
+AliasUnitSubset: func(alias, unitName, memberNames)
+	begin
+	local decl := :AliasUnit(alias, unitName);
+	local oldIndexes := decl.indexes;
+	local newIndexes := {};
+	foreach memberName in memberNames do
+		newIndexes.(memberName) := oldIndexes.(memberName);
+	decl.indexes := newIndexes;
+	decl
+	end,
+
+DefineUnit: func(unitName, members)
+	begin
+	local decl := :GetDeclaredUnit(unitName);
+	if LFetch(exportTable, unitName, 0, '|=|, 'name) then
+		Throw('|evt.ex.msg|, "redefinition of unit:" && unitName);
+	local objects := Array(Length(decl.indexes), nil);
+	foreach s, v in members do
+		begin
+		if IsImmediate(v) or IsSymbol(v) or IsMagicPtr(v) then
+			Throw('|evt.ex.msg|, "illegal unit member value:" && unitName & $. & s);
+		local index := decl.indexes.(s);
+		if not index then
+			Throw('|evt.ex.msg|, "unit definition contains undeclared member:" && unitName & $. & s);
+		objects[index] := v
+		end;
+	if LSearch(objects, nil, 0, '|=|, nil) then
+		Throw('|evt.ex.msg|, "unit" && unitName && "missing declared members:" && Substr(stringer(foreach s, v in decl.indexes collect not members.(s) and ", " & s), 2, nil));
+	AddArraySlot(exportTable, { name: decl.name,
+										 major: decl.major, minor: decl.minor,
+										 objects: objects });
+	SetPartFrameSlot('_exportTable, exportTable);
+	nil
+	end,
+
+ImportDeclaredUnit: func(decl)
+	begin
+	local pos := LSearch(importTable, decl.name, 0, '|=|, 'name);
+	if not pos then
+		begin
+		pos := Length(importTable);
+		AddArraySlot(importTable, { name: decl.name,
+											 major: decl.major, minor: decl.minor });
+		SetPartFrameSlot('_importTable, importTable);
+		end;
+	pos
+	end,
+
+UnitReference: func(unitName, memberName)
+	begin
+	if unitName = 'ROM and IsGlobalConstant(memberName) then
+		begin
+		local value := GetGlobalConstant(memberName);
+		if IsMagicPtr(value) then
+			return value;
+		end;
+	local decl := :GetDeclaredUnit(unitName);
+	local memberIndex := decl.indexes.(memberName);
+	if not memberIndex then
+		Throw('|evt.ex.msg|, "undeclared unit member:" && unitName & $. & memberName);
+	local pos := :ImportDeclaredUnit(decl);
+	local mpValue := (pos + 2) << 12 + memberIndex;
+	if GlobalFnExists('ref) then
+		ref(mpValue << 2 + 3);
+	else
+		call Compile($@ & mpValue) with ()
+	end
+};

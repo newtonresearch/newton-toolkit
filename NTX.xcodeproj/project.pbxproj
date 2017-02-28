@@ -13,10 +13,11 @@
 		F40100031BA702C400555CBC /* Disconnected.pdf in Resources */ = {isa = PBXBuildFile; fileRef = F401FFFF1BA702C400555CBC /* Disconnected.pdf */; };
 		F40100041BA702C400555CBC /* PrintDepth.pdf in Resources */ = {isa = PBXBuildFile; fileRef = F40100001BA702C400555CBC /* PrintDepth.pdf */; };
 		F40100051BA702C400555CBC /* PrintLength.pdf in Resources */ = {isa = PBXBuildFile; fileRef = F40100011BA702C400555CBC /* PrintLength.pdf */; };
-		F4079F451B3B0F160071A48B /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4079F441B3B0F160071A48B /* Sparkle.framework */; };
-		F4079F481B3BFDA90071A48B /* UpdatePrefsViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = F4079F461B3BFDA90071A48B /* UpdatePrefsViewController.h */; };
-		F4079F491B3BFDA90071A48B /* UpdatePrefsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F4079F471B3BFDA90071A48B /* UpdatePrefsViewController.m */; };
-		F4079F4A1B3BFEFF0071A48B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = F4079F441B3B0F160071A48B /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		F41121E21E5C9319004D3596 /* GlobalInit.newtonscript in Resources */ = {isa = PBXBuildFile; fileRef = F41121E11E5C9312004D3596 /* GlobalInit.newtonscript */; };
+		F41121E61E5C956D004D3596 /* NTK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F41121E51E5C956D004D3596 /* NTK.framework */; };
+		F41121E81E5CA76E004D3596 /* NTK.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = F41121E51E5C956D004D3596 /* NTK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		F41121ED1E5CB927004D3596 /* Newton 2.1 1.2d6 in Resources */ = {isa = PBXBuildFile; fileRef = F41121EC1E5CB927004D3596 /* Newton 2.1 1.2d6 */; };
+		F41121EE1E5CBA9C004D3596 /* EinsteinEndpoint.m in Sources */ = {isa = PBXBuildFile; fileRef = F41121EB1E5CB138004D3596 /* EinsteinEndpoint.m */; };
 		F42394F417BE7E20000E4701 /* MNPSerialEndpoint.m in Sources */ = {isa = PBXBuildFile; fileRef = F42394F317BE7E20000E4701 /* MNPSerialEndpoint.m */; };
 		F42394F917BE8147000E4701 /* CRC.m in Sources */ = {isa = PBXBuildFile; fileRef = F42394F617BE8147000E4701 /* CRC.m */; };
 		F42394FA17BE8147000E4701 /* Endpoint.m in Sources */ = {isa = PBXBuildFile; fileRef = F42394F717BE8147000E4701 /* Endpoint.m */; };
@@ -25,14 +26,24 @@
 		F423950917BF81F0000E4701 /* Utilities.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4E905AE098283B800247A7E /* Utilities.mm */; };
 		F423951917BFBF57000E4701 /* NSMutableArray-Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = F423951717BFBF57000E4701 /* NSMutableArray-Extensions.m */; };
 		F423951A17BFC487000E4701 /* ToolkitProtocolController.mm in Sources */ = {isa = PBXBuildFile; fileRef = F423950017BEA25C000E4701 /* ToolkitProtocolController.mm */; };
+		F42A24841DEDAB4A00CD22AD /* MagicPointer.strings in Resources */ = {isa = PBXBuildFile; fileRef = F42A24821DEDAB4A00CD22AD /* MagicPointer.strings */; };
+		F42A24871DF2CB9F00CD22AD /* Stream.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F42A24851DF2CB9F00CD22AD /* Stream.storyboard */; };
+		F42A248A1DF2CE5000CD22AD /* NativeCode.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F42A24881DF2CE5000CD22AD /* NativeCode.storyboard */; };
+		F42A248E1DF2D8ED00CD22AD /* LayoutViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = F42A248C1DF2D8ED00CD22AD /* LayoutViewController.mm */; };
+		F42A24921DF30CC100CD22AD /* PackageViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = F42A24901DF30CC100CD22AD /* PackageViewController.mm */; };
+		F42A24951DF4749600CD22AD /* Layout.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F42A24931DF4749600CD22AD /* Layout.storyboard */; };
 		F42AD8881AC05DF300F18E96 /* DVTViewDebugArea_10_10.pdf in Resources */ = {isa = PBXBuildFile; fileRef = F42AD8851AC05DF300F18E96 /* DVTViewDebugArea_10_10.pdf */; };
 		F42AD8891AC05DF300F18E96 /* DVTViewNavigators_10_10.pdf in Resources */ = {isa = PBXBuildFile; fileRef = F42AD8861AC05DF300F18E96 /* DVTViewNavigators_10_10.pdf */; };
 		F42AD88A1AC05DF300F18E96 /* DVTViewUtilities_10_10.pdf in Resources */ = {isa = PBXBuildFile; fileRef = F42AD8871AC05DF300F18E96 /* DVTViewUtilities_10_10.pdf */; };
 		F42AD8971AC0660D00F18E96 /* GeneralPrefsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F42AD8931AC0660D00F18E96 /* GeneralPrefsViewController.m */; };
+		F42C9A3D1E65B523007F9095 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = F42C9A3C1E65B523007F9095 /* dsa_pub.pem */; };
 		F45C934D0B85AEB300D4FE3B /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42206B609BDC68A00E48AEB /* IOKit.framework */; };
 		F46105B90A82222A006CEC0A /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F46105B80A82222A006CEC0A /* AppKit.framework */; };
+		F477F5AA1E5EFBD700208D48 /* pkg.icns in Resources */ = {isa = PBXBuildFile; fileRef = F477F5A91E5EFBD700208D48 /* pkg.icns */; };
+		F477F5AC1E5F66A500208D48 /* UpdatePrefsViewController.png in Resources */ = {isa = PBXBuildFile; fileRef = F477F5AB1E5F66A500208D48 /* UpdatePrefsViewController.png */; };
 		F47FDD970A25A12400E24349 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F47FDC4B0A25A01B00E24349 /* SystemConfiguration.framework */; };
-		F4A58F9A18ACEFD1008B0832 /* ProjectRoot.stream in Copy NewtonScripts */ = {isa = PBXBuildFile; fileRef = F4A58F9918ACEF21008B0832 /* ProjectRoot.stream */; };
+		F4A3DEC31DDDCA6C0060BFDC /* Toolkit.newtonpkg in Copy NewtonScripts */ = {isa = PBXBuildFile; fileRef = F4A3DEC21DDDCA6C0060BFDC /* Toolkit.newtonpkg */; };
+		F4A58F9A18ACEFD1008B0832 /* CanonicalProject.stream in Copy NewtonScripts */ = {isa = PBXBuildFile; fileRef = F4A58F9918ACEF21008B0832 /* CanonicalProject.stream */; };
 		F4A58FEA18BE0867008B0832 /* project.iconset in Resources */ = {isa = PBXBuildFile; fileRef = F4A58FE518BE0867008B0832 /* project.iconset */; };
 		F4A58FEB18BE0867008B0832 /* proto.iconset in Resources */ = {isa = PBXBuildFile; fileRef = F4A58FE618BE0867008B0832 /* proto.iconset */; };
 		F4A58FEC18BE0867008B0832 /* script.iconset in Resources */ = {isa = PBXBuildFile; fileRef = F4A58FE718BE0867008B0832 /* script.iconset */; };
@@ -48,35 +59,26 @@
 		F4A5F21E17CF61CF0004B6DB /* MessagePad in Copy Platforms */ = {isa = PBXBuildFile; fileRef = F4A5F21B17CF618D0004B6DB /* MessagePad */; };
 		F4A5F21F17CF61D20004B6DB /* Newton 2.0 in Copy Platforms */ = {isa = PBXBuildFile; fileRef = F4A5F21C17CF618D0004B6DB /* Newton 2.0 */; };
 		F4A5F22017CF61D50004B6DB /* Newton 2.1 in Copy Platforms */ = {isa = PBXBuildFile; fileRef = F4A5F21D17CF618D0004B6DB /* Newton 2.1 */; };
-		F4A5F23517CF9E320004B6DB /* NTK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4A5F23417CF9E320004B6DB /* NTK.framework */; };
-		F4A5F23817D533450004B6DB /* NTK.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = F4A5F23417CF9E320004B6DB /* NTK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		F4A5F23F17D63E300004B6DB /* EditorCommands in Copy NewtonScripts */ = {isa = PBXBuildFile; fileRef = F4D44FA90BE9DCA9004937CC /* EditorCommands */; };
 		F4A5F24017D63E330004B6DB /* GlobalData.newtonscript in Copy NewtonScripts */ = {isa = PBXBuildFile; fileRef = F4D44FAA0BE9DCA9004937CC /* GlobalData.newtonscript */; };
 		F4A5F24117D63E360004B6DB /* GlobalFunctions.newtonscript in Copy NewtonScripts */ = {isa = PBXBuildFile; fileRef = F4D44FAB0BE9DCA9004937CC /* GlobalFunctions.newtonscript */; };
 		F4A927850945EC6400F746B2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		F4A9278B0945EC6400F746B2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		F4AE56C21B00B35C00F15F10 /* NRBox.m in Sources */ = {isa = PBXBuildFile; fileRef = F4AE56C01B00B35C00F15F10 /* NRBox.m */; };
-		F4AE56CC1B0220B300F15F10 /* NTXStreamViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F4AE56C91B0220B300F15F10 /* NTXStreamViewController.xib */; };
 		F4AE56D21B0246FD00F15F10 /* PkgPart.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4AE56CE1B0246FD00F15F10 /* PkgPart.mm */; };
 		F4AE56D81B024E1200F15F10 /* Package.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F4AE56D61B024E1200F15F10 /* Package.storyboard */; };
 		F4AE56DA1B024E6D00F15F10 /* book.png in Resources */ = {isa = PBXBuildFile; fileRef = F4AE56D91B024E6D00F15F10 /* book.png */; };
-		F4AE56DC1B04D84200F15F10 /* Toolkit.newtonpkg in Resources */ = {isa = PBXBuildFile; fileRef = F4AE56DB1B04D84200F15F10 /* Toolkit.newtonpkg */; };
 		F4B90A8E18927F7E004F1742 /* ProjectDocument.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4B90A8B18927F7E004F1742 /* ProjectDocument.mm */; };
 		F4B90A971892AA44004F1742 /* ProjectWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4B90A931892AA44004F1742 /* ProjectWindowController.mm */; };
-		F4B90A9B1892AC3A004F1742 /* ImageAndTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F4B90A991892AC3A004F1742 /* ImageAndTextCell.m */; };
 		F4B90A9F1892B5FC004F1742 /* ProjectItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4B90A9D1892B5FC004F1742 /* ProjectItem.mm */; };
 		F4BCE9101AFF7DB800423A34 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = F4BCE9001AFF7DB800423A34 /* Credits.rtf */; };
 		F4BCE9111AFF7DB800423A34 /* Error.strings in Resources */ = {isa = PBXBuildFile; fileRef = F4BCE9021AFF7DB800423A34 /* Error.strings */; };
 		F4BCE9121AFF7DB800423A34 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F4BCE9041AFF7DB800423A34 /* InfoPlist.strings */; };
 		F4BCE9131AFF7DB800423A34 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F4BCE9061AFF7DB800423A34 /* Main.storyboard */; };
-		F4BCE9141AFF7DB800423A34 /* NTXCodeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F4BCE9081AFF7DB800423A34 /* NTXCodeViewController.xib */; };
-		F4BCE9151AFF7DB800423A34 /* NTXIconViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F4BCE90A1AFF7DB800423A34 /* NTXIconViewController.xib */; };
-		F4BCE9161AFF7DB800423A34 /* NTXScriptViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F4BCE90C1AFF7DB800423A34 /* NTXScriptViewController.xib */; };
 		F4BCE9171AFF7DB800423A34 /* Project.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F4BCE90E1AFF7DB800423A34 /* Project.storyboard */; };
 		F4BD7D85189BC8BE00D9F71F /* projectfiletype.plist in Resources */ = {isa = PBXBuildFile; fileRef = F4BD7D84189BC8BE00D9F71F /* projectfiletype.plist */; };
 		F4BD7D97189BF2F100D9F71F /* SettingsViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4BD7D95189BF2F100D9F71F /* SettingsViewController.mm */; };
 		F4BD7D99189E684B00D9F71F /* projectsettings.plist in Resources */ = {isa = PBXBuildFile; fileRef = F4BD7D98189E684B00D9F71F /* projectsettings.plist */; };
-		F4BD7D9D189E74AF00D9F71F /* EditorViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4BD7D9B189E74AF00D9F71F /* EditorViewController.mm */; };
 		F4BD7DA218A118F400D9F71F /* ScriptViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4BD7D9F18A118F400D9F71F /* ScriptViewController.mm */; };
 		F4C2CB2C1AC43811000E6887 /* InspectorViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4C2CB2A1AC43811000E6887 /* InspectorViewController.mm */; };
 		F4C2CB301AC45C71000E6887 /* MacRsrcProject.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4C2CB2E1AC45C71000E6887 /* MacRsrcProject.mm */; };
@@ -91,7 +93,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				F4A58F9A18ACEFD1008B0832 /* ProjectRoot.stream in Copy NewtonScripts */,
+				F4A3DEC31DDDCA6C0060BFDC /* Toolkit.newtonpkg in Copy NewtonScripts */,
+				F4A58F9A18ACEFD1008B0832 /* CanonicalProject.stream in Copy NewtonScripts */,
 				F4A5F23F17D63E300004B6DB /* EditorCommands in Copy NewtonScripts */,
 				F4A5F24017D63E330004B6DB /* GlobalData.newtonscript in Copy NewtonScripts */,
 				F4A5F24117D63E360004B6DB /* GlobalFunctions.newtonscript in Copy NewtonScripts */,
@@ -118,8 +121,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				F4A5F23817D533450004B6DB /* NTK.framework in Copy Frameworks */,
-				F4079F4A1B3BFEFF0071A48B /* Sparkle.framework in Copy Frameworks */,
+				F41121E81E5CA76E004D3596 /* NTK.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -128,127 +130,125 @@
 
 /* Begin PBXFileReference section */
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = main.m; path = NTX/main.m; sourceTree = "<group>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
-		660F3E0C028177E0007CB514 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = SOURCE_ROOT; };
-		660F3E0D028177E0007CB514 /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = AppDelegate.mm; sourceTree = "<group>"; };
-		F40086F71AC17B34004AC598 /* SourceListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SourceListViewController.h; sourceTree = "<group>"; };
-		F40086F81AC17B34004AC598 /* SourceListViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SourceListViewController.mm; sourceTree = "<group>"; };
+		660F3E0C028177E0007CB514 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = NTX/AppDelegate.h; sourceTree = SOURCE_ROOT; };
+		660F3E0D028177E0007CB514 /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = AppDelegate.mm; path = NTX/AppDelegate.mm; sourceTree = "<group>"; };
+		F40086F71AC17B34004AC598 /* SourceListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SourceListViewController.h; path = NTX/SourceListViewController.h; sourceTree = "<group>"; };
+		F40086F81AC17B34004AC598 /* SourceListViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SourceListViewController.mm; path = NTX/SourceListViewController.mm; sourceTree = "<group>"; };
 		F40100001BA702C400555CBC /* PrintDepth.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = PrintDepth.pdf; path = NTX/Images/PrintDepth.pdf; sourceTree = "<group>"; };
 		F40100011BA702C400555CBC /* PrintLength.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = PrintLength.pdf; path = NTX/Images/PrintLength.pdf; sourceTree = "<group>"; };
 		F401FFFE1BA702C400555CBC /* Connected.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = Connected.pdf; path = NTX/Images/Connected.pdf; sourceTree = "<group>"; };
 		F401FFFF1BA702C400555CBC /* Disconnected.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = Disconnected.pdf; path = NTX/Images/Disconnected.pdf; sourceTree = "<group>"; };
-		F4079F441B3B0F160071A48B /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Sparkle/Sparkle.framework; sourceTree = "<group>"; };
-		F4079F461B3BFDA90071A48B /* UpdatePrefsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UpdatePrefsViewController.h; path = Preferences/UpdatePrefsViewController.h; sourceTree = "<group>"; };
-		F4079F471B3BFDA90071A48B /* UpdatePrefsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UpdatePrefsViewController.m; path = Preferences/UpdatePrefsViewController.m; sourceTree = "<group>"; };
+		F41121E01E5C910C004D3596 /* PreferenceKeys.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PreferenceKeys.h; path = NTX/PreferenceKeys.h; sourceTree = "<group>"; };
+		F41121E11E5C9312004D3596 /* GlobalInit.newtonscript */ = {isa = PBXFileReference; lastKnownFileType = text; path = GlobalInit.newtonscript; sourceTree = "<group>"; };
+		F41121E51E5C956D004D3596 /* NTK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NTK.framework; sourceTree = "<group>"; };
+		F41121EA1E5CB138004D3596 /* EinsteinEndpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EinsteinEndpoint.h; sourceTree = "<group>"; };
+		F41121EB1E5CB138004D3596 /* EinsteinEndpoint.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EinsteinEndpoint.m; sourceTree = "<group>"; };
+		F41121EC1E5CB927004D3596 /* Newton 2.1 1.2d6 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Newton 2.1 1.2d6"; sourceTree = "<group>"; };
 		F42206B609BDC68A00E48AEB /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
-		F42394C017BD4862000E4701 /* NTX.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = NTX.entitlements; sourceTree = "<group>"; };
-		F42394E417BE70C7000E4701 /* MNPSerialEndpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MNPSerialEndpoint.h; path = Comms/MNPSerialEndpoint.h; sourceTree = "<group>"; };
-		F42394E717BE7317000E4701 /* Endpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Endpoint.h; path = Comms/Endpoint.h; sourceTree = "<group>"; };
-		F42394E917BE736E000E4701 /* NTKProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NTKProtocol.h; path = Comms/NTKProtocol.h; sourceTree = "<group>"; };
-		F42394F317BE7E20000E4701 /* MNPSerialEndpoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MNPSerialEndpoint.m; path = Comms/MNPSerialEndpoint.m; sourceTree = "<group>"; };
-		F42394F617BE8147000E4701 /* CRC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CRC.m; path = Comms/CRC.m; sourceTree = "<group>"; };
-		F42394F717BE8147000E4701 /* Endpoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Endpoint.m; path = Comms/Endpoint.m; sourceTree = "<group>"; };
-		F42394F817BE8147000E4701 /* NCBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NCBuffer.m; path = Comms/NCBuffer.m; sourceTree = "<group>"; };
-		F42394FC17BE8398000E4701 /* DockErrors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DockErrors.h; path = Comms/DockErrors.h; sourceTree = "<group>"; };
-		F42394FD17BE8462000E4701 /* CRC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CRC.h; path = Comms/CRC.h; sourceTree = "<group>"; };
-		F42394FE17BE8462000E4701 /* NCBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NCBuffer.h; path = Comms/NCBuffer.h; sourceTree = "<group>"; };
-		F42394FF17BEA25B000E4701 /* ToolkitProtocolController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ToolkitProtocolController.h; sourceTree = "<group>"; };
-		F423950017BEA25C000E4701 /* ToolkitProtocolController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolkitProtocolController.mm; sourceTree = "<group>"; };
-		F423950517BEA8A3000E4701 /* NewtonKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NewtonKit.h; sourceTree = "<group>"; };
-		F423951617BFBF56000E4701 /* NSMutableArray-Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray-Extensions.h"; sourceTree = "<group>"; };
-		F423951717BFBF57000E4701 /* NSMutableArray-Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray-Extensions.m"; sourceTree = "<group>"; };
+		F42394C017BD4862000E4701 /* NTX.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = NTX.entitlements; path = NTX/NTX.entitlements; sourceTree = "<group>"; };
+		F42394E417BE70C7000E4701 /* MNPSerialEndpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNPSerialEndpoint.h; sourceTree = "<group>"; };
+		F42394E717BE7317000E4701 /* Endpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Endpoint.h; sourceTree = "<group>"; };
+		F42394E917BE736E000E4701 /* NTKProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NTKProtocol.h; path = Protocol/NTKProtocol.h; sourceTree = "<group>"; };
+		F42394F317BE7E20000E4701 /* MNPSerialEndpoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPSerialEndpoint.m; sourceTree = "<group>"; };
+		F42394F617BE8147000E4701 /* CRC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CRC.m; sourceTree = "<group>"; };
+		F42394F717BE8147000E4701 /* Endpoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Endpoint.m; sourceTree = "<group>"; };
+		F42394F817BE8147000E4701 /* NCBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NCBuffer.m; sourceTree = "<group>"; };
+		F42394FC17BE8398000E4701 /* DockErrors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DockErrors.h; path = Protocol/DockErrors.h; sourceTree = "<group>"; };
+		F42394FD17BE8462000E4701 /* CRC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CRC.h; sourceTree = "<group>"; };
+		F42394FE17BE8462000E4701 /* NCBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NCBuffer.h; sourceTree = "<group>"; };
+		F42394FF17BEA25B000E4701 /* ToolkitProtocolController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ToolkitProtocolController.h; path = NTX/ToolkitProtocolController.h; sourceTree = "<group>"; };
+		F423950017BEA25C000E4701 /* ToolkitProtocolController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ToolkitProtocolController.mm; path = NTX/ToolkitProtocolController.mm; sourceTree = "<group>"; };
+		F423951617BFBF56000E4701 /* NSMutableArray-Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSMutableArray-Extensions.h"; path = "NTX/NSMutableArray-Extensions.h"; sourceTree = "<group>"; };
+		F423951717BFBF57000E4701 /* NSMutableArray-Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSMutableArray-Extensions.m"; path = "NTX/NSMutableArray-Extensions.m"; sourceTree = "<group>"; };
+		F42A24831DEDAB4A00CD22AD /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = NTX/Base.lproj/MagicPointer.strings; sourceTree = "<group>"; };
+		F42A24861DF2CB9F00CD22AD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = NTX/Base.lproj/Stream.storyboard; sourceTree = "<group>"; };
+		F42A24891DF2CE5000CD22AD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = NTX/Base.lproj/NativeCode.storyboard; sourceTree = "<group>"; };
+		F42A248B1DF2D8ED00CD22AD /* LayoutViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LayoutViewController.h; path = NTX/LayoutViewController.h; sourceTree = "<group>"; };
+		F42A248C1DF2D8ED00CD22AD /* LayoutViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = LayoutViewController.mm; path = NTX/LayoutViewController.mm; sourceTree = "<group>"; };
+		F42A248F1DF30CC100CD22AD /* PackageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PackageViewController.h; path = NTX/PackageViewController.h; sourceTree = "<group>"; };
+		F42A24901DF30CC100CD22AD /* PackageViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = PackageViewController.mm; path = NTX/PackageViewController.mm; sourceTree = "<group>"; };
+		F42A24941DF4749600CD22AD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = NTX/Base.lproj/Layout.storyboard; sourceTree = "<group>"; };
 		F42AD8851AC05DF300F18E96 /* DVTViewDebugArea_10_10.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = DVTViewDebugArea_10_10.pdf; path = NTX/Images/DVTViewDebugArea_10_10.pdf; sourceTree = "<group>"; };
 		F42AD8861AC05DF300F18E96 /* DVTViewNavigators_10_10.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = DVTViewNavigators_10_10.pdf; path = NTX/Images/DVTViewNavigators_10_10.pdf; sourceTree = "<group>"; };
 		F42AD8871AC05DF300F18E96 /* DVTViewUtilities_10_10.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = DVTViewUtilities_10_10.pdf; path = NTX/Images/DVTViewUtilities_10_10.pdf; sourceTree = "<group>"; };
-		F42AD8921AC0660D00F18E96 /* GeneralPrefsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeneralPrefsViewController.h; path = Preferences/GeneralPrefsViewController.h; sourceTree = "<group>"; };
-		F42AD8931AC0660D00F18E96 /* GeneralPrefsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GeneralPrefsViewController.m; path = Preferences/GeneralPrefsViewController.m; sourceTree = "<group>"; };
-		F432A8070AC7EC8800D9E6A9 /* PreferenceKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferenceKeys.h; sourceTree = "<group>"; };
+		F42AD8921AC0660D00F18E96 /* GeneralPrefsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeneralPrefsViewController.h; path = NTX/Preferences/GeneralPrefsViewController.h; sourceTree = "<group>"; };
+		F42AD8931AC0660D00F18E96 /* GeneralPrefsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GeneralPrefsViewController.m; path = NTX/Preferences/GeneralPrefsViewController.m; sourceTree = "<group>"; };
+		F42C9A3C1E65B523007F9095 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = /Users/simon/Projects/Sparkle/Certificates/dsa_pub.pem; sourceTree = "<absolute>"; };
 		F46105B80A82222A006CEC0A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		F477F5A91E5EFBD700208D48 /* pkg.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = pkg.icns; path = NTX/Images/pkg.icns; sourceTree = "<group>"; };
+		F477F5AB1E5F66A500208D48 /* UpdatePrefsViewController.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpdatePrefsViewController.png; path = NTX/Images/UpdatePrefsViewController.png; sourceTree = "<group>"; };
 		F47FDC4B0A25A01B00E24349 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
-		F48435840954427100777EB8 /* Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
-		F4A58F9918ACEF21008B0832 /* ProjectRoot.stream */ = {isa = PBXFileReference; lastKnownFileType = file; path = ProjectRoot.stream; sourceTree = "<group>"; };
-		F4A58F9B18B24E82008B0832 /* ProjectTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProjectTypes.h; sourceTree = "<group>"; };
-		F4A58FE518BE0867008B0832 /* project.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = project.iconset; path = Resources/icons/project.iconset; sourceTree = "<group>"; };
-		F4A58FE618BE0867008B0832 /* proto.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = proto.iconset; path = Resources/icons/proto.iconset; sourceTree = "<group>"; };
-		F4A58FE718BE0867008B0832 /* script.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = script.iconset; path = Resources/icons/script.iconset; sourceTree = "<group>"; };
-		F4A58FE818BE0867008B0832 /* stream.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = stream.iconset; path = Resources/icons/stream.iconset; sourceTree = "<group>"; };
+		F48435840954427100777EB8 /* Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utilities.h; path = NTX/Utilities.h; sourceTree = "<group>"; };
+		F4A3DEC21DDDCA6C0060BFDC /* Toolkit.newtonpkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = Toolkit.newtonpkg; sourceTree = "<group>"; };
+		F4A58F9918ACEF21008B0832 /* CanonicalProject.stream */ = {isa = PBXFileReference; lastKnownFileType = file; path = CanonicalProject.stream; sourceTree = "<group>"; };
+		F4A58F9B18B24E82008B0832 /* ProjectTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ProjectTypes.h; path = NTX/ProjectTypes.h; sourceTree = "<group>"; };
+		F4A58FE518BE0867008B0832 /* project.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = project.iconset; path = NTX/Images.xcassets/project.iconset; sourceTree = "<group>"; };
+		F4A58FE618BE0867008B0832 /* proto.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = proto.iconset; path = NTX/Images.xcassets/proto.iconset; sourceTree = "<group>"; };
+		F4A58FE718BE0867008B0832 /* script.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = script.iconset; path = NTX/Images.xcassets/script.iconset; sourceTree = "<group>"; };
+		F4A58FE818BE0867008B0832 /* stream.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = stream.iconset; path = NTX/Images.xcassets/stream.iconset; sourceTree = "<group>"; };
 		F4A58FEE18BE09AB008B0832 /* toolkit.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = toolkit.iconset; path = NTX/Images.xcassets/toolkit.iconset; sourceTree = "<group>"; };
 		F4A58FF018BE0A01008B0832 /* layout.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = layout.iconset; path = NTX/Images.xcassets/layout.iconset; sourceTree = "<group>"; };
 		F4A58FF218BE0A66008B0832 /* platform.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = platform.iconset; path = NTX/Images.xcassets/platform.iconset; sourceTree = "<group>"; };
 		F4A58FF418BE0AC6008B0832 /* package.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = package.iconset; path = NTX/Images.xcassets/package.iconset; sourceTree = "<group>"; };
-		F4A58FF618BE1FD2008B0832 /* NTXDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTXDocument.h; sourceTree = "<group>"; };
-		F4A58FF718BE1FD2008B0832 /* NTXDocument.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NTXDocument.mm; sourceTree = "<group>"; };
+		F4A58FF618BE1FD2008B0832 /* NTXDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NTXDocument.h; path = NTX/NTXDocument.h; sourceTree = "<group>"; };
+		F4A58FF718BE1FD2008B0832 /* NTXDocument.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NTXDocument.mm; path = NTX/NTXDocument.mm; sourceTree = "<group>"; };
 		F4A58FFC18C777C9008B0832 /* nativecode.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = nativecode.iconset; path = NTX/Images.xcassets/nativecode.iconset; sourceTree = "<group>"; };
-		F4A58FFE18C7828A008B0832 /* ScriptDocument.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ScriptDocument.mm; sourceTree = "<group>"; };
+		F4A58FFE18C7828A008B0832 /* ScriptDocument.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ScriptDocument.mm; path = NTX/ScriptDocument.mm; sourceTree = "<group>"; };
 		F4A5F21B17CF618D0004B6DB /* MessagePad */ = {isa = PBXFileReference; lastKnownFileType = file; path = MessagePad; sourceTree = "<group>"; };
 		F4A5F21C17CF618D0004B6DB /* Newton 2.0 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Newton 2.0"; sourceTree = "<group>"; };
 		F4A5F21D17CF618D0004B6DB /* Newton 2.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = "Newton 2.1"; sourceTree = "<group>"; };
-		F4A5F23417CF9E320004B6DB /* NTK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NTK.framework; path = NTK/NTK.framework; sourceTree = "<group>"; };
-		F4A927940945EC6400F746B2 /* NTX-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; lineEnding = 0; path = "NTX-Info.plist"; sourceTree = "<group>"; };
+		F4A927940945EC6400F746B2 /* NTX-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; lineEnding = 0; name = "NTX-Info.plist"; path = "NTX/NTX-Info.plist"; sourceTree = "<group>"; };
 		F4A927950945EC6400F746B2 /* NTX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NTX.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		F4ABC2421805526B0043F3EA /* MNPSerialEndpoint-experimental.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "MNPSerialEndpoint-experimental.m"; path = "Comms/MNPSerialEndpoint-experimental.m"; sourceTree = "<group>"; };
-		F4AE56BF1B00B35C00F15F10 /* NRBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NRBox.h; sourceTree = "<group>"; };
-		F4AE56C01B00B35C00F15F10 /* NRBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NRBox.m; sourceTree = "<group>"; };
-		F4AE56CA1B0220B300F15F10 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = NTX/Base.lproj/NTXStreamViewController.xib; sourceTree = "<group>"; };
-		F4AE56CD1B0246FD00F15F10 /* PkgPart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PkgPart.h; sourceTree = "<group>"; };
-		F4AE56CE1B0246FD00F15F10 /* PkgPart.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PkgPart.mm; sourceTree = "<group>"; };
+		F4AE56BF1B00B35C00F15F10 /* NRBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NRBox.h; path = NTX/NRBox.h; sourceTree = "<group>"; };
+		F4AE56C01B00B35C00F15F10 /* NRBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NRBox.m; path = NTX/NRBox.m; sourceTree = "<group>"; };
+		F4AE56CD1B0246FD00F15F10 /* PkgPart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PkgPart.h; path = NTX/PkgPart.h; sourceTree = "<group>"; };
+		F4AE56CE1B0246FD00F15F10 /* PkgPart.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = PkgPart.mm; path = NTX/PkgPart.mm; sourceTree = "<group>"; };
 		F4AE56D71B024E1200F15F10 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = NTX/Base.lproj/Package.storyboard; sourceTree = "<group>"; };
 		F4AE56D91B024E6D00F15F10 /* book.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = book.png; path = NTX/Images/book.png; sourceTree = "<group>"; };
-		F4AE56DB1B04D84200F15F10 /* Toolkit.newtonpkg */ = {isa = PBXFileReference; lastKnownFileType = file; name = Toolkit.newtonpkg; path = Platforms/Toolkit.newtonpkg; sourceTree = "<group>"; };
-		F4AE56DD1B074B7000F15F10 /* Design Thoughts.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = "Design Thoughts.rtf"; path = "doc/Design Thoughts.rtf"; sourceTree = "<group>"; };
-		F4B90A8A18927F7E004F1742 /* ProjectDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectDocument.h; sourceTree = "<group>"; };
-		F4B90A8B18927F7E004F1742 /* ProjectDocument.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ProjectDocument.mm; sourceTree = "<group>"; };
-		F4B90A921892AA44004F1742 /* ProjectWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectWindowController.h; sourceTree = "<group>"; };
-		F4B90A931892AA44004F1742 /* ProjectWindowController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ProjectWindowController.mm; sourceTree = "<group>"; };
-		F4B90A981892AC3A004F1742 /* ImageAndTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageAndTextCell.h; sourceTree = "<group>"; };
-		F4B90A991892AC3A004F1742 /* ImageAndTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageAndTextCell.m; sourceTree = "<group>"; };
-		F4B90A9C1892B5FC004F1742 /* ProjectItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectItem.h; sourceTree = "<group>"; };
-		F4B90A9D1892B5FC004F1742 /* ProjectItem.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ProjectItem.mm; sourceTree = "<group>"; };
+		F4B90A8A18927F7E004F1742 /* ProjectDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProjectDocument.h; path = NTX/ProjectDocument.h; sourceTree = "<group>"; };
+		F4B90A8B18927F7E004F1742 /* ProjectDocument.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ProjectDocument.mm; path = NTX/ProjectDocument.mm; sourceTree = "<group>"; };
+		F4B90A921892AA44004F1742 /* ProjectWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProjectWindowController.h; path = NTX/ProjectWindowController.h; sourceTree = "<group>"; };
+		F4B90A931892AA44004F1742 /* ProjectWindowController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ProjectWindowController.mm; path = NTX/ProjectWindowController.mm; sourceTree = "<group>"; };
+		F4B90A9C1892B5FC004F1742 /* ProjectItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProjectItem.h; path = NTX/ProjectItem.h; sourceTree = "<group>"; };
+		F4B90A9D1892B5FC004F1742 /* ProjectItem.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ProjectItem.mm; path = NTX/ProjectItem.mm; sourceTree = "<group>"; };
 		F4BCE9011AFF7DB800423A34 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Base; path = NTX/Base.lproj/Credits.rtf; sourceTree = "<group>"; };
 		F4BCE9031AFF7DB800423A34 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = NTX/Base.lproj/Error.strings; sourceTree = "<group>"; };
 		F4BCE9051AFF7DB800423A34 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = NTX/Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		F4BCE9071AFF7DB800423A34 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = NTX/Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		F4BCE9091AFF7DB800423A34 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = NTX/Base.lproj/NTXCodeViewController.xib; sourceTree = "<group>"; };
-		F4BCE90B1AFF7DB800423A34 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = NTX/Base.lproj/NTXIconViewController.xib; sourceTree = "<group>"; };
-		F4BCE90D1AFF7DB800423A34 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = NTX/Base.lproj/NTXScriptViewController.xib; sourceTree = "<group>"; };
 		F4BCE90F1AFF7DB800423A34 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = NTX/Base.lproj/Project.storyboard; sourceTree = "<group>"; };
-		F4BD7D84189BC8BE00D9F71F /* projectfiletype.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = projectfiletype.plist; path = Resources/projectfiletype.plist; sourceTree = "<group>"; };
-		F4BD7D94189BF2F100D9F71F /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
-		F4BD7D95189BF2F100D9F71F /* SettingsViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SettingsViewController.mm; sourceTree = "<group>"; };
-		F4BD7D98189E684B00D9F71F /* projectsettings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = projectsettings.plist; path = Resources/projectsettings.plist; sourceTree = "<group>"; };
-		F4BD7D9A189E74AF00D9F71F /* EditorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorViewController.h; sourceTree = "<group>"; };
-		F4BD7D9B189E74AF00D9F71F /* EditorViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = EditorViewController.mm; sourceTree = "<group>"; };
-		F4BD7D9E18A118F400D9F71F /* ScriptViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScriptViewController.h; sourceTree = "<group>"; };
-		F4BD7D9F18A118F400D9F71F /* ScriptViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ScriptViewController.mm; sourceTree = "<group>"; };
-		F4C2CB291AC43811000E6887 /* InspectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InspectorViewController.h; sourceTree = "<group>"; };
-		F4C2CB2A1AC43811000E6887 /* InspectorViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = InspectorViewController.mm; sourceTree = "<group>"; };
-		F4C2CB2D1AC45C71000E6887 /* MacRsrcProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MacRsrcProject.h; sourceTree = "<group>"; };
-		F4C2CB2E1AC45C71000E6887 /* MacRsrcProject.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MacRsrcProject.mm; sourceTree = "<group>"; };
-		F4C2CB331AC87BBB000E6887 /* ContentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContentViewController.h; sourceTree = "<group>"; };
-		F4C2CB341AC87BBB000E6887 /* ContentViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ContentViewController.mm; sourceTree = "<group>"; };
-		F4C2CB371AD54C1B000E6887 /* PackagePart.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PackagePart.h; sourceTree = "<group>"; };
-		F4C4C1C81A28CE79002B8821 /* NRProgressBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NRProgressBox.h; sourceTree = "<group>"; };
-		F4C4C1C91A28CE79002B8821 /* NRProgressBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NRProgressBox.m; sourceTree = "<group>"; };
+		F4BD7D84189BC8BE00D9F71F /* projectfiletype.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = projectfiletype.plist; path = NTX/Resources/projectfiletype.plist; sourceTree = "<group>"; };
+		F4BD7D94189BF2F100D9F71F /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SettingsViewController.h; path = NTX/SettingsViewController.h; sourceTree = "<group>"; };
+		F4BD7D95189BF2F100D9F71F /* SettingsViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SettingsViewController.mm; path = NTX/SettingsViewController.mm; sourceTree = "<group>"; };
+		F4BD7D98189E684B00D9F71F /* projectsettings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = projectsettings.plist; path = NTX/Resources/projectsettings.plist; sourceTree = "<group>"; };
+		F4BD7D9E18A118F400D9F71F /* ScriptViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScriptViewController.h; path = NTX/ScriptViewController.h; sourceTree = "<group>"; };
+		F4BD7D9F18A118F400D9F71F /* ScriptViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ScriptViewController.mm; path = NTX/ScriptViewController.mm; sourceTree = "<group>"; };
+		F4C2CB291AC43811000E6887 /* InspectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InspectorViewController.h; path = NTX/InspectorViewController.h; sourceTree = "<group>"; };
+		F4C2CB2A1AC43811000E6887 /* InspectorViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = InspectorViewController.mm; path = NTX/InspectorViewController.mm; sourceTree = "<group>"; };
+		F4C2CB2D1AC45C71000E6887 /* MacRsrcProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacRsrcProject.h; path = NTX/MacRsrcProject.h; sourceTree = "<group>"; };
+		F4C2CB2E1AC45C71000E6887 /* MacRsrcProject.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MacRsrcProject.mm; path = NTX/MacRsrcProject.mm; sourceTree = "<group>"; };
+		F4C2CB331AC87BBB000E6887 /* ContentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ContentViewController.h; path = NTX/ContentViewController.h; sourceTree = "<group>"; };
+		F4C2CB341AC87BBB000E6887 /* ContentViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ContentViewController.mm; path = NTX/ContentViewController.mm; sourceTree = "<group>"; };
+		F4C2CB371AD54C1B000E6887 /* PackagePart.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PackagePart.h; path = NTX/PackagePart.h; sourceTree = "<group>"; };
+		F4C4C1C81A28CE79002B8821 /* NRProgressBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NRProgressBox.h; path = NTX/NRProgressBox.h; sourceTree = "<group>"; };
+		F4C4C1C91A28CE79002B8821 /* NRProgressBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NRProgressBox.m; path = NTX/NRProgressBox.m; sourceTree = "<group>"; };
 		F4D44FA90BE9DCA9004937CC /* EditorCommands */ = {isa = PBXFileReference; lastKnownFileType = file; path = EditorCommands; sourceTree = "<group>"; };
 		F4D44FAA0BE9DCA9004937CC /* GlobalData.newtonscript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GlobalData.newtonscript; sourceTree = "<group>"; };
 		F4D44FAB0BE9DCA9004937CC /* GlobalFunctions.newtonscript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GlobalFunctions.newtonscript; sourceTree = "<group>"; };
 		F4D44FAF0BE9DCA9004937CC /* MessagePad Defs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "MessagePad Defs"; sourceTree = "<group>"; };
 		F4D44FB10BE9DCAA004937CC /* Newton 2.0 Defs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Newton 2.0 Defs"; sourceTree = "<group>"; };
-		F4D44FB40BE9DCAA004937CC /* Newton 2.1 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.man; path = "Newton 2.1"; sourceTree = "<group>"; };
-		F4D44FB50BE9DCAA004937CC /* Newton 2.1 Defs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Newton 2.1 Defs"; sourceTree = "<group>"; };
-		F4D44FB60BE9DCAA004937CC /* Release_Notes_2.0_and_2.1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Release_Notes_2.0_and_2.1.txt; sourceTree = "<group>"; };
 		F4D44FB70BE9DCAA004937CC /* Newton 2.1 Defs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Newton 2.1 Defs"; sourceTree = "<group>"; };
 		F4D44FB80BE9DCAA004937CC /* Platform File Notes */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Platform File Notes"; sourceTree = "<group>"; };
 		F4D44FB90BE9DCAA004937CC /* Platform File Notes.idx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Platform File Notes.idx"; sourceTree = "<group>"; };
 		F4D44FBA0BE9DCAA004937CC /* Platform_Files_Release_Notes.tx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Platform_Files_Release_Notes.tx; sourceTree = "<group>"; };
 		F4D44FBB0BE9DCAA004937CC /* Platforms Release Notes */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Platforms Release Notes"; sourceTree = "<group>"; };
 		F4D44FBC0BE9DCAA004937CC /* Release Notes 1.2b2 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Release Notes 1.2b2"; sourceTree = "<group>"; };
-		F4D450ED0BEE49A2004937CC /* NTXEditorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTXEditorView.h; sourceTree = "<group>"; };
-		F4D450EE0BEE49A2004937CC /* NTXEditorView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NTXEditorView.mm; sourceTree = "<group>"; };
-		F4E5B97517EC6173007DA5BC /* stdioDirector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdioDirector.h; sourceTree = "<group>"; };
-		F4E5B97617EC6173007DA5BC /* stdioDirector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = stdioDirector.m; sourceTree = "<group>"; };
-		F4E905AE098283B800247A7E /* Utilities.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Utilities.mm; sourceTree = "<group>"; };
+		F4D450ED0BEE49A2004937CC /* NTXEditorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NTXEditorView.h; path = NTX/NTXEditorView.h; sourceTree = "<group>"; };
+		F4D450EE0BEE49A2004937CC /* NTXEditorView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NTXEditorView.mm; path = NTX/NTXEditorView.mm; sourceTree = "<group>"; };
+		F4E5B97517EC6173007DA5BC /* stdioDirector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stdioDirector.h; path = NTX/stdioDirector.h; sourceTree = "<group>"; };
+		F4E5B97617EC6173007DA5BC /* stdioDirector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = stdioDirector.m; path = NTX/stdioDirector.m; sourceTree = "<group>"; };
+		F4E905AE098283B800247A7E /* Utilities.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Utilities.mm; path = NTX/Utilities.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -259,9 +259,8 @@
 				F4A9278B0945EC6400F746B2 /* Cocoa.framework in Frameworks */,
 				F46105B90A82222A006CEC0A /* AppKit.framework in Frameworks */,
 				F47FDD970A25A12400E24349 /* SystemConfiguration.framework in Frameworks */,
-				F4079F451B3B0F160071A48B /* Sparkle.framework in Frameworks */,
 				F45C934D0B85AEB300D4FE3B /* IOKit.framework in Frameworks */,
-				F4A5F23517CF9E320004B6DB /* NTK.framework in Frameworks */,
+				F41121E61E5C956D004D3596 /* NTK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -279,14 +278,10 @@
 		29B97314FDCFA39411CA2CEA /* NTX */ = {
 			isa = PBXGroup;
 			children = (
-				F4A58FEE18BE09AB008B0832 /* toolkit.iconset */,
-				F4A58FE318BE0823008B0832 /* Document Icons */,
 				F42394C017BD4862000E4701 /* NTX.entitlements */,
+				F4A927940945EC6400F746B2 /* NTX-Info.plist */,
 				F4BD7D84189BC8BE00D9F71F /* projectfiletype.plist */,
 				F4BD7D98189E684B00D9F71F /* projectsettings.plist */,
-				F4A927940945EC6400F746B2 /* NTX-Info.plist */,
-				F4AE56DD1B074B7000F15F10 /* Design Thoughts.rtf */,
-				F423950517BEA8A3000E4701 /* NewtonKit.h */,
 				F4079F4B1B3C00100071A48B /* Preferences */,
 				F42394E517BE7301000E4701 /* Comm */,
 				F423951617BFBF56000E4701 /* NSMutableArray-Extensions.h */,
@@ -309,16 +304,14 @@
 				F4C2CB371AD54C1B000E6887 /* PackagePart.h */,
 				F4AE56CD1B0246FD00F15F10 /* PkgPart.h */,
 				F4AE56CE1B0246FD00F15F10 /* PkgPart.mm */,
-				F4C2CB331AC87BBB000E6887 /* ContentViewController.h */,
-				F4C2CB341AC87BBB000E6887 /* ContentViewController.mm */,
-				F4C2CB291AC43811000E6887 /* InspectorViewController.h */,
-				F4C2CB2A1AC43811000E6887 /* InspectorViewController.mm */,
-				F4BD7D9A189E74AF00D9F71F /* EditorViewController.h */,
-				F4BD7D9B189E74AF00D9F71F /* EditorViewController.mm */,
 				F4BD7D94189BF2F100D9F71F /* SettingsViewController.h */,
 				F4BD7D95189BF2F100D9F71F /* SettingsViewController.mm */,
 				F4BD7D9E18A118F400D9F71F /* ScriptViewController.h */,
 				F4BD7D9F18A118F400D9F71F /* ScriptViewController.mm */,
+				F42A248F1DF30CC100CD22AD /* PackageViewController.h */,
+				F42A24901DF30CC100CD22AD /* PackageViewController.mm */,
+				F42A248B1DF2D8ED00CD22AD /* LayoutViewController.h */,
+				F42A248C1DF2D8ED00CD22AD /* LayoutViewController.mm */,
 				F4D450ED0BEE49A2004937CC /* NTXEditorView.h */,
 				F4D450EE0BEE49A2004937CC /* NTXEditorView.mm */,
 				F4E5B97517EC6173007DA5BC /* stdioDirector.h */,
@@ -326,8 +319,8 @@
 				F48435840954427100777EB8 /* Utilities.h */,
 				F4E905AE098283B800247A7E /* Utilities.mm */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
-				F401F4EC1AFD34F5009E76C2 /* Icons */,
 				66FC8157030106B8000ACE77 /* Interfaces */,
+				F42C9A3E1E65B52D007F9095 /* Resources */,
 				66FC8158030106B8000ACE77 /* NTK Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
@@ -338,13 +331,12 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				F4A5F23417CF9E320004B6DB /* NTK.framework */,
+				F41121E51E5C956D004D3596 /* NTK.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
 				F46105B80A82222A006CEC0A /* AppKit.framework */,
 				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
 				F42206B609BDC68A00E48AEB /* IOKit.framework */,
 				F47FDC4B0A25A01B00E24349 /* SystemConfiguration.framework */,
-				F4079F441B3B0F160071A48B /* Sparkle.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -353,15 +345,39 @@
 			isa = PBXGroup;
 			children = (
 				F4BCE9001AFF7DB800423A34 /* Credits.rtf */,
-				F4BCE9021AFF7DB800423A34 /* Error.strings */,
 				F4BCE9041AFF7DB800423A34 /* InfoPlist.strings */,
+				F4BCE9021AFF7DB800423A34 /* Error.strings */,
+				F42A24821DEDAB4A00CD22AD /* MagicPointer.strings */,
 				F4BCE9061AFF7DB800423A34 /* Main.storyboard */,
 				F4BCE90E1AFF7DB800423A34 /* Project.storyboard */,
+				F42A24851DF2CB9F00CD22AD /* Stream.storyboard */,
+				F42A24881DF2CE5000CD22AD /* NativeCode.storyboard */,
 				F4AE56D61B024E1200F15F10 /* Package.storyboard */,
-				F4BCE9081AFF7DB800423A34 /* NTXCodeViewController.xib */,
-				F4BCE90A1AFF7DB800423A34 /* NTXIconViewController.xib */,
-				F4BCE90C1AFF7DB800423A34 /* NTXScriptViewController.xib */,
-				F4AE56C91B0220B300F15F10 /* NTXStreamViewController.xib */,
+				F42A24931DF4749600CD22AD /* Layout.storyboard */,
+			);
+			name = Interfaces;
+			sourceTree = "<group>";
+		};
+		66FC8158030106B8000ACE77 /* NTK Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F4A58F9918ACEF21008B0832 /* CanonicalProject.stream */,
+				F4D44FA90BE9DCA9004937CC /* EditorCommands */,
+				F41121E11E5C9312004D3596 /* GlobalInit.newtonscript */,
+				F4D44FAA0BE9DCA9004937CC /* GlobalData.newtonscript */,
+				F4D44FAB0BE9DCA9004937CC /* GlobalFunctions.newtonscript */,
+				F4D44FAD0BE9DCA9004937CC /* Platforms */,
+				F4A3DEC21DDDCA6C0060BFDC /* Toolkit.newtonpkg */,
+			);
+			name = "NTK Resources";
+			path = NTX/Context;
+			sourceTree = "<group>";
+		};
+		F401F4EC1AFD34F5009E76C2 /* Icons */ = {
+			isa = PBXGroup;
+			children = (
+				F477F5AB1E5F66A500208D48 /* UpdatePrefsViewController.png */,
+				F477F5A91E5EFBD700208D48 /* pkg.icns */,
 				F42AD8851AC05DF300F18E96 /* DVTViewDebugArea_10_10.pdf */,
 				F42AD8861AC05DF300F18E96 /* DVTViewNavigators_10_10.pdf */,
 				F42AD8871AC05DF300F18E96 /* DVTViewUtilities_10_10.pdf */,
@@ -370,27 +386,8 @@
 				F40100001BA702C400555CBC /* PrintDepth.pdf */,
 				F40100011BA702C400555CBC /* PrintLength.pdf */,
 				F4AE56D91B024E6D00F15F10 /* book.png */,
-			);
-			name = Interfaces;
-			sourceTree = "<group>";
-		};
-		66FC8158030106B8000ACE77 /* NTK Resources */ = {
-			isa = PBXGroup;
-			children = (
-				F4A58F9918ACEF21008B0832 /* ProjectRoot.stream */,
-				F4D44FA90BE9DCA9004937CC /* EditorCommands */,
-				F4D44FAA0BE9DCA9004937CC /* GlobalData.newtonscript */,
-				F4D44FAB0BE9DCA9004937CC /* GlobalFunctions.newtonscript */,
-				F4D44FAD0BE9DCA9004937CC /* Platforms */,
-				F4AE56DB1B04D84200F15F10 /* Toolkit.newtonpkg */,
-			);
-			name = "NTK Resources";
-			path = Context;
-			sourceTree = "<group>";
-		};
-		F401F4EC1AFD34F5009E76C2 /* Icons */ = {
-			isa = PBXGroup;
-			children = (
+				F4A58FEE18BE09AB008B0832 /* toolkit.iconset */,
+				F4A58FE318BE0823008B0832 /* Document Icons */,
 			);
 			name = Icons;
 			sourceTree = "<group>";
@@ -398,11 +395,9 @@
 		F4079F4B1B3C00100071A48B /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
-				F432A8070AC7EC8800D9E6A9 /* PreferenceKeys.h */,
+				F41121E01E5C910C004D3596 /* PreferenceKeys.h */,
 				F42AD8921AC0660D00F18E96 /* GeneralPrefsViewController.h */,
 				F42AD8931AC0660D00F18E96 /* GeneralPrefsViewController.m */,
-				F4079F461B3BFDA90071A48B /* UpdatePrefsViewController.h */,
-				F4079F471B3BFDA90071A48B /* UpdatePrefsViewController.m */,
 			);
 			name = Preferences;
 			sourceTree = "<group>";
@@ -414,14 +409,29 @@
 				F4AE56C01B00B35C00F15F10 /* NRBox.m */,
 				F4C4C1C81A28CE79002B8821 /* NRProgressBox.h */,
 				F4C4C1C91A28CE79002B8821 /* NRProgressBox.m */,
-				F4B90A981892AC3A004F1742 /* ImageAndTextCell.h */,
-				F4B90A991892AC3A004F1742 /* ImageAndTextCell.m */,
 				F4B90A921892AA44004F1742 /* ProjectWindowController.h */,
 				F4B90A931892AA44004F1742 /* ProjectWindowController.mm */,
 				F40086F71AC17B34004AC598 /* SourceListViewController.h */,
 				F40086F81AC17B34004AC598 /* SourceListViewController.mm */,
+				F4C2CB331AC87BBB000E6887 /* ContentViewController.h */,
+				F4C2CB341AC87BBB000E6887 /* ContentViewController.mm */,
+				F4C2CB291AC43811000E6887 /* InspectorViewController.h */,
+				F4C2CB2A1AC43811000E6887 /* InspectorViewController.mm */,
 			);
 			name = "Window Controller";
+			sourceTree = "<group>";
+		};
+		F41121E91E5CB0F0004D3596 /* Endpoints */ = {
+			isa = PBXGroup;
+			children = (
+				F42394E717BE7317000E4701 /* Endpoint.h */,
+				F42394F717BE8147000E4701 /* Endpoint.m */,
+				F42394E417BE70C7000E4701 /* MNPSerialEndpoint.h */,
+				F42394F317BE7E20000E4701 /* MNPSerialEndpoint.m */,
+				F41121EA1E5CB138004D3596 /* EinsteinEndpoint.h */,
+				F41121EB1E5CB138004D3596 /* EinsteinEndpoint.m */,
+			);
+			path = Endpoints;
 			sourceTree = "<group>";
 		};
 		F42394E517BE7301000E4701 /* Comm */ = {
@@ -429,17 +439,22 @@
 			children = (
 				F42394FC17BE8398000E4701 /* DockErrors.h */,
 				F42394E917BE736E000E4701 /* NTKProtocol.h */,
-				F42394E417BE70C7000E4701 /* MNPSerialEndpoint.h */,
-				F42394F317BE7E20000E4701 /* MNPSerialEndpoint.m */,
-				F4ABC2421805526B0043F3EA /* MNPSerialEndpoint-experimental.m */,
+				F41121E91E5CB0F0004D3596 /* Endpoints */,
 				F42394FD17BE8462000E4701 /* CRC.h */,
 				F42394F617BE8147000E4701 /* CRC.m */,
 				F42394FE17BE8462000E4701 /* NCBuffer.h */,
 				F42394F817BE8147000E4701 /* NCBuffer.m */,
-				F42394E717BE7317000E4701 /* Endpoint.h */,
-				F42394F717BE8147000E4701 /* Endpoint.m */,
 			);
 			name = Comm;
+			path = NTX/Comms;
+			sourceTree = "<group>";
+		};
+		F42C9A3E1E65B52D007F9095 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F401F4EC1AFD34F5009E76C2 /* Icons */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 		F4A58FE318BE0823008B0832 /* Document Icons */ = {
@@ -466,7 +481,7 @@
 				F4D44FAF0BE9DCA9004937CC /* MessagePad Defs */,
 				F4D44FB10BE9DCAA004937CC /* Newton 2.0 Defs */,
 				F4D44FB70BE9DCAA004937CC /* Newton 2.1 Defs */,
-				F4D44FB30BE9DCAA004937CC /* Newton 2.1 1.2d6 */,
+				F41121EC1E5CB927004D3596 /* Newton 2.1 1.2d6 */,
 				F4D44FB80BE9DCAA004937CC /* Platform File Notes */,
 				F4D44FB90BE9DCAA004937CC /* Platform File Notes.idx */,
 				F4D44FBA0BE9DCAA004937CC /* Platform_Files_Release_Notes.tx */,
@@ -476,16 +491,6 @@
 			path = Platforms;
 			sourceTree = "<group>";
 		};
-		F4D44FB30BE9DCAA004937CC /* Newton 2.1 1.2d6 */ = {
-			isa = PBXGroup;
-			children = (
-				F4D44FB40BE9DCAA004937CC /* Newton 2.1 */,
-				F4D44FB50BE9DCAA004937CC /* Newton 2.1 Defs */,
-				F4D44FB60BE9DCAA004937CC /* Release_Notes_2.0_and_2.1.txt */,
-			);
-			path = "Newton 2.1 1.2d6";
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -493,7 +498,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F4079F481B3BFDA90071A48B /* UpdatePrefsViewController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -561,26 +565,30 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4A58FEF18BE09AB008B0832 /* toolkit.iconset in Resources */,
-				F4AE56CC1B0220B300F15F10 /* NTXStreamViewController.xib in Resources */,
+				F42C9A3D1E65B523007F9095 /* dsa_pub.pem in Resources */,
 				F40100021BA702C400555CBC /* Connected.pdf in Resources */,
 				F4BD7D85189BC8BE00D9F71F /* projectfiletype.plist in Resources */,
-				F4BCE9151AFF7DB800423A34 /* NTXIconViewController.xib in Resources */,
 				F40100051BA702C400555CBC /* PrintLength.pdf in Resources */,
 				F4A58FEA18BE0867008B0832 /* project.iconset in Resources */,
+				F477F5AA1E5EFBD700208D48 /* pkg.icns in Resources */,
+				F42A24951DF4749600CD22AD /* Layout.storyboard in Resources */,
 				F4AE56DA1B024E6D00F15F10 /* book.png in Resources */,
-				F4BCE9141AFF7DB800423A34 /* NTXCodeViewController.xib in Resources */,
+				F41121ED1E5CB927004D3596 /* Newton 2.1 1.2d6 in Resources */,
 				F4A58FFD18C777C9008B0832 /* nativecode.iconset in Resources */,
 				F4A58FF118BE0A01008B0832 /* layout.iconset in Resources */,
 				F40100031BA702C400555CBC /* Disconnected.pdf in Resources */,
-				F4AE56DC1B04D84200F15F10 /* Toolkit.newtonpkg in Resources */,
 				F4BCE9171AFF7DB800423A34 /* Project.storyboard in Resources */,
+				F477F5AC1E5F66A500208D48 /* UpdatePrefsViewController.png in Resources */,
 				F4BD7D99189E684B00D9F71F /* projectsettings.plist in Resources */,
 				F4A58FEB18BE0867008B0832 /* proto.iconset in Resources */,
 				F42AD8881AC05DF300F18E96 /* DVTViewDebugArea_10_10.pdf in Resources */,
 				F4BCE9121AFF7DB800423A34 /* InfoPlist.strings in Resources */,
 				F4BCE9131AFF7DB800423A34 /* Main.storyboard in Resources */,
 				F40100041BA702C400555CBC /* PrintDepth.pdf in Resources */,
-				F4BCE9161AFF7DB800423A34 /* NTXScriptViewController.xib in Resources */,
+				F42A248A1DF2CE5000CD22AD /* NativeCode.storyboard in Resources */,
+				F42A24871DF2CB9F00CD22AD /* Stream.storyboard in Resources */,
+				F42A24841DEDAB4A00CD22AD /* MagicPointer.strings in Resources */,
+				F41121E21E5C9319004D3596 /* GlobalInit.newtonscript in Resources */,
 				F4A58FED18BE0867008B0832 /* stream.iconset in Resources */,
 				F42AD8891AC05DF300F18E96 /* DVTViewNavigators_10_10.pdf in Resources */,
 				F4BCE9101AFF7DB800423A34 /* Credits.rtf in Resources */,
@@ -610,7 +618,7 @@
 				F4B90A9F1892B5FC004F1742 /* ProjectItem.mm in Sources */,
 				F4AE56D21B0246FD00F15F10 /* PkgPart.mm in Sources */,
 				F40087031AC1CD6B004AC598 /* NRProgressBox.m in Sources */,
-				F4B90A9B1892AC3A004F1742 /* ImageAndTextCell.m in Sources */,
+				F42A248E1DF2D8ED00CD22AD /* LayoutViewController.mm in Sources */,
 				F4C2CB2C1AC43811000E6887 /* InspectorViewController.mm in Sources */,
 				F4C2CB301AC45C71000E6887 /* MacRsrcProject.mm in Sources */,
 				F42AD8971AC0660D00F18E96 /* GeneralPrefsViewController.m in Sources */,
@@ -620,14 +628,14 @@
 				F4B90A971892AA44004F1742 /* ProjectWindowController.mm in Sources */,
 				F4B90A8E18927F7E004F1742 /* ProjectDocument.mm in Sources */,
 				F423951917BFBF57000E4701 /* NSMutableArray-Extensions.m in Sources */,
-				F4BD7D9D189E74AF00D9F71F /* EditorViewController.mm in Sources */,
 				F4C2CB361AC87BBB000E6887 /* ContentViewController.mm in Sources */,
 				F423951A17BFC487000E4701 /* ToolkitProtocolController.mm in Sources */,
+				F41121EE1E5CBA9C004D3596 /* EinsteinEndpoint.m in Sources */,
 				F4A58FFF18C7828A008B0832 /* ScriptDocument.mm in Sources */,
 				F4A5F20B17CF4E740004B6DB /* NTXEditorView.mm in Sources */,
 				F4E5B97817EC6173007DA5BC /* stdioDirector.m in Sources */,
+				F42A24921DF30CC100CD22AD /* PackageViewController.mm in Sources */,
 				F40086FA1AC17B34004AC598 /* SourceListViewController.mm in Sources */,
-				F4079F491B3BFDA90071A48B /* UpdatePrefsViewController.m in Sources */,
 				F4AE56C21B00B35C00F15F10 /* NRBox.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -635,12 +643,36 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		F4AE56C91B0220B300F15F10 /* NTXStreamViewController.xib */ = {
+		F42A24821DEDAB4A00CD22AD /* MagicPointer.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				F4AE56CA1B0220B300F15F10 /* Base */,
+				F42A24831DEDAB4A00CD22AD /* Base */,
 			);
-			name = NTXStreamViewController.xib;
+			name = MagicPointer.strings;
+			sourceTree = "<group>";
+		};
+		F42A24851DF2CB9F00CD22AD /* Stream.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F42A24861DF2CB9F00CD22AD /* Base */,
+			);
+			name = Stream.storyboard;
+			sourceTree = "<group>";
+		};
+		F42A24881DF2CE5000CD22AD /* NativeCode.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F42A24891DF2CE5000CD22AD /* Base */,
+			);
+			name = NativeCode.storyboard;
+			sourceTree = "<group>";
+		};
+		F42A24931DF4749600CD22AD /* Layout.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F42A24941DF4749600CD22AD /* Base */,
+			);
+			name = Layout.storyboard;
 			sourceTree = "<group>";
 		};
 		F4AE56D61B024E1200F15F10 /* Package.storyboard */ = {
@@ -683,30 +715,6 @@
 			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
-		F4BCE9081AFF7DB800423A34 /* NTXCodeViewController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				F4BCE9091AFF7DB800423A34 /* Base */,
-			);
-			name = NTXCodeViewController.xib;
-			sourceTree = "<group>";
-		};
-		F4BCE90A1AFF7DB800423A34 /* NTXIconViewController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				F4BCE90B1AFF7DB800423A34 /* Base */,
-			);
-			name = NTXIconViewController.xib;
-			sourceTree = "<group>";
-		};
-		F4BCE90C1AFF7DB800423A34 /* NTXScriptViewController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				F4BCE90D1AFF7DB800423A34 /* Base */,
-			);
-			name = NTXScriptViewController.xib;
-			sourceTree = "<group>";
-		};
 		F4BCE90E1AFF7DB800423A34 /* Project.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -727,7 +735,7 @@
 				OTHER_CFLAGS = "-DforNTK";
 				SDKROOT = macosx;
 				STRIP_STYLE = "non-global";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 			};
 			name = Debug;
 		};
@@ -739,7 +747,7 @@
 				OTHER_CFLAGS = "-DforNTK";
 				SDKROOT = macosx;
 				STRIP_STYLE = "non-global";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 			};
 			name = Release;
 		};
@@ -749,16 +757,12 @@
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/Sparkle",
-					"$(SRCROOT)/NTK",
-				);
+				FRAMEWORK_SEARCH_PATHS = "~/Projects/Sparkle/Sparkle-1.16.0";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INFOPLIST_FILE = "NTX-Info.plist";
+				INFOPLIST_FILE = "NTX/NTX-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_NAME = NTX;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -768,12 +772,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/Sparkle",
-					"$(SRCROOT)/NTK",
-				);
+				FRAMEWORK_SEARCH_PATHS = "~/Projects/Sparkle/Sparkle-1.16.0";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				INFOPLIST_FILE = "NTX-Info.plist";
+				INFOPLIST_FILE = "NTX/NTX-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_NAME = NTX;
 			};

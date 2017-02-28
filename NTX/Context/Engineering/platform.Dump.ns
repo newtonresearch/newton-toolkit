@@ -1,0 +1,4123 @@
+
+// for information only -- the __platform.Dump function
+
+func()
+begin
+if not dumpOnly exists or dumpOnly <> 'platformFunctions then
+	begin
+
+	local MakeObjectTypes := func(objType)
+		begin
+		local result := [];
+		local rem := SymbolName(objType);
+		local i;
+		while i := StrPos(rem, "|", 0) do
+			begin
+			AddArraySlot(result, Intern(Substr(rem, 0, i)));
+			StrMunger(rem, 0, i + 1, nil, 0, nil);
+			end;
+		if 2 < Length(rem) then
+			AddArraySlot(result, Intern(rem));
+		result
+		end;
+
+	local SafeIsFunction := func(obj)
+		begin
+		try
+			IsFunction(obj)
+		onexception do
+			nil
+		end;
+
+	Write("### Initial Functions:\n");
+	foreach f in __origFunctions do
+		begin
+		Write(f);
+		Write($\n);
+		end;
+	Write("### Initial Builtin Functions:\n");
+	foreach f, fn deeply in @4098 /* {#1357}  */ do
+		begin
+		Write(f);
+		Write($\n);
+		end;
+	Write("### Initial Vars:\n");
+	foreach v deeply in __origVars do
+		begin
+		Write(v);
+		Write($\n);
+		end;
+	Write("### Initial Constants:\n");
+	Write("### Platform Functions:\n");
+	foreach f, fn in __platform.platformFunctions do
+		begin
+		Write(f);
+		Write($\n);
+		end;
+	Write("### Platform Weak Functions:\n");
+	foreach f, fn in __platform.platformWeakFunctions do
+		begin
+		Write(f);
+		Write($\n);
+		end;
+	Write("### Platform Function Constants:\n");
+	foreach s, v in __platform.platformConstants do
+		if not IsMagicPtr(v) and not(IsFrame(v) and IsMagicPtr(v._proto)) and call SafeIsFunction with (v) then
+			begin
+			Write(s);
+			Write($\n);
+			end;
+	Write("### Platform Magic Ptr Constants:\n");
+	foreach s, v in __platform.platformConstants do
+		if IsMagicPtr(v) then
+			begin
+			Write(s);
+			Write($\n);
+			end;
+	Write("### Platform Other Constants:\n");
+	foreach s, v in __platform.platformConstants do
+		if not IsMagicPtr(v) and (IsFrame(v) and IsMagicPtr(v._proto) or not call SafeIsFunction with (v)) then
+			begin
+			Write(s);
+			Write($\n);
+			end;
+	Write("### Platform Variables:\n");
+	foreach s, v in __platform.platformVariables do
+		begin
+		Write(s);
+		Write($\n);
+		end;
+	Write("### Platform View Classes:\n");
+	foreach s, v in __platform.viewClasses do
+		begin
+		Write(s);
+		Write($\n);
+		end;
+	Write("### Platform Templates:\n");
+	foreach s, v in __platform.templates do
+		begin
+		Write(s);
+		Write($\n);
+		end;
+	Write("### Platform Attribute slots:\n");
+	foreach s, v in __platform.attributeSlots do
+		begin
+		Write(s);
+		Write($\n);
+		end;
+	Write("### Platform Script slots:\n");
+	foreach s, v in __platform.scriptSlots do
+		begin
+		Write(s);
+		Write($\n);
+		end;
+	end;
+
+Write("### Platform global functions:\n");
+local mapping := '{	app: "App method",
+							cursor: "Cursor Methods",
+							store: "Store Methods",
+							soup: "Soup Methods",
+							usoup: "Soup Methods",
+							view: "View method",
+							SleepScreen: "View method",
+							rootView: "View method",
+							worldClock: "Time Zones",
+							ExtrasDrawer: "Extras Drawer",
+							netChooser: "App method" };
+foreach s, v in __platform.platformVariables.GlobalFnHelpStrings do
+	foreach objType in call MakeObjectTypes with (v[0]) do
+		begin
+		if objType = 'globalFn then
+			Write("function    ");
+		else
+			begin
+			Write("method      ");
+			if mapping.(objType) exists then
+				Write(mapping.(objType));
+			else
+				begin
+				Write($');
+				Write(objType);
+				end;
+			Write($:);
+			end;
+		Write(s);
+		if StrPos(v[1], "deprecated", 0) then
+			Write(" deprecated");
+		Write($\n);
+		end
+end;
+
+
+
+### Initial Functions:
+BrowseSlot
+ReadMemoryPartFile
+GetPartInfo
+PutMacScrap
+ReadFramePartFile
+Ticks
+GetSndAsSamplesCompressed6To1
+OpenResFileX
+CloseResFileX
+GetResource
+UseResourceFile
+GetIndexedResource
+GetIndexedResourceType
+XORBitMaps
+Time
+GetSndAsSamplesRate11KHz
+VerboseGC
+ImageFile
+ExtractData
+Get1Resource
+GetProjectInfo
+FullPathNameFromFileSpec
+GetPartCount
+CalculateMask
+GetMacScrap
+GetPICTData
+GetIndexedResourceInfo
+OpenResourceFileSpec
+MeasureString
+OpenResFile
+CloseResFile
+CurrentResourceFile
+GetNamedResource
+StuffHex
+ReadStreamFile
+GetSndAsSamples8kMuLaw
+GetPICTDepth
+GetSndAsSamples
+ImageFileFunction
+CountResources
+CountResourceTypes
+GetPictAsBits
+GetPartData
+GetPartFrame
+### Initial Builtin Functions:
+setClass
+ExtractLong
+SetContains
+Rethrow
+SubstituteChars
+DefGlobalFn
+EntryFlush
+EntryFlushXmit
+|>=|
+StuffChar
+cosh
+Display
+GetPICTResource
+Apply
+pow
+IsMockEntry
+SetOverlaps
+|/|
+GetGlobalVar
+clone
+PeekControlStack
+PrimClassOf
+SetAdd
+|<|
+SymbolName
+InstallBreakPoints
+IsNativeFunction
+GetStores
+ShellSort
+StringToTime
+TotalMinutes
+ProtoPerformIfDefined
+GetSelfFromStack
+length
+NumStackFrames
+sinh
+IsArray
+Perform
+Write
+ArrayRemoveCount
+EntryCopy
+EntrySize
+SmartStop
+GetVariable
+EntryCopyXmit
+collect
+EntryUndoChanges
+UnorderedOrEqual
+max
+StuffLong
+EntryModTime
+IsDirty
+TimeStr
+|<<|
+CapitalizeWords
+IsSubclass
+QuickSort
+UnDefineGlobalConstant
+band
+map
+StrTokenize
+IsImmediate
+BMerge
+DateNTime
+ccom
+FindSlotName
+ClassOf
+BeginsWith
+SymbolCompareLex
+ArrayMunger
+NewMockEntry
+abs
+EntryChange
+EntryChangeWithModTime
+Unordered
+Time
+NewWeakArray
+EntryChangeXmit
+GlobalVarExists
+EntryChangeWithModTimeXmit
+ArrayPos
+StrEqual
+StringToNumber
+ReplaceObject
+BSearchLeft
+UnDefGlobalVar
+GetLocalFromStack
+gc
+TimeInSeconds
+bor
+div
+tan
+EntryChangeVerbatim
+|>|
+IsWhiteSpace
+CharPos
+EntryChangeVerbatimXmit
+LessOrGreater
+PopValueStack
+NumberStr
+ceiling
+GetGlobals
+Downcase
+localVar
+hasSiblingSlot
+EvalStringer
+UnorderedLessOrEqual
+ValueStackPosition
+Print
+atan2
+FindStringInFrame
+SetLocalOnStack
+IsInstance
+UnorderedOrGreater
+IsBinary
+PushValueStack
+SetRemove
+ResolveEntryAlias
+ExtractXLong
+EntryIsResident
+TrimString
+|<>|
+BFind
+and
+EntryReplace
+EntryReplaceWithModTime
+stringer
+EntryReplaceXmit
+ExtractWord
+EntryReplaceWithModTimeXmit
+StrMunger
+GetUnionSoup
+PerformIfDefined
+EntryRemoveFromSoup
+mod
+EntryRemoveFromSoupXmit
+getSlot
+DefineGlobalConstant
+StrPos
+negate
+SetGlobal
+atan
+Real
+getPath
+SetValueStack
+EndsWith
+exp
+ExtractByte
+BFindRight
+BinEqual
+Random
+Upcase
+IsInteger
+BinaryMunger
+EntrySetHandler
+or
+StableSort
+IsString
+Substr
+GetGlobalFn
+BFetch
+fabs
+SetLocalizationFrame
+cos
+ORD
+LongDateStr
+GetFunctionArgCount
+HourMinute
+RemoveSlot
+DefGlobalVar
+EntrySoup
+SetVariable
+floor
+ArrayInsert
+IsSameEntry
+newiterator
+StuffWord
+|+|
+BSearchRight
+Capitalize
+DefConst
+CHR
+SmartConcat
+IsEntryAlias
+StringToDate
+IsPathExpr
+stats
+BFetchRight
+setAref
+BIntersect
+IsMagicPtr
+sin
+signum
+DeclareGlobalFn
+ExtractCString
+IsSubexception
+MapCursor
+StuffByte
+log10
+SmartStart
+BDelete
+|>>|
+EntryHandler
+BInsert
+StrCompare
+CurrentException
+ExtractPString
+EntryMove
+hasVariable
+EntryMoveXmit
+LSearch
+refOf
+log
+bxor
+StringFilter
+BDifference
+Throw
+EntryUniqueID
+LFetch
+PeekValueStack
+|=|
+BreakLoop
+DefPureFn
+acos
+fmod
+LessEqualOrGreater
+Array
+StrLen
+Sort
+ControlStackPosition
+InsertionSort
+MakeBinary
+ExtractUniChar
+GlobalFnExists
+FindStringInArray
+bnot
+BInsertRight
+SetUnion
+SetDifference
+UnDefGlobalFn
+aref
+Date
+IsFrame
+UnorderedGreaterOrEqual
+ExitBreakLoop
+Intern
+ExtractBytes
+StuffCString
+EntrySetCachedObject
+|<=|
+asin
+tanh
+ProtoPerform
+StuffPString
+EntryStore
+GetUnionSoupAlways
+|-|
+DeepClone
+SetDebugMode
+MakePixFamily
+getSiblingSlot
+StrConcat
+forLoop
+SetControlStack
+IsAlphaNumeric
+StrReplace
+TotalClone
+IsNumber
+ShortDateStr
+setSlot
+EnableBreakPoints
+ExtractChar
+IsReal
+StrFilled
+StuffUniChar
+setPath
+EntryValid
+IsFunction
+IsSymbol
+min
+EnsureInternal
+Query
+EntryCachedObject
+MakeEntryAlias
+addArraySlot
+IsReadOnly
+ParamStr
+not
+sqrt
+|*|
+IsSoupEntry
+StackTrace
+IsGlobalConstant
+hasVar
+SetLength
+ShortDate
+SPrintObject
+HasSlot
+UnorderedOrLess
+IsCharacter
+EntryTextSize
+GetGlobalConstant
+Load
+Compile
+hasPath
+### Initial Vars:
+trace
+vars
+functions
+printDepth
+prettyPrint
+constantfunctions
+protoProtoEditor
+protoEditor
+compilercompatibility
+international
+vdescHandlers
+this
+printInstructions
+__origFunctions
+### Initial Constants:
+### Platform Functions:
+vfShadow
+GetPartFrameSlot
+GetDateStringSpec
+fxStepTime
+fxRows
+fxSteps
+MakeDitheredPattern
+DeclareUnit
+GetBlue
+SetPartFrameSlot
+GetSynthSoundFrameSlow
+UnpackRGB
+fxColumns
+GetGreen
+GetSound11Deprecated
+AliasUnit
+SetBounds
+PictBounds
+vfInset
+GetSynthSoundFrame
+DefineUnit
+GetSoundFrame
+vfRound
+vfPen
+PackRGB
+StdButtonWidth
+GetRed
+ButtonBounds
+tsSize
+GetSoundDeprecated
+RelBounds
+AliasUnitSubset
+### Platform Weak Functions:
+DefConst
+XORPixels
+MakeExtrasIcons
+### Platform Function Constants:
+kGetPagerTypeFunc
+kUnRegNamesRouteScriptFunc
+kRegGlobalKeyboardFunc
+kPtInBitMapDeprecatedFunc
+kSetUserConfigDeprecatedFunc
+kSetDefaultStoreDeprecatedFunc
+kGetPhoneTypesFunc
+kSetExtrasInfoFunc
+kMissingImportsFunc
+kGetPartEntryDataFunc
+kGetCorrectInfoFunc
+kEnableIRModuleDeprecatedFunc
+kGetDialinNetworkFunc
+kRegEmailSystemFunc
+kGetDialinNetworkSlotFunc
+kLaunchPartEntryFunc
+kClearSelectionHilitesFunc
+kResetLocalesFunc
+kGetLocAccessNumsFunc
+kUnRegFindAppsDeprecatedFunc
+kRemoveLocaleFunc
+kQuietSendAllFunc
+kGetPagerTypesFunc
+kRegNamesRouteScriptFunc
+kUnregPhoneTypeFunc
+kGetTransportFunc
+kAddExtraIconFunc
+kUnRegisterCardSoupDeprecatedFunc
+kFindLocaleFunc
+kCardFileSafeRemoveLayoutFunc
+kNumberNotDuplicateFunc
+kGetEmailSystemFunc
+kUnionSoupIsNullDeprecatedFunc
+kGetPrinterNameFunc
+kUnregPagerTypeFunc
+kRegFindAppsDeprecatedFunc
+kSendDeprecatedFunc
+kSendRemoteControlCodeDeprecatedFunc
+kRegPhoneTypeFunc
+kRegisterCardSoupDeprecatedFunc
+kOpenRemoteControlDeprecatedFunc
+kGetAllDialinNetworksFunc
+kItemToTextFunc
+kUnRegPrefsDeprecatedFunc
+kCloseRemoteControlDeprecatedFunc
+kUnRegFormulasDeprecatedFunc
+kGetAllDialinNetworksDFunc
+kMungeBitmapFunc
+kItemToTextDFunc
+kGetUserConfigDeprecatedFunc
+kGetDefaultStoreDeprecatedFunc
+kUnRegDialinNetworkFunc
+kFrameToTextFunc
+kTextToFrameFunc
+kSetExtrasInfoDeprecatedFunc
+kGetEmailSystemsFunc
+kSetEventAlarmFunc
+kDownUpKeyCodesFunc
+kSupplantSoupDefFunc
+kSetupOwnerAppFunc
+kFlushUserConfigDeprecatedFunc
+kShowBusyBoxFunc
+kGetCalendarMeetingTypesFunc
+kRegPagerTypeFunc
+kGetSCCSideBDeprecatedFunc
+kStringToKeyCodesFunc
+kUnRegGlobalKeyboardFunc
+kDragAndDropLtdFunc
+kBlessAppFunc
+kGetAllFontsFunc
+kGetPhoneTypeFunc
+kGetPartCursorFunc
+kSimpleTextHeightDeprecatedFunc
+kGetMaskedPixelFunc
+kGetLanguageEnvironmentFunc
+kItemContainsInkFunc
+kGetCommPortInfoFunc
+kRegPrefsDeprecatedFunc
+kGetCalendarMeetingTypeInfoFunc
+kRegFormulasDeprecatedFunc
+kUnregEmailSystemFunc
+kRegDialinNetworkFunc
+kViewIsOpenFunc
+kAddLocaleFunc
+kRegDialinNetworkDFunc
+### Platform Magic Ptr Constants:
+newtROLabelTimeInputLine
+ROM_calendarNotesSoupDef
+protoLogPicker
+ROM_asciiShift
+ROM_flapSlides
+protoMeetingPlacePopup
+ROM_toDoName
+newtFalseEntryView
+ROM_dsExceptions
+ROM_fontSystem9Underline
+ROM_keySmallButtonBitmap
+protoConvertInkSlip
+ROM_keyButtonBitmap
+ROM_repeatQuerySpec
+protoIoItemStatus
+protoPasswordSlip
+ROM_nameRefValidationFrame
+ROM_northSouthBitmap
+protoConfigPicker
+ROM_rcBuildChains
+ROM_searchPrefix
+ROM_UKDateFilter
+ROM_romAvailablePrinters
+protoLeftRightScroller
+ROM_defaultOutBoxPrefInfo
+ROM_soundOff
+ROM_vConfirm
+ROM_romInternational
+newtAreaCodeLine
+protoAZVertTabs
+protoSendButton
+ROM_cuckooSound
+ROM_timesRomanFont
+newtRONumView
+ROM_bootSound
+ROM_canonicalDate
+newtLabelSimpleDateInputLine
+newtEmbeddedEntryView
+protoIoTransportOver
+ROM_tabRightHiliteBitmap
+protoPrefFrame
+ROM_noConvertSoupList
+ROM_click
+newtProtoLineBase
+ROM_capslockLight
+ROM_defaultInfoPrefs
+newtStateFilter
+protoFilingSlip
+newtROLabelNumInputLine
+ROM_keyRightParenBitmap
+ROM_vGauge
+ROM_keyColonBitmap
+ROM_keySlashBitmap
+ROM_midPunctBitmap
+ROM_crumple
+protoAssistant
+ROM_keyPlusBitmap
+newtTextView
+ROM_postMark
+ROM_routeLog
+ROM_USStdPhoneFilter
+ROM_strokesItem
+ROM_freshCardName
+ROM_vStatus
+ROM_countrySoupName
+protoDatePicker
+protoRichLabelInputLine
+ROM_cloud3
+ROM_kbdRightBitmap
+ROM_kbdShiftBitmap
+ROM_transportScripts
+ROM_defaultInBoxPrefInfo
+ROM_draggeurNoGrayBitmap
+newtEntryRollHeader
+newtPageLayout
+ROM_mediumPenTipBitmap
+protoTouchTonePad
+ROM_gtScenes
+protoNameRefDataDef
+ROM_alarmQuerySpec
+protoCountryLocPicker
+ROM_userConfiguration
+protoBottomTitle
+ROM_outboxBitmap
+ROM_toDoSoupName
+protoStatusTemplate
+protoRouteSlip
+protoTitleText
+protoPreviewRemoteView
+newtRollEntryView
+ROM_outBoxSoupDef
+ROM_canonicalCharCorrector
+protoTableDef
+newtNewStationeryButton
+ROM_calendarSoupDef
+ROM_cardfileSoupDef
+ROM_rcDefaultConfig
+protoRecConfig
+ROM_cardBitmap
+protoLetterHeader
+ROM_repeatIndices
+protoBasicCallTransport
+newtFilter
+ROM_routeAddSender
+protoPrefInfo
+ROM_defaultStateIcons
+protoNewSetClock
+newtInfoButton
+protoDatePopup
+protoLongLatTextPicker
+protoRoll
+protoHiliteButton
+protoTimeButton
+protoLabeledBatteryGauge
+protoTransportPrefs
+ROM_checkBitmap
+ROM_dtmf3Bitmap
+ROM_routeReply
+newtCheckAllButton
+ROM_priorityItems
+protoCharEdit
+ROM_cardEventHandlers
+ROM_openPadlockBitmap
+protoCopperfield
+ROM_keyCapsBitmap
+ROM_routeBeamIcon
+protoFloater
+ROM_callSlip
+ROM_caretPunctBitmap
+newtROComboView
+protoDictionary
+protoIOCategory
+protoReviewDict
+ROM_inboxBitmap
+ROM_prefsBitmap
+ROM_settingsShapeBitmap
+protoAbstractArrow
+newtProtoLine
+ROM_routeUpdateBitmap
+ROM_poof
+protoZoneChooser
+ROM_inBoxSoupDef
+ROM_AustStdPhoneFilter
+ROM_ioBoxCursor
+newtCountrySymbolFilter
+ROM_loadCalibration
+protoFaxHeader
+ROM_paperLinedBitmap
+protoTable
+protoLargeClosebox
+ROM_helpbookBitmap
+newtStationeryPopupButton
+protoKeyboard
+ROM_fontSystem14
+protoTimeDeltaTextPicker
+protoTracer
+protoBlindEntryLine
+protoPrintPage
+ROM_routeDuplicateIcon
+ROM_AZTabsSlimMaskCZ
+ROM_alarmSoupConversionFrame
+protoRebootSlip
+protoTextPicker
+protoSnoozeNotification
+ROM_gtPens
+ROM_tockSound
+newtROSymbolView
+ROM_UKCountyName
+ROM_closedPadlockBitmap
+protoCanonicalCompass
+protoBeamer
+protoIoStateMachine
+newtIntegerFilter
+ROM_fontSystem14Underline
+protoBackupSlip
+ROM_digitSlides
+ROM_alarmIconTinyBitmap
+ROM_AZTabsMaskCZ
+ROM_vPhoneKeypad
+ROM_USStdDateFilter
+ROM_repeatNotesSoupDef
+protoPinWithoutLogic
+ROM_removeSound
+protoMultiCursor
+ROM_paragraphData
+ROM_dtmf8Bitmap
+protoCanonicalCorrector
+newtLabelInputLine
+ROM_systemSymbolFont
+ROM_recInkBitmap
+ROM_infoBitmap
+ROM_wakeUpBeep
+ROM_starterParagraph
+ROM_tickleIAProgress
+ROM_blackListNowBuiltIn
+protoTitle
+ROM_caretPunctBits
+protoMultiDatePopup
+newtOverLayout
+ROM_rcTryLettersConfig
+ROM_systemConversionFrame
+protoPreferencesField
+protoUSstatesTextPicker
+ROM_starterPolygon
+ROM_systemSoupName
+ROM_arrayersatzCursor
+protoStateMachine
+ROM_digitWideFlap
+ROM_fontSystem18Bold
+ROM_additionalBootShiftKeyFn
+protoLongLatPicker
+protoStateMachineInputSpec
+protoBookmark
+protoCribNote
+newtFilingButton
+protoPictIndexer
+protoStatePicker
+ROM_UKStdDateFilter
+ROM_bootScriptWannabes
+protoNote
+newtStationerMenu
+ROM_dateQuerySpec
+protoInfoButton
+protoRoutingFormat
+ROM_rcSingleCharacterConfig
+ROM_phoneText
+ROM_iaCancelAlert
+ROM_USStateSoupName
+ROM_dtmf0Bitmap
+protoMessageNotification
+protoPeoplePicker
+ROM_DefRotateFunc
+protoStateMachineCallBackSpec
+ROM_alarmWakeup
+ROM_cities
+ROM_worldMapBitmap
+newtStatusBar
+protoOrientation
+ROM_notifyCloudMask
+newtStationery
+ROM_plunk
+protoIoItemLayout
+ROM_routePrintIcon
+ROM_letterWeightQuery
+protoTimeDeltaPicker
+ROM_fontSystem10Bold
+protoLettersPreferencesField
+newtApplication
+newtMailnetChooser
+ROM_draggeurBitmap
+newtRollShowStationeryButton
+ROM_dictionaries
+ROM_todo2SoupDef
+ROM_repeatMeetingSoupDef
+protoBorder
+protoKeypad
+protoPicker
+ROM_funBeep
+ROM_AZTabsSlimMaskA
+ROM_filingExtBitmap
+ROM_kbdOptionBitmap
+ROM_canonicalScrollingPopup
+newtEntryShowStationeryButton
+protoFinderWindow
+protoFaxSlip
+protoExtrasIcon
+newtROTextDateView
+protoPutAwayPicker
+ROM_faxRoutingIcon
+ROM_paperRollSoupName
+newtTextTimeView
+protoPeoplePopup
+protoExtrasListItem
+ROM_eWorldCountries
+ROM_userDictquery
+newtNRLabelDateNTimeInputLine
+newtDateNTimeFilter
+protoSchedulePicker
+ROM_leadingPunctBitmap
+protoStdAddressee
+ROM_calendarStuff
+protoDragNGo
+protoNumericKeyboard
+protoPopInPlace
+ROM_AZTabsMaskA
+protoMailSlip
+ROM_rcNoRecog
+newtActionButton
+ROM_searchSuffix
+protoSmallKeyboardButton
+ROM_USDefaultPhoneFilter
+protoKeyboardButton
+protoTimeDeltaPopup
+protoNotifyForm
+protoStaticText
+protoStatusIcon
+ROM_canadianProvinceName
+protoExpandoShellDeprecated
+ROM_initialInheritanceFrame
+ROM_keyRadicalBitmap
+ROM_dateIndices
+ROM_dtmf5Bitmap
+protoCanonicalTextBlock
+ROM_disconnectMessage
+ROM_filingBitmap
+newtNRLabelTimeInputLine
+protoBanner
+newtSmartNameFilter
+protoLabelInputLine
+ROM_FrCanTimeFilter
+newtTimeFilter
+ROM_simpleBeep
+protoMailRegister
+protoScheduleView
+ROM_canonicalGesturePoint
+protoPalette
+newtSmartPhoneFilter
+protoMultiLinePicker
+protoPageCounterForm
+ROM_colonSlides
+ROM_trailingPunctBitmap
+protoMapTextPicker
+ROM_keyTimesBitmap
+protoRollItem
+protoWordInfo
+newtRollLayout
+protoPrintForm
+newtEntryViewFilingButton
+ROM_espyFont
+ROM_romFontList
+ROM_routePutAway
+ROM_meetingName
+ROM_bookmarkBitmap
+ROM_keyCommaBitmap
+ROM_plinkBeep
+protoStarterClipboard
+protoDateNTimeTextPicker
+protoSlider
+protoDateDurationTextPicker
+newtROEditView
+ROM_undoBitmap
+newtSmartCompanyFilter
+protoIoTransportHeader
+protoFilingButton
+ROM_recTextBitmap
+ROM_noFilter
+ROM_todoSoupDef
+ROM_standardStyles
+ROM_countries
+ROM_globalHeapVarWannabes
+protoIoPrintPreview
+protoAlphaKeyboard
+protoDoubleClock
+ROM_checkBitmaps
+ROM_saveCalibration
+ROM_findBitmap
+ROM_CanTimeFilter
+protoDivider
+protoLongitudePicker
+ROM_paperRollIndices
+ROM_phoneBitmap
+newtAboutView
+protoPin
+protoTimeTextPicker
+protoStatusBar
+ROM_action_list
+ROM_kbdDictBitmap
+ROM_cloud2
+protoAddressPicker
+ROM_shapeName
+protoCanonicalContext
+protoFrameFormat
+ROM_keyPadBitmap
+ROM_defaultConfiguration
+protoStateLocPicker
+ROM_calendarStrings
+newtNetChooser
+protoThumbnail
+protoBook
+newtSmartNameView
+protoConfigServer
+newtStatusBarNoClose
+protoTransportHeader
+ROM_unionSoupPrototype
+newtSmartPhoneView
+ROM_eastWestBitmap
+ROM_tickSound
+protoCallAssistButton
+protoOutCategory
+protoPrintFormat
+ROM_USTimeFilter
+ROM_symbolFont
+protoTimeIntervalPopup
+newtEntryViewActionButton
+ROM_tryLettersBitmap
+ROM_newYorkFont
+newtROLabelDateInputLine
+ROM_blackListGenericApology
+newtLabelTimeInputLine
+ROM_systemPSFont
+ROM_tabLeftBitmap
+protoTransportPopup
+ROM_USDefaultDateFilter
+newtAZTabs
+protoCharCorrector
+protoSetClock
+protoAbstractScroller
+ROM_keyEqualsBitmap
+protoActionButton
+ROM_bootSoupWannabes
+ROM_printForm
+protoRestorePrefsSlip
+ROM_defaultStatusMsgs
+protoPrefsSlipProto
+ROM_assistUtilities
+newtFloatingBar
+ROM_dtmf2Bitmap
+ROM_backdropBitmap
+ROM_a2zBitmap
+protoCanonicalGroup
+ROM_routeTransport
+protoDayPicker
+protoRecToggle
+protoScheduleSlip
+ROM_helveticaFont
+ROM_paletteBitmap
+protoBackupPrefsSlip
+protoInCategory
+newtPhonePopupEdit
+protoRichInputLine
+newtPrefsView
+ROM_paragraphCodeBook2
+ROM_assistFrames
+ROM_canonicalDictRamFrame
+newtNumView
+protoCorrectContext
+ROM_continents
+protoNotesOverview
+ROM_asciiBreak
+protoCheckboxIcon
+protoPopupButton
+protoStatusProgress
+ROM_fontSystem12Bold
+protoFindItem
+ROM_ioIndices
+newtLabelNumInputLine
+newtNumberFilter
+ROM_unicode
+ROM_GetSerialNumber
+ROM_keyPeriodBitmap
+newtCityFilter
+protoStreamingEndpoint
+protoGeneralPopup
+protoStatusBarber
+protoDayView
+protoDesktopEndpoint
+protoPictRadioButton
+newtQBETextView
+protoNotifyIcon
+protoToSubjectSlip
+ROM_dictionaryList
+ROM_keyMinusBitmap
+protoMapPopup
+protoDictionaryCursor
+protoListViewInternal
+protoCoverPageFormatDeprecated
+protoRubricPopup
+newtROTextView
+ROM_calendarNotesName
+ROM_extraProtos
+protoNewFolderTab
+ROM_containerName
+ROM_preparingMessage
+ROM_stampFrameBitmap
+ROM_AustralianStateName
+ROM_onlineMessages
+ROM_smallPenTipBitmap
+ROM_flip
+newtSymbolFilter
+protoWorldPicker
+ROM_markupBitmap
+protoCategorizedOverview
+ROM_defaultItemStateMsgs
+protoDateNTimePopup
+ROM_fontSystem9Bold
+ROM_handwritingFont
+protoTXViewFinder
+ROM_canonicalBaseInfo
+ROM_modemSetUps
+protoPictureButton
+protoPhoneExpandoDeprecated
+protoCanonicalScrollee
+protoPictTextButton
+ROM_compatibleFinder
+ROM_dtmf7Bitmap
+ROM_typewriter
+ROM_recShapeBitmap
+ROM_command
+protoLatitudePicker
+ROM_bookBitmap
+ROM_leftBitmap
+protoPagePreviewForm
+protoListPicker
+protoNetChooser
+protoStdClosing
+protoTableEntry
+ROM_noMarkupBitmap
+newtSoup
+protoTimePopup
+protoPersonaPopup
+ROM_cancelBitmap
+protoDigitBase
+protoCanonicalScroller
+protoCardAlertTemplate
+ROM_vStatusTitle
+protoDragger
+protoCorrectInfo
+ROM_fontSystem18
+ROM_goAwayBitmap
+protoAZTabs
+protoDrawer
+ROM_dtmfPoundBitmap
+ROM_kbdReturnBitmap
+ROM_keyBulletBitmap
+ROM_NewtonModemName
+protoNotePaper
+ROM_downBitmap
+newtAreaCodePhoneLine
+ROM_paperrollSoupDef
+protoDurationTextPicker
+protoCanonicalTable
+ROM_locationCursor
+newtEntryView
+protoOverview
+protoTXView
+ROM_confirmButtonLists
+ROM_chargingBitmap
+ROM_diamanteBitmap
+ROM_globalVarWannabes
+ROM_stylusDownBitmap
+protoStatusText
+ROM_canonicalInkWordInfo
+ROM_recSketchBitmap
+ROM_zero2nineBitmap
+protoRCheckBox
+protoTargetFrameFormat
+protoDisplayClock
+protoSoundChannel
+protoValidateSlip
+ROM_radioOnBitmap
+protoIoProtoShowByButton
+ROM_fontSystem18Underline
+protoMeeting
+ROM_bootLogoBitmap
+ROM_dtmfStarBitmap
+protoCitiesTextPicker
+ROM_loadLetterWeights
+ROM_romPhrasalLexicon
+newtCustomFilter
+protoRadioButton
+newtSymbolView
+protoStoryCard
+ROM_wordFilter
+newtCountryFilter
+protoNotesContent
+ROM_stdForms
+newtRollOverLayout
+ROM_vProgress
+ROM_dataName
+ROM_loadGlobals
+ROM_caretSpaceBits
+ROM_digitFlap
+ROM_fontSystem10
+newtLabelSymbolInputLine
+ROM_vBarber
+ROM_genevaFont
+protoMeetingSoupFinder
+protoTapiEndpoint
+ROM_correctorMidBits
+ROM_notesBitmap
+protoPrefsRollItem
+protoPrinterChooserButton
+ROM_viewRoot
+newtQBELabelInputLine
+protoTextButton
+protoPeriodicAlarmEditor
+protoCanonicalTitle
+ROM_paperCallBitmap
+ROM_routePasteText
+ROM_cardAction
+ROM_fontSystem10Underline
+newtROLabelInputLine
+newtPhoneFilter
+protoCalculator
+protoMailEditor
+protoPrefFramer
+ROM_namesBitmap
+protoDigit
+protoFloatNGo
+protoApp
+protoCorrector
+protoDateExpandoDeprecated
+ROM_canonicalCharGrid
+ROM_hollowStarBitmap
+ROM_dstSoupName
+protoCanonicalDataContext
+ROM_dtmf4Bitmap
+ROM_systemFont
+protoCountryTextPicker
+ROM_tabLeftHiliteBitmap
+protoSoupOverview
+ROM_dockerBitmap
+newtEntryLockedIcon
+protoLocationPicker
+protoImageView
+ROM_keyLeftParenBitmap
+protoFormatPicker
+protoNotification
+protoNumberPicker
+protoConfirm
+ROM_AZTabsSlimBitmap
+protoRemindSlip
+protoZonesTable
+protoTwoLinePicker
+ROM_charsVersion
+ROM_routeFaxIcon
+ROM_downArrowBitmap
+ROM_starterInk
+newtClockFolderTab
+protoSmartCluster
+protoIoProtoReceiveButton
+ROM_salutationSuffix
+ROM_ioIOBoxSoup
+newtEntryPageHeader
+protoEmporiumPopup
+ROM_outboxSoupName
+protoHorizontalUpDownScroller
+ROM_kbdLeftBitmap
+protoDateNYearPicker
+ROM_calendarSoupName
+ROM_cardfileSoupName
+ROM_fontSystem14Bold
+protoGauge
+ROM_canonicalPoint
+ROM_tabRightBitmap
+ROM_blackList
+protoPreferencesTitle
+ROM_cardfileQuerySpec
+ROM_correctorLeadBits
+ROM_AZTabsBitmap
+ROM_dsPlaceHints
+ROM_onlineBitmap
+newtLabelCustomInputLine
+protoMissingViewDef
+protoProvincePicker
+ROM_digitFlapLowOrd
+ROM_repeatNotesName
+ROM_routeDeleteIcon
+protoNavigator
+ROM_errorTable
+ROM_routeMailIcon
+ROM_upBitmap
+ROM_dateTimeStrSpecs
+ROM_storageCardTypes
+ROM_directoryConversionFrame
+protoLocationPopup
+ROM_overviewBitmap
+protoRollBrowser
+ROM_routeForward
+protoStatus
+ROM_plusMinusBitmap
+ROM_startIAProgress
+protoTransport
+newtFolderTab
+protoCanonicalGroupee
+protoRecognitionCheckbox
+ROM_stylusUpBitmap
+protoParagraph
+protoFindCategory
+protoRepeatPicker
+protoCursiveCheckbox
+ROM_finePenTipBitmap
+ROM_printPageMessage
+protoYearPicker
+protoDiamondButton
+protoCloseBox
+protoDigitalTimePopup
+newtTextDateView
+protoAliasCursor
+ROM_metaSoupName
+ROM_numberFilter
+protoInputLine
+ROM_soupFinder
+ROM_correctorTrailBits
+ROM_inboxSoupName
+ROM_USPhoneFilter
+protoPolygon
+newtROTextTimeView
+protoFullRouteSlip
+ROM_extrasRomIcons
+ROM_kbdDeleteBitmap
+protoTextList
+protoDigitalClock
+newtCheckBox
+ROM_dtmf9Bitmap
+newtLabelPhoneInputLine
+ROM_cloud1
+protoBasicEndpoint
+protoTextExpandoDeprecated
+ROM_correctorTwoButtons
+protoCanonicalPopup
+ROM_recognizerUserChoices
+protoAnalogTimePopup
+protoRepeatView
+ROM_routeReaddress
+protoSenderPopup
+ROM_addingMachine
+ROM_letters
+ROM_conversionRates
+protoPrintSlip
+protoYearPopup
+protoPeopleDataDef
+ROM_kbdCapslockBitmap
+protoAnalogClock
+protoLabelPicker
+ROM_kbdTabBitmap
+newtNRLabelDateInputLine
+newtDateFilter
+ROM_stopWordList
+newtShowStationeryButton
+ROM_calculatorBitmap
+ROM_filledStarBitmap
+ROM_handScrollBitmap
+ROM_datesBitmap
+protoPrinterSerialPicker
+protoOnlineServices
+ROM_drawerOpen
+protoLetterFormat
+ROM_UKPhoneFilter
+newtShowMenu
+ROM_notifyCloud
+protoCountryPicker
+ROM_cardfileIndices
+ROM_routeMissing
+ROM_dtmf1Bitmap
+ROM_repeatMeetingName
+ROM_keyDivideBitmap
+newtSmartAddressFilter
+protoBatteryGauge
+ROM_rcPrefsConfig
+protoHorizontal2DScroller
+ROM_defaultSilentPrefinfo
+newtEditView
+ROM_addSound
+protoRepeatDateDurationTextPicker
+protoSoundFrame
+protoWorldClock
+ROM_drawerClose
+ROM_rightBitmap
+ROM_copier
+ROM_handwritingStyleImages
+newtPopupEdit
+ROM_faxDriver
+protoPreferencesPopup
+protoAMPMCluster
+protoStatusGauge
+ROM_assistBitmap
+ROM_extrasBitmap
+ROM_ratchetSound
+ROM_topicMarkers
+ROM_AustPhoneFilter
+ROM_extrasSoupDef
+ROM_upArrowBitmap
+ROM_newtOnNewtBitmap
+ROM_rcInkOrText
+protoClockFolderTab
+protoPinWindowWithoutLogic
+ROM_canonicalRect
+newtSimpleDateFilter
+ROM_globeBitmap
+protoIoTransportButton
+ROM_defaultSendPrefInfo
+ROM_rcRerecognizeConfig
+protoAddresseeSlip
+ROM_connectMessage
+protoPhonePad
+protoThumbnailFloater
+ROM_largePenTipBitmap
+ROM_fontSystem12
+newtInfoBox
+protoDateTextPicker
+ROM_routeCallBitmap
+protoEraseSlip
+ROM_ampmSlides
+protoRadioCluster
+protoRecorderView
+ROM_hiliteSound
+ROM_ownerBitmap
+protoRecognitionCluster
+newtLayout
+ROM_saveLetterWeights
+ROM_citySoupName
+protoStatusCloseBox
+protoUpDownScroller
+protoMeetingPlacePicker
+protoCalendar
+protoCardfile
+protoGlance
+ROM_canonicalCorrectorAlternates
+ROM_alarmIconBitmap
+protoFolderTab
+ROM_edgeDrawer
+ROM_systemSoupIndexes
+ROM_fontSystem12Underline
+protoPageFooter
+protoTapiPicker
+ROM_dialTones
+ROM_USDateFilter
+protoEWorldEndpoint
+newtTextFilter
+protoDateIntervalPopup
+ROM_keyButtBitmap
+ROM_routingBitmap
+protoWordInterp
+ROM_fontSystem9
+newtStationeryView
+newtLabelDateInputLine
+ROM_dtmf6Bitmap
+protoStatusButton
+ROM_radioOffBitmap
+protoCheckBox
+### Platform Other Constants:
+kFirstNamesDictionary
+vfInsetMask
+kFlowControl
+kFormatShort
+fxMoveV
+kSubArrayOption
+kNoOptions
+kReturnKey
+kOutLstn
+kGestalt_SystemInfo
+kIrDA1ProbeSlot
+opNotSupported
+aeRemoveAllHilites
+kCmdPKeyCodes
+vCalculateBounds
+kCommScriptExpectedTemplate
+kIrDASvcHintFileServer
+kCMSMNPID
+kPopSpace
+opInvalid
+kNegativeInfinity
+chSO
+T_CANCONNECT
+keyAEvents
+kFirstWeek
+kNull
+vfLtGray
+vjReflow
+kV17st_72Mod
+vSingleUnit
+kF14Key
+kGestalt_Manufacturer_Apple
+kCMOLocalTalkMiscConfig
+kBackspaceKey
+aeMoveChild
+unitFirstY
+aeClickUp
+kFaceOutline
+aeAbout
+kDefaultXOnChar
+kWizardEncoding
+keyHEighth
+kRGB_Gray2
+kSndBuffer
+kSerialChipVoyager
+aeStartHilite
+kElementShift
+keyVHalf
+kCMOSerialCircuitControl
+kConfigType
+vfLinesMask
+clView
+kArray
+aeAddChild
+kCommScriptInappropriateFilter
+kFloat22kRate
+kNotifyAlert
+k12000bps
+kOutCon
+kCommScriptNoActiveInputSpec
+opNotFound
+kUSACountryId
+protoendpoint
+aeClick
+T_COTS
+kCommandKeyCode
+kCMOIrDAConnectAttrName
+aeDropData
+kCodecRate
+kCMATypeLabel
+aeHilite
+kSCCServiceModem
+aeSave
+chGS
+kCanSendZero
+vfHiliteMask
+kLastNamesDictionary
+vWidthGrowsWithText
+kControlKeyCode
+kSCCServicePrinter
+kMore
+vfShadowShift
+kIrDASvcHintTelephony
+kSerInRI
+aeRunScript
+aeSetVertex
+clMonthView
+vfRoundMask
+kMaxDateTimeStrSize
+editFont12
+kPortrait
+unicodeDC2
+fxMoveVShift
+kMoneyOnlyDictionary
+kStruct
+aeLCDScreen
+kRGB_Gray10
+aeHide
+T_EXP
+kCMSVBlackbird
+kSerialChip6850
+aeTapDrag
+T_INFLUX
+fxBarnDoorOpenEffect
+k7200bps
+vfBlack
+kCMS_CapabilityType_Version
+kCMOMNPDataRate
+kIrDA6ProbeSlot
+kRGB_Black
+tsFaceMask
+unicodeESC
+unicodeETB
+kChar
+kIdle
+kHelpKeyCodes
+kInvalid
+sChinese
+cpReadOnlyCopies
+fxIrisOpenEffect
+kV27Ter24Mod
+aeWord
+finalX
+kInCon
+kUnbnd
+fxColAltVPhase
+kLastWeek
+kV17_12Mod
+vfPenMask
+lvShowChecks
+finalXY
+tsPlain
+vjFullH
+protoMailConnectionSlip
+kNotifyQAlert
+kCMOModemVoiceSupport
+kModemCntSpeed1200
+kFnZapZeros
+k6DataBits
+kUsing19200
+kShowCentury
+kUseHourZero
+fxBarnDoorCloseEffect
+kSerCap_StopBits_All
+aeDoubleTap
+kSerOutRTS
+kF3Key
+kCMSVFramedAsyncSerial
+fxIrisCloseEffect
+chEM
+chLF
+kCMSKeyboard
+T_TRANS_ORD
+kModemECProtocolLAPM
+kSerialEventHSKiAssertedMask
+kRGB_Gray7
+kWednesday
+unicodeEOT
+vfFillMask
+kHWLocBuiltInModem
+kDisk
+kNoConnection
+kSharedPropersDictionary
+protoMailConnectionSlipD
+vfGray
+vjSiblingFullV
+kSaturday
+kTransOrd
+opSuccess
+kSerialEventDCDNegatedMask
+kSnoozeAlert
+fancyFont18
+cpNewtonOnlyCopies
+irUsingNewtIR
+simpleFont18
+kCMOSerialMiscConfig
+kKbdTracksCaret
+unicodeBEL
+kCMOEndpointName
+kFnBasicCurrency
+clGaugeView
+kElementDay
+kSecondWeek
+vfFrameMask
+kCMOOutputFlowControlParms
+kCMOModemPrefs
+vjSiblingHMask
+unicodeHT
+unicodeSI
+kCMOSerialIOParms
+kFormatNumericDay
+kLPC
+aePrint
+kMonday
+sKorean
+vjLeftH
+vNothingAllowed
+kLocalPropersDictionary
+kCMSVMNPID
+fxHStartPhase
+vjParentFullH
+keyHQuarter
+lvAdjustTopicBounds
+kF11Key
+fxRowAltVPhase
+kCanRelease
+kRGB_Gray15
+T_OUTREL
+kCommScriptNoEndpointAvailable
+kCMOAppleTalkADSP
+kRawAppleTalkAddress
+kCanEOM
+clParagraphView
+protoMailHeader
+fxFromEdge
+macAEvents
+kSerCap_DataBits_6
+kFormatSecond
+kGestalt_NewtonScriptVersion
+aeRemoveVertices
+kNotKeyCode
+fxColAltVPhaseShift
+kModemECProtocolMNP
+aeShow
+kNBPEntityName
+kNotifyMessage
+kTextCompander
+kUnicodeString
+kModemCntSpeed16800
+keyRightOpen
+kImportFiles
+T_EXPCHANNEL
+fancyFont10
+T_INFINITE
+k24Bit
+clPolygonView
+kCheckMarkChar
+kNamedAppleTalkAddress
+kWindowsPlatform
+simpleFont10
+kRGB_16GrayIncrement
+T_CLTS
+vjTopV
+kFloatCodecRate
+kCMOIrDAConnectUserData
+kCMOInputFlowControlParms
+kCmdEKeyCodes
+kCanadaCountryId
+kFormatAbbr
+kF8Key
+opGetDefault
+kCMOFramedAsyncStats
+kTabKey
+kCMOIrDADiscoveryInformation
+k1StopBits
+kLong
+kNone
+kUsingNewton1
+vjParentLeftH
+kForever
+vVisible
+tsUnderline
+vCustomDictionaries
+chDC2
+aeDeferredRecognition
+T_INREL
+keyRoundingUnit
+kSerialChip8530
+fxVenetianBlindsEffect
+vAlwaysTryKeyCommands
+kHWLocPCMCIASlot1
+k2400bps
+kDefaultSOHChar
+userFont18
+chESC
+chETB
+kCmdRKeyCodes
+kSampleLinear
+kFnFixed
+kFraming
+kCMOFramingParms
+kFormatAbbrMonth
+vfHiliteTriangle
+vjSiblingCenterH
+kCommonDictionary
+vStandAloneBounds
+kEOP
+tsFancy
+kHWLocBuiltInIR
+vNumbersAllowed
+unicodeSYN
+fxHStartPhaseShift
+kLeftArrowKey
+kNameTypeZone
+kUsingSharpIR
+vfLinesLtGray
+keyHUnit
+tsSimple
+T_ABSREQ
+kCMS_CapabilityType_ServiceId
+kFormatShortTime
+vjSiblingBottomV
+fxRowAltVPhaseShift
+vWidthIsParentWidth
+firstY
+kGestaltArg_HasSoftContrast
+kModemFaxClass1
+vSingleKeystrokes
+vjParentTopV
+kCanBind
+vFixedTextStyle
+kFaceNormal
+kDraggerBorderWidth
+kIncludeAllElements
+T_FLOWCONTROL
+unicodeFF
+kCMOSerialBitRate
+kInfoDotChar
+aePaste
+kPacket
+fxFromEdgeShift
+lvShowPriority
+kCanListen
+kRGB_Gray4
+kSerClk_DivideBy_1
+kSpeakerVolumeHigh
+chEOT
+kCMSVKeyboard
+kSoundAborted
+kFaceSuperScript
+vfNone
+kInfinity
+kSerInDSR
+kElementTypeWidth
+kstdButtonSpacing
+kYes
+vfFillCustom
+fxStepTimeShift
+aeAddHilite
+kCMSSlowIR
+keyTopOpen
+kSettingUp
+tsSizeMask
+kSerCap_StopBits_1
+kDownArrowKey
+kMacRomanEncoding
+fxRowsShift
+T_NULL
+aeToggleTracing
+kCMSBasicSerial
+kSCCServiceNotSpecified
+aeMoveData
+userFont10
+kCMOSerialChipSpec
+chBEL
+vAddressField
+kMNPCompressionV42bis
+aeDoNothing
+kModalAlert
+T_COTS_ORD
+kFaceSubScript
+kFormatDefault
+kModifiersMask
+protoMailAddressPicker
+kUsing9600
+unicodeFS
+chHT
+chSI
+kHWLocExternalSerial
+vCallStandardScripts
+sHebrew
+fxPopDownEffect
+k1KOutputBuffer
+kRestoreFiles
+vfFrameCustom
+aeAddData
+kCotsOrd
+kstdButtonHeight
+kEvenParity
+kFormatHour
+kV17st_12Mod
+irJ1ProtocolOptions
+aeDuplicateData
+kSplitByteLong
+unicodeDC4
+fxStepsShift
+opInProgress
+k57600bps
+kCMOModemDialing
+kRGB_Gray12
+vNoScripts
+kSerialEventDCDAssertedMask
+kCMOSerialEventEnables
+kFrameExchange_Confirm
+kReliable
+kSCCSideB
+T_OUTCON
+vfLinesBlack
+kDefaultSOMChar
+kIrDA8ProbeSlot
+modeNotBic
+aeTap
+kFile
+k1pt5StopBits
+kCmdWKeyCodes
+kShiftKeyCode
+kPostalCodeDictionary
+kHWLocPCMCIAAnySlot
+kPropagateDown
+kV17_14Mod
+kModemCntSpeed19200
+clRemoteView
+kSoundPaused
+vfFillLtGray
+vjParentMask
+fxMoveH
+vfWhite
+kNotifyLog
+kRGB_White
+unicodeSTX
+lastY
+opPartSuccess
+T_CANSENDZERO
+T_MORE
+tsUndefinedFace
+k8DataBits
+kBitmapCompander
+kDefaultXOffChar
+kF5Key
+kElementSecond
+keyFramed
+vfDragger
+kInternalMic
+kMacPlatform
+kModalQAlert
+kCMS_UnknownVersion
+kFormatLongDayOfWeek
+clPickView
+FE_INVALID
+kRGB_Gray9
+unicodeSOH
+unicodeSUB
+kGestalt_MachineType_MessagePad
+vfFrameLtGray
+kElementTypeMask
+kNoPropagateDown
+kNo
+kFnCurrency
+kFnGrouping
+vfLinesGray
+vjLeftRatio
+kMuLaw
+T_IDLE
+vfHiliteInvert
+kV29_96Mod
+T_INVALID
+kSerialEventBreakEndedMask
+T_INCON
+T_UNBND
+kSerCap_Parity_Even
+k1200bps
+modeBic
+kDeleteKeyCodes
+aePickItem
+kUseHour24
+unicodeDLE
+kCmdOKeyCodes
+protoMailTextOnlyBox
+keyHHalf
+kCMOIrDALinkDisconnectTimeout
+vjParentAnchored
+aeUndo
+kNormalConnect
+kLocalStatesDictionary
+aeGesture
+kPhoneNumber
+vfShadowMask
+editViewAEvents
+chSYN
+aeDumpWindows
+tsFamilyShift
+kSerClk_DivideBy_Mask
+vGesturesAllowed
+kHasScrollersOption
+kF13Key
+tsOutline
+kCMOSlowIRStats
+kCommandModifier
+irUsing38400
+kRepeatable
+opBadOpCode
+unitFirstX
+vfFillBlack
+kCMOAppletalkBuffer
+kSerClk_DivideBy_32
+chFF
+kTabKeyCodes
+kLocalTimeDictionary
+kFormatLongDate
+kRGB_Gray1
+vTimeField
+kSerCap_DataBits_8
+aeNew
+kLocalMoneyDictionary
+k115200bps
+k230400bps
+kControlModifier
+vfLineShift
+aeQuit
+fxLeft
+opSetNegotiate
+kEnterKey
+vNoSpaces
+kCMOSlowIRConnect
+fxMoveHShift
+vjSiblingNoV
+kCountriesDictionary
+kUninit
+vjVMask
+kGestaltArg_BuiltIn_Keyboard
+fancyFont12
+vjBottomRatio
+kFaceBold
+kCMSVSlowIR
+kUpArrowKey
+simpleFont12
+vfFrameBlack
+kGestalt_Manufacturer_Sharp
+aeSetDOSMachine
+kFrameExchange_Initiate
+aeChangeStyle
+kCMSVBasicSerial
+kModemCntSpeed300
+kCMSModemID
+kElementEra
+fxColAltHPhase
+chFS
+kElementYear
+T_CANRELEASE
+kCMOModemConnectType
+FE_INEXACT
+unicodeNUL
+vfFillGray
+kFormatNumericYear
+lvShowTopPriority
+kSyncing
+T_CANEOM
+vjRightH
+kFourthWeek
+fxDown
+aeSetMacMachine
+kThursday
+unicodeDC1
+chDC4
+FE_DIVBYZERO
+kDataExchange
+k38400bps
+vNoKeys
+kLandscapeFlip
+kCapsLockModifier
+kAddressAbbrevsDictionary
+kSerialEventBreakStartedMask
+kCMOMNPAllocate
+fancyFont9
+kNoChannel
+unicodeNAK
+aeInk
+kDraggerInset
+modeMask
+kInternalSpeaker
+kKbdUsesKeyCodes
+simpleFont9
+vfFrameGray
+aeCopy
+vfHiliteBullet
+vjSiblingFullH
+kSimplePhoneDictionary
+kUseModem
+vFloating
+kModemCntSpeed14400
+kModemCntSpeed21600
+kUsingNegotiateIR
+kElementHour
+kKbdforInput
+kPropagateUp
+kSampleMuLaw
+kCMOSerialDTRControl
+unitFinalY
+chSTX
+opSetRequired
+vjParentVMask
+k5DataBits
+kCMOModemConnectSpeed
+kIrDASvcHintLanAccess
+kSerClk_DivideBy_64
+kF2Key
+kMNPDoAllocate
+kCMOSerialBuffers
+aeScrub
+kCommScriptExpectedSpec
+kRGB_Gray6
+aePrintAllPagesNow
+kCMOLocalTalkStats
+chSOH
+chSUB
+kLetterSetSelectionDefault
+aeRevert
+aeStroke
+vfDkGray
+vAnythingAllowed
+fxRowAltHPhase
+kNoPropagateUp
+kSerialChip16550
+vjParentRightH
+kV17_96Mod
+modeNotOr
+T_FRAMING
+vjCenterV
+kWorksInAppModals
+vExpectingNumbers
+FE_UNDERFLOW
+textOnlyPickerD
+vStrokesAllowed
+kFaceItalic
+cpNoCopyProtection
+kDefaultFramingChar
+kFrameExchange
+kModemCntSpeed9600
+kSerCap_Parity_Mark
+kCMSLocalTalkID
+kUseHour12
+unicodeCAN
+userFont12
+chDLE
+aeSaveAs
+fxColAltHPhaseShift
+clKeyboardView
+vjSiblingLeftH
+T_CANBIND
+aeGetContext
+cpOriginalOnlyCopies
+kIsSoftKeyboard
+kOddParity
+kLineOut
+kV17st_14Mod
+lvNoMarkers
+T_CANLISTEN
+kF10Key
+kShort
+fxColumnsShift
+kRightArrowKey
+kNumbersOnlyDictionary
+kNoSounds
+kStdButtonExtra
+irUsing19200
+kRGB_Gray14
+T_YES
+kSerCap_DataBits_5
+kUseLocalTalk
+vCharsAllowed
+kHighInt
+kModemECProtocolExternal
+k600bps
+modeOr
+kOptionKeyCode
+clOutline
+unicodeUS
+userFont9
+kCMOSerialIOStats
+kWorksInAllModals
+vfLinesWhite
+kSunday
+kUnused
+vjParentCenterV
+vLettersAllowed
+aeScaleData
+kRestoring
+vjSiblingTopV
+kfirstButtonLeft
+opPadded
+kF7Key
+aeRemoveHilite
+kLocalNumberDictionary
+kCMSFaxID
+kDataXfer
+sJapanese
+kIrDASvcHintModem
+kCMSVModemID
+kFriday
+kLineIn
+kCMSAsyncSerial
+kElementNothing
+cpNoCopies
+T_RELIABLE
+chNUL
+kWorldPostalCodeDictionary
+kOKForDevelopers
+oneLineOnly
+fxRowAltHPhaseShift
+kIrDASvcHintPrinter
+fxWipe
+kTrans
+kUseIR
+fxStepTimeMask
+kLoadingPackage
+vjNoRatio
+chDC1
+fxUp
+k19200bps
+fxRowsMask
+kSerCap_Parity_Odd
+kCMATitleLabel
+kSerialChip8250
+kstdButtonBottom
+aeRemoveData
+aeCaret
+sArabic
+aeShowClipboard
+chNAK
+aeReplaceText
+kSimpleDateDictionary
+kUpperCaseCharSetInfo
+kCMSIrDA
+kMNPDontAllocate
+kCRKeyCodes
+kSystemInvertStyle
+aeKeyDown
+keySpacer
+opFailure
+kModemCntSpeed24000
+vTakesCommandKeys
+vfMatte
+kAllSounds
+irSymmetricConnect
+kDaysMonthsDictionary
+kCMABBServiceName
+fxStepsMask
+kSCCServicePtToPtIR
+firstX
+kF15Key
+kModemFaxClass0
+T_NO
+firstXY
+kGestaltArg_HasBackLight
+aeNoCommand
+kSerClk_DivideBy_16
+kUCBlockCharSetInfo
+protoMailTransport
+aeRedrawScreen
+kCMARouteLabel
+tsSuperScript
+kLocalCitiesDictionary
+kElementDayOfWeek
+kNoflag
+kRGB_Gray3
+unicodeENQ
+aeCut
+kADSPEndpoint
+vjSiblingMask
+kFormatLong
+vfFillWhite
+kEveryday
+kV29_72Mod
+vReadOnly
+kCommScriptInappropriateTarget
+vfInsetShift
+vjRightRatio
+kMaxElementStrSize
+vjLinesCustom
+tsHWFont
+kModemCntSpeed4800
+kOptionType
+tsSubScript
+protoMailTransportD
+aeClear
+kCMOSerialBreak
+kDefaultEOMChar
+aeDumpData
+kLandscape
+unicodeACK
+kCMOSerialHardware
+chCAN
+kCMOIrDAConnectInformation
+kCommScriptInvalidEndSequence
+kCMSVLocalTalkID
+kFrame
+kShiftModifier
+vSelected
+kCMOSlowIRBitBang
+kTimeOutImmediate
+vfFrameWhite
+kCommScriptInputSpecAlreadyActive
+fxZoomVerticalEffect
+kEscKey
+kSoundCompleted
+keyVEighth
+unicodeETX
+kByte
+keyAutoHilite
+kWorldPhoneDictionary
+irJ1ProtocolType
+kFormatLongMonth
+kCommScriptInvalidOption
+fxWipeShift
+modeNotCopy
+viewAEvents
+irUsingSharpIR
+kGestaltArg_VolumeInfo
+kNoParity
+unicodeDC3
+kPackageFiles
+kSerCap_Parity_Space
+kCMOBreakFraming
+kCommScriptInvalidProxy
+kRGB_Gray11
+vfFrameDragger
+kSCCSideA
+T_UNINIT
+aeDumpFields
+kCMOSlowIRProtocolType
+kFormatNumericDate
+kElementFormatWidth
+finalY
+k300bps
+unicodeRS
+vClipping
+kModemCntSpeed29000
+chUS
+tsFamilyMask
+fxRight
+aeKeyboardEnable
+kCMOMNPCompression
+lastX
+FE_OVERFLOW
+kV17st_96Mod
+lastXY
+k7DataBits
+kCmdAKeyCodes
+kCanConnect
+aeLine
+kF4Key
+fxDrawerEffect
+kSerInDCD
+kElementAMPM
+kFolder
+kIrDASvcHintFAX
+clEditView
+irUsing9600
+kCMSVFaxID
+kFnPercent
+kRcvBuffer
+kRGB_Gray8
+kGestalt_Base
+vfHiliteShift
+vfLinesDkGray
+kHexLong
+modeCopy
+vNoFlags
+fxZoomOpenEffect
+kCMSVAsyncSerial
+opTruncated
+kLetterSpaceCursiveOptionDefault
+kULong
+sRoman
+kTypeMask
+kCMAKindLabel
+opGetCurrent
+vfRoundShift
+vjFillCustom
+kSerCap_StopBits_1_5
+k14400bps
+vjFullV
+platformVersion
+vWriteProtected
+kNoCentury
+vjTopRatio
+kCMOLocalTalkNodeID
+kASCIIEncoding
+kSerialChip6402
+kCMOSerialDiscard
+kGestalt_Version
+vNameField
+k8Bit
+kCmdNKeyCodes
+kLocalPhoneDictionary
+kBoolean
+kInkChar
+kCMOModemProfile
+aePageSetUp
+tsFaceShift
+vPhoneField
+kFixed
+aeShowDebugWindow
+fxZoomCloseEffect
+kModemCntSpeed12000
+kCommScriptZeroLengthData
+aeScrollDown
+vjSiblingNoH
+kSpeakerVolumeMedium
+aeKeyUp
+vjHMask
+kJapanCountryId
+aeOverview
+opReadOnly
+vfPenShift
+kSerialChipUnknown
+kCots
+clPictureView
+kFormatMinute
+vjFrameCustom
+kMNPCompressionNone
+vPunctuationAllowed
+kF12Key
+editFont18
+aeDropChild
+aeSelectAll
+aeSetRolexMachine
+k9600bps
+irAcitveConnect
+kAtnBuffer
+kRGB_Gray0
+kElementFormatMask
+kSerCap_DataBits_7
+chENQ
+kPopChar
+kV27Ter48Mod
+vfFillShift
+tsBold
+kElementSuffix
+vjSiblingVMask
+kGestaltArg_Microphone
+kV17_72Mod
+unicodeVT
+kModemCntSpeed26800
+kExp
+kFloat11kRate
+kCycle24
+kInFlux
+kCMOModemFaxCapabilities
+k16Bit
+fxVStartPhase
+vjParentFullV
+kModemCntSpeed7200
+kRGBpackedInteger
+keyVQuarter
+kFeedbackSounds
+chACK
+kCmdFKeyCodes
+aeSetNewtMachine
+kF9Key
+unicodeBS
+unicodeCR
+fxRevealLine
+vfFillDkGray
+vfFrameShift
+kModemECProtocolNone
+vjSiblingRightH
+k2StopBits
+recognitionAEvents
+chETX
+kNegativeZero
+kUsingNewton2
+vCapsRequired
+vjParentHMask
+kCString
+kDesktop
+vjNoLineLimits
+kCommScriptInappropriateTermination
+editFont10
+opProcess
+kCMOMNPStatistics
+kSpeakerVolumeLow
+chDC3
+kOutputFrame
+vTakesNoKeys
+kSerialEventExtClkDetectEnableMask
+kCMOSerialBytesAvailable
+kBarberIdle
+kSerOutDTR
+kDefaultDevice
+kFaceUnderline
+T_UNUSED
+kHWLocPCMCIASlot2
+kLocalCompaniesDictionary
+kUnicodeChar
+kCMOPCMCIAModemSound
+kStandardCharSetInfo
+aeShape
+kCMSAppleTalkID
+aeSetNewtonMachine
+kPalmerCharSetInfo
+kCmdSKeyCodes
+vfFrameDkGray
+kHMOSerExtClockDivide
+kCMSVAppleTalk
+vShapesAllowed
+unicodeSO
+vjCenterH
+kModemCntSpeed31400
+chRS
+vjParentClip
+kEveryWeek
+T_DATAXFER
+unitFinalX
+fxColumnsMask
+kPortraitFlip
+kModemFaxClass2
+vjBottomV
+T_TRANS
+kSCCServiceStandard
+kF1Key
+kShiftJISEncoding
+kIrDASvcHintPnPCompatible
+debugAEvents
+kCMOModemECType
+kRGB_Gray5
+lvShowSubPriority
+kFileBrowsing
+kFirstClassID
+aeString
+tsItalic
+vjSiblingCenterV
+keyLeftOpen
+kInputFrame
+fxCheckerboardEffect
+kMNPCompressionMNP5
+kOther
+kSerialChip16450
+kSerInCTS
+kCMADiscLabel
+kOutRel
+kIrDA12ProbeSlot
+aeChangePen
+kNoTimeout
+modeNotXor
+fxVStartPhaseShift
+kSerCap_StopBits_2
+kCMOIrDAReceiveBuffers
+keyVUnit
+kFormatAbbrDayOfWeek
+kLocalDateDictionary
+protoMailFontButton
+vDateField
+kLocalStatesAbbrevsDictionary
+kExpChannel
+kOpCodeMask
+kSerInBreak
+aeOpen
+kExternalClock
+kInternalModem
+kIrDASvcHintPDAPalmtop
+kInfinite
+kLeadZero
+kV21Ch2Mod
+unicodeGS
+fxRevealLineShift
+kNAN
+kRef
+kCommScriptExpectedTarget
+kNoModifiers
+vApplication
+kSerCap_DataBits_All
+k2KOutputbuffer
+kFormatLongTime
+kOptionModifier
+kSerClk_Default
+vjParentCenterH
+aeScrollUp
+kCommScriptInappropriatePartial
+irUsingNegotiateIR
+kClts
+kUseMNPSerial
+vTakesAllKeys
+kTuesday
+T_NOFLAG
+kGestalt_RebootInfo
+kCMSBlackbird
+keyInsetUnit
+protoMailFontButtonD
+vjParentBottomV
+kCMAltLabel
+kRGB_Gray13
+protoMailRouteSlip
+vFixedInkTextStyle
+kSerialEventHSKiNegatedMask
+kDraggerBorder
+kstdButtonTop
+tsSystem
+aeClose
+k4800bps
+kSampleStandard
+kCommScriptBadForm
+kSoundCompression6To1
+kNoLeadZero
+kInRel
+kElementMinute
+kFormatNumeric
+kOpCodeResultMask
+chVT
+kFormatTerse
+noLineLimits
+kIrDASvcHintComputer
+kCycle12
+modeXor
+T_FRAME
+kCMOSlowIRSniff
+kUserDictionary
+kSplitLong
+keyBottomOpen
+vfCustom
+kModemCntSpeed2400
+oneWordOnly
+tsSizeShift
+aeFlipBuffering
+kFormatAbbrDate
+kStdButtonFont
+kUsing38400
+vClickable
+kSerialEventGPiWakeupEnableMask
+kCmdCKeyCodes
+kLoadingPatch
+kCMSFramedAsyncSerial
+kPCRomanEncoding
+aeOpenDeskAccessory
+kCMOSerialHWChipLoc
+aeMath
+kADPCM
+kF6Key
+unicodeEM
+unicodeLF
+chBS
+chCR
+kFnNegParens
+vfFrameMatte
+kModemECInternalOnly
+kAbsReq
+kCommScriptInappropriateCall
+vjChildrenLasso
+kThirdWeek
+kElementMonth
+### Platform Variables:
+_GetSoundFrameCache
+_GetSynthSoundFrameCache
+_GetSynthSoundFrameSlowCache
+knownglobalfunctions
+GlobalFnHelpStrings
+_UnitManager
+### Platform View Classes:
+linkedSubview
+clView
+clPictureView
+clEditView
+clParagraphView
+clPolygonView
+clRemoteView
+clMonthView
+clOutline
+clKeyboardView
+clGaugeView
+### Platform Templates:
+newtROLabelTimeInputLine
+newtFalseEntryView
+protoLeftRightScroller
+protoAZVertTabs
+newtRONumView
+newtROLabelNumInputLine
+newtTextView
+protoDatePicker
+protoRichLabelInputLine
+newtEntryRollHeader
+newtPageLayout
+protoStatusTemplate
+newtRollEntryView
+newtNewStationeryButton
+protoNewSetClock
+protoDatePopup
+protoLongLatTextPicker
+protoRoll
+protoLabeledBatteryGauge
+protoTransportPrefs
+newtCheckAllButton
+protoCharEdit
+protoFloater
+newtProtoLine
+protoTable
+protoLargeClosebox
+newtStationeryPopupButton
+protoKeyboard
+protoTimeDeltaTextPicker
+protoBlindEntryLine
+protoTextPicker
+newtLabelInputLine
+|~protoExpandoShellDeprecated|
+protoTitle
+protoMultiDatePopup
+newtOverLayout
+protoUSstatesTextPicker
+newtFilingButton
+protoPictIndexer
+protoStatePicker
+protoInfoButton
+protoPeoplePicker
+newtStatusBar
+protoOrientation
+newtStationery
+newtApplication
+newtRollShowStationeryButton
+protoBorder
+protoKeypad
+protoPicker
+newtEntryShowStationeryButton
+newtROTextDateView
+newtTextTimeView
+newtNRLabelDateNTimeInputLine
+protoDragNGo
+protoNumericKeyboard
+protoPopInPlace
+newtActionButton
+protoSmallKeyboardButton
+protoKeyboardButton
+protoTimeDeltaPopup
+protoStaticText
+protoStatusIcon
+newtNRLabelTimeInputLine
+protoLabelInputLine
+protoMapTextPicker
+protoRollItem
+protoWordInfo
+newtRollLayout
+newtEntryViewFilingButton
+protoDateNTimeTextPicker
+protoSlider
+protoDateDurationTextPicker
+newtROEditView
+protoFilingButton
+protoAlphaKeyboard
+protoDivider
+protoTimeTextPicker
+protoStatusBar
+protoAddressPicker
+protoThumbnail
+newtSmartNameView
+newtStatusBarNoClose
+protoTransportHeader
+|~protoPhoneExpandoDeprecated|
+protoPrintFormat
+protoTimeIntervalPopup
+newtEntryViewActionButton
+newtROLabelDateInputLine
+newtLabelTimeInputLine
+newtAZTabs
+protoSetClock
+protoActionButton
+newtFloatingBar
+protoRecToggle
+protoRichInputLine
+newtPrefsView
+newtNumView
+protoPopupButton
+protoStatusProgress
+newtLabelNumInputLine
+protoGeneralPopup
+protoPictRadioButton
+newtROTextView
+protoNewFolderTab
+protoWorldPicker
+protoDateNTimePopup
+protoPictureButton
+|~protoDateExpandoDeprecated|
+protoListPicker
+protoTableEntry
+protoTimePopup
+protoPersonaPopup
+protoDragger
+protoCorrectInfo
+protoAZTabs
+protoDrawer
+protoDurationTextPicker
+newtEntryView
+protoOverview
+protoTXView
+protoStatusText
+protoRCheckBox
+protoCitiesTextPicker
+protoRadioButton
+newtRollOverLayout
+protoPrefsRollItem
+|~protoTextExpandoDeprecated|
+protoPrinterChooserButton
+protoTextButton
+protoPeriodicAlarmEditor
+newtROLabelInputLine
+protoFloatNGo
+protoApp
+protoCountryTextPicker
+protoSoupOverview
+protoImageView
+protoNumberPicker
+newtClockFolderTab
+newtEntryPageHeader
+protoEmporiumPopup
+protoHorizontalUpDownScroller
+protoGauge
+protoProvincePicker
+protoRollBrowser
+protoStatus
+protoTransport
+newtFolderTab
+protoRepeatPicker
+protoCloseBox
+newtTextDateView
+protoInputLine
+newtROTextTimeView
+protoFullRouteSlip
+protoTextList
+protoDigitalClock
+newtCheckBox
+newtLabelPhoneInputLine
+protoAnalogTimePopup
+protoRepeatView
+protoYearPopup
+protoLabelPicker
+newtNRLabelDateInputLine
+newtShowStationeryButton
+protoCountryPicker
+protoHorizontal2DScroller
+newtEditView
+protoAMPMCluster
+protoStatusGauge
+protoClockFolderTab
+protoThumbnailFloater
+newtInfoBox
+protoDateTextPicker
+protoRadioCluster
+protoRecorderView
+newtLayout
+protoStatusCloseBox
+protoUpDownScroller
+protoGlance
+protoDateIntervalPopup
+protoWordInterp
+newtStationeryView
+newtLabelDateInputLine
+protoStatusButton
+protoCheckBox
+### Platform Attribute slots:
+viewBounds
+viewFlags
+viewFormat
+viewJustify
+viewEffect
+viewFont
+viewOriginX
+viewOriginY
+viewTransferMode
+declareSelf
+copyProtection
+showSound
+hideSound
+scrollUpSound
+scrollDownSound
+doCardRouting
+textFlags
+_nextKeyView
+### Platform Script slots:
+ViewKeyRepeatScript
+ViewDropRemoveScript
+GetTargetInfo
+viewSetupDoneScript
+viewgesturescript
+viewQuitScript
+viewDrawScript
+ViewDropDoneScript
+ViewDrawDragDataScript
+ViewGetDropDataScript
+viewStrokeScript
+ViewGetDropTypesScript
+viewIdleScript
+ViewFindTargetScript
+ViewKeyDownScript
+viewChangedScript
+printNextPageScript
+ViewDropScript
+viewScrollDownScript
+ViewKeyUpScript
+viewOverviewScript
+afterScript
+viewDropChildScript
+powerOffScript
+ViewDragFeedbackScript
+pickCancelledScript
+ViewKeyStringScript
+viewScrollUpScript
+beforeScript
+ViewDropMoveScript
+viewSetupFormScript
+viewAddChildScript
+viewClickScript
+viewHiliteScript
+ViewDrawDragBackgroundScript
+pickActionScript
+viewHideScript
+viewWordScript
+ViewCaretActivateScript
+ViewDropApproveScript
+viewSetupChildrenScript
+viewShowScript
+soupChanged
+### Platform global functions:
+function    setClass
+function    vfShadow
+function    GetPartFrameSlot
+method      'endpoint:ReadCommandHeader
+function    RecognizeInkWord
+method      'TXView:CharToPoint
+method      'TXView:Externalize
+function    ExtractLong
+method      'TXView:PointToChar
+function    SetContains
+function    AddDeferredSend
+function    BatteryCount
+method      'list:IsEmpty
+method      View method:PutAway
+function    PutAway
+function    Rethrow
+function    SetOutputDevice
+function    SubstituteChars
+function    DefGlobalFn
+function    StrHexDump
+function    CircleDistance
+function    GetAppDataDefs
+function    GetAuxButtons
+function    GetDesktopConnTransports
+function    EntryFlushXmit
+method      'book:FindPageByValue
+method      'TXView:IsModified
+function    CategorizeKeyCommands
+function    GetAlarm
+method      'protoSoundChannel:Schedule
+function    InkOff
+function    Recognize
+function    StuffChar
+function    cosh
+method      'endpoint:FlushPartial
+function    GenFolderSym
+method      'protoSoundChannel:GetInputGain
+function    Display
+function    GetTone
+function    GetPICTResource
+function    FeSetRound
+function    ShowManual
+function    Apply
+method      'list:GetTopicCount
+function    FitToBox
+function    pow
+function    GetZoneList
+function    IsMockEntry
+method      'TXView:SetGeometry
+function    SetOverlaps
+method      View method:ViewKeyRepeatScript
+function    TargetIsCursor
+function    LookupWordInDictionary
+method      'TXView:ViewUpdateScrollersScript
+method      View method:AddKeyCommand
+method      'imageView:TargetChanged
+method      View method:ViewDropRemoveScript
+function    ComputeParagraphHeight
+function    GetGlobalVar
+method      Store Methods:GetName
+method      Soup Methods:GetName
+method      Soup Methods:GetName
+method      'endpoint:Release
+function    UnRegCommConfig
+method      'endpoint:Disconnect
+function    clone
+method      'thumbnail:DoneScrolling
+method      View method:GetTargetInfo
+method      'endpoint:ProcessBuiltinCommand
+function    DrawXBitmap
+function    PrimClassOf
+method      View method:parent
+method      App method:OpenNetChooser
+function    HaveZones
+method      Store Methods:HasSoup
+method      Time Zones:NewCity
+function    GetTargetCursor
+function    PolyContainsInk
+method      'endpoint:GetOptions
+method      View method:SyncScroll
+method      Extras Drawer:GetPartCursor
+method      'dataDef:newEntry
+method      'endpoint:InputScript
+method      View method:viewSetupDoneScript
+function    RegisterDataDef
+function    UnRegTransport
+method      'TXView:ReplaceAll
+method      'book:BookData
+function    SetAdd
+function    GetLanguageEnvironment
+method      'imageView:GetAnnotationMode
+function    GetDateStringSpec
+method      'protoSoundChannel:NewRecording
+function    SetCaretInfo
+function    UnRegTheseAppClasses
+method      View method:Confirm
+function    Visible
+function    UnRegAppClasses
+function    FrameDirty
+method      View method:GetDrawBox
+function    SymbolName
+function    AppleTalkOpenCount
+function    CreateTargetCursor
+function    Ticks
+function    NewDictionary
+function    ClosestLocations
+function    GetFontFamilyNum
+function    IsNativeFunction
+method      'list:OlderSister
+function    PowerOffResume
+function    GetStores
+function    StringToTime
+function    TotalMinutes
+function    OpenRoutingSlip
+function    BackLight
+method      View method:StandardFind
+method      'TXView:ChangeRangeRuns
+function    GetEntryDataDef
+function    SetExchangeRate
+method      'ioBox:DeleteItem
+function    GetAppName
+function    MakeRegion
+function    GetPkgRefInfo
+function    RegSoupChange
+function    ProtoPerformIfDefined
+function    MergeInk
+function    LocationEntryAdd
+method      'list:ActiveTopic
+function    RemoveAlarm
+function    length
+method      View method:Toggle
+method      View method:SetHilite
+function    DisposeDictionary
+method      View method:Open
+function    sinh
+function    FeTestExcept
+function    OpenResFileX
+method      Soup Methods:GetSize
+method      Soup Methods:GetSize
+function    GetView
+function    IsArray
+method      'imageView:PenDown
+function    Perform
+function    SetTime
+method      View method:SysBeep
+function    GetKeyView
+function    Write
+function    StripInk
+function    ArrayRemoveCount
+function    LatitudeToString
+function    GetDSTEntry
+function    EntryCopy
+method      'handler:EntryCopy
+function    EntrySize
+method      'handler:EntrySize
+function    SmartStop deprecated
+function    AddPowerOffHandler deprecated
+method      View method:viewgesturescript
+method      View method:DragAndDrop
+function    GetFontFace
+function    GetVariable
+method      View method:Effect
+function    EntryCopyXmit
+function    collect
+method      Store Methods:GetKind
+function    ClassAppByClass
+method      View method:Close
+function    CloseResFileX
+function    GetFolderList
+function    EntryUndoChanges
+method      'handler:EntryUndoChanges
+method      Soup Methods:RemoveAllEntries
+function    SetTimeInSeconds
+function    UnorderedOrEqual
+function    max
+function    GetResource
+method      'endpoint:Listen
+method      'list:Mother
+method      'TXView:Scroll
+function    GetStroke
+function    GetVolume
+function    StuffLong
+method      Cursor Methods:Next
+function    EntryFromObj
+function    EntryModTime
+method      'handler:EntryModTime
+method      Soup Methods:RemoveAllEntriesXmit
+function    annuity
+function    TimeStr
+method      'list:ListBottom
+function    UnRegDataDef
+method      'endpoint:output
+method      View method:BlockKeyCommand
+method      View method:viewQuitScript
+method      'dataDef:Validate
+method      Cursor Methods:WhichEnd
+function    GetPackageStores
+method      'list:IsCollapsed
+function    RegDataView
+function    RegFindApps
+function    MakeAppletalkOption
+function    IsHalting
+method      'endpoint:ReadBytes
+function    FMin
+function    Send
+function    AsyncConfirm
+function    CapitalizeWords
+function    StrExactCompare
+function    DV
+function    IsSubclass
+function    IsVBO
+method      Cursor Methods:Reset
+method      'protoSoundChannel:NewInputBlock
+function    SetFontFamily
+function    CopySign
+method      Store Methods:UsedSize
+method      Soup Methods:CopyEntries
+method      View method:viewDrawScript
+function    UnRegFolderChanged
+function    RegUnionSoup
+function    CompressStrokes
+method      Soup Methods:CopyEntriesXmit
+method      View method:GetRouteScripts
+function    SetSysEntryData
+method      View method:SlideEffect
+function    BroadcastSoupChange
+method      'book:TurnToContent
+function    UnDefineGlobalConstant
+method      View method:ViewCaretChangedScript
+method      'TXView:ChangeRangeRulers
+function    GetDictionaryData
+function    GetMatchedEntries
+function    band
+function    GetVBOCompander
+method      'TXView:GetCountCharacters
+method      'TXViewFinder:GetCountCharacters
+function    acosh
+function    OpenAppleTalk
+function    RemoveAutoAdd
+function    SendRemoteControlCode
+function    GetInkAt
+method      View method:RegLogin
+function    GetHiliteOffsets
+function    map
+function    AddStepView
+method      'book:CurrentPage
+function    FeSetExcept
+function    RemoveAllButIndexes
+function    ConnImportFile
+method      View method:GlobalOuterBox
+method      View method:PointToCharOffset
+function    UnRegisterViewDef
+method      Cursor Methods:Move
+function    isRichString
+function    NextInkIndex
+function    UR
+function    fxStepTime
+method      'book:InsertForm
+function    RemoveView
+method      'book:TurnToPage
+method      View method:ViewDropDoneScript
+method      'endpoint:Input
+method      'drawAppViewDef:UnRegPatterns
+function    AddLocale
+method      'TXView:SetStore
+function    StrWidth deprecated
+function    StrTokenize
+function    fxRows
+function    UnRegAuxButton
+function    StyledStrTruncate
+function    UnregDesktopConnTransport
+function    FeClearExcept
+method      Soup Methods:Add
+function    FontLeading
+method      'list:HandleScrub
+function    IsImmediate
+function    BMerge
+function    CloseAppleTalk
+method      View method:ViewDrawDragDataScript
+function    DateNTime
+method      Soup Methods:AddXmit
+function    ClassOf
+method      Soup Methods:HasTags
+method      Soup Methods:HasTags
+function    BackLightStatus
+method      Store Methods:PackageAvailable
+function    RegTaskTemplate
+function    AppendList
+function    BeginsWith
+function    AddDelayedCall
+function    GetRandomWord
+method      View method:GetRichString
+method      'soundFrame:GetSampleSize
+method      View method:ViewGetDropDataScript
+method      Store Methods:NewCompressedVBO
+function    RegisterCardSoup
+function    SymbolCompareLex
+function    ArrayMunger
+method      'findProto:ReSync
+method      'ioBox:Submit
+function    IsKeyDown
+function    OpenRemoteControl
+function    NewMockEntry
+function    SetFontParms
+function    SmartCFQuery
+function    AddProcrastinatedCall
+function    fxSteps
+method      Soup Methods:RemoveFromStore
+function    LookupWord
+function    ArrayToPoints
+function    BatteryStatus
+function    PointsToArray
+method      View method:viewStrokeScript
+method      Soup Methods:RemoveFromStoreXmit
+method      View method:ViewGetDropTypesScript
+method      'category:click
+function    FeRaiseExcept
+function    abs
+function    EntryChange
+method      'handler:EntryChange
+function    GetCaretBox
+function    OffsetShape
+method      'list:TopicHeight
+method      View method:hilite
+function    EntryChangeWithModTime
+method      'handler:EntryChangeWithModTime
+function    GetViewID
+function    Unordered
+method      Store Methods:CheckWriteProtect
+function    Time
+function    NewWeakArray
+method      Store Methods:SetInfo
+method      Soup Methods:SetInfo
+function    EntryChangeXmit
+function    GlobalVarExists
+method      Store Methods:BusyAction
+method      'handler:EntryAcess
+method      Soup Methods:GetNextUID
+function    UnRegPrefs
+function    CloseRemoteControl
+method      App method:NetworkChooserDone
+function    Round
+function    EntryChangeWithModTimeXmit
+function    RecognizePoly
+function    UnRegFormulas
+function    ArrayPos deprecated
+function    StrEqual
+function    GetVBOStoredSize
+method      'dataDef:ModifyEntry
+method      Soup Methods:SetInfoXmit
+function    NBPLookupCount
+function    StringToNumber
+function    PlaySoundAtVolume
+function    ReplaceObject
+method      'homePage:MultiUserSwitch
+function    SetUserSettings
+function    BSearchLeft
+function    MakeDitheredPattern
+method      'TXView:GetHiliteRange
+function    UnDefGlobalVar
+method      View method:Dial
+method      View method:Hide
+function    ParaContainsInk
+function    gc
+method      'book:ScrollPage
+function    Asinh
+function    GetUserConfig
+method      'book:HideStoryCard
+function    TimeInSeconds
+function    RemoveAppFolders
+function    bor
+function    div
+function    tan
+method      'TXView:Internalize
+function    IsPrimShape
+method      Time Zones:SetLocation
+function    TimeInSecondsToTime
+function    TimeToTimeInSeconds
+method      Store Methods:Unlock
+method      'imageView:GetAnnotations
+method      'list:HandlePriority
+function    SetRandomState
+method      View method:viewIdleScript
+method      'imageView:ScalingInfoChanged
+method      Store Methods:SetSignature
+method      Soup Methods:SetSignature
+method      'TXView:GetRangeData
+function    GetFormatTransports
+function    InkOffUnHobbled
+function    RegCommConfig
+function    SetSystemVolume
+function    DeclareUnit
+method      'handler:EntryChangeVerbatim
+method      'TXView:GetWordRange
+function    IsWhiteSpace
+function    CharPos
+function    signbit
+function    GetDefaultStore
+method      View method:JustifiedBounds
+method      'book:CountPages
+method      'dataDef:OpenEditor
+function    InsertItemsAtCaret
+function    KeyIn
+function    LessOrGreater
+method      'endpoint:PartialScript
+method      'TXView:SetDrawOrigin
+function    UnRegInboxApp
+method      'list:NewTopic
+function    SetValue
+function    GetFontSize
+method      View method:Notify
+function    remquo
+method      Soup Methods:AddToStoreXmit
+function    GetMemoryItems
+function    GetMyZone
+function    NumberStr
+function    GetCityEntry
+function    RegTransport
+function    UnRegPowerOn
+function    TotalTextBounds
+function    AddUndoCall
+method      'endpoint:ReadCommand
+method      View method:AddKeyCommands
+function    RecognizeTextInStyles
+method      'list:CalcLevel
+function    GetPointsArrayXY
+function    RenameFolder
+function    LoadExpandDictionary
+function    ceiling
+method      View method:ChildViewFrames
+function    GetGlobals deprecated
+function    Expm1
+function    RegAppClasses
+method      'overview:Abstract
+function    Downcase
+function    FeGetEnv
+function    GetNames
+method      View method:LocalBox
+function    FontDescent
+function    GetViewDefs
+function    AddDeferredCall
+function    GetUnitEndTime
+method      'book:BookTitle
+method      'infoButton:DoInfoAux
+function    EvalStringer
+method      View method:HiliteUnique
+function    UnorderedLessOrEqual
+method      View method:ViewFindTargetScript
+function    AddDelayedAction deprecated
+method      'TXView:GetScrollValues
+method      Soup Methods:IndexSizes
+function    FormattedNumberStr deprecated
+function    Print
+method      Extras Drawer:SetExtrasInfo
+function    ViewAllowsInk
+function    PlaySoundIrregardlessAtVolume
+function    DurationStr
+function    StrTruncate deprecated
+function    NBPStartLookup
+method      View method:ViewKeyDownScript
+function    atan2
+function    DecodeRichString
+function    lgamma
+method      'endpoint:InputAvailable
+method      Soup Methods:GetMember
+function    MakePhone
+function    FindStringInFrame
+method      'ioBox:AppInstalled
+function    AppInstalled
+function    GetBlue
+function    GetAppAlarmKeys
+function    HandleKeyEvents
+function    IsInstance
+method      'soundRecorder:OpenRecord
+method      Store Methods:SetAllInfo
+method      Soup Methods:SetAllInfo
+function    UnorderedOrGreater
+method      'endpoint:GetState
+function    IsBinary
+method      Extras Drawer:GetPartEntryData
+function    HiliteOwner
+function    IsEqualTone
+method      'list:SetReadOnly
+function    SyncEmporia
+method      'category:newmsg
+method      Store Methods:NewVBO
+method      Soup Methods:SetAllInfoXmit
+function    SetRemove
+function    ResolveEntryAlias
+method      View method:Show
+method      Cursor Methods:CountEntries
+function    ExtractXLong
+function    StrokeBounds
+function    EntryIsResident
+function    TrimString
+function    PlaySoundSync
+method      'book:ShowStoryCard
+method      View method:RevealEffect
+method      Store Methods:SuckPackageFromEndpoint
+function    BFind
+function    Gamma
+function    log1p
+function    MakeRect
+function    MakeDisplayPhone
+function    and
+function    ExtractData
+function    GetDataView
+function    GetCorrectInfo
+function    FMax
+function    EntryReplace
+method      'handler:EntryReplace
+function    FlushUserConfig
+function    EntryReplaceWithModTime
+method      'handler:EntryReplaceWithModTime
+method      View method:MoveTarget
+function    OpenHelpTo
+function    StrokeDone
+function    NBPStart
+function    stringer
+function    EntryReplaceXmit
+function    GetRemoteWriting
+function    SetPartFrameSlot
+function    ExtractWord
+function    PtInPicture
+function    EntryReplaceWithModTimeXmit
+function    GetPackageNames
+function    RegDataDef
+function    StrMunger
+function    GetUnionSoup
+function    StrFontWidth
+function    PerformIfDefined
+function    ThawPackage
+function    FindKeyCommand
+method      'endpoint:RetryPassword
+function    GetLocale
+function    AliasFromObj
+function    EntryRemoveFromSoup
+method      'handler:EntryRemoveFromSoup
+method      View method:LockScreen
+function    MarkPackageNotBusy
+method      'soundFrame:SetRecordingLength
+method      Store Methods:Erase
+method      'list:CollapseTopic
+function    RemovePowerOffHandler deprecated
+method      'dataDef:Get
+function    mod
+function    EntryRemoveFromSoupXmit
+method      'homePage:GenSoupName
+function    ConnOpenFileBrowser
+method      'dataDef:MakeCanonicalNameRef
+function    getVar
+method      'soundFrame:GetSampleCount
+function    IncrementMonth
+method      'imageView:CanZoomBy
+method      'dataDef:MakePopup
+method      Cursor Methods:Goto
+method      Store Methods:GetSoupNames
+function    GetWordArray
+function    SetInputGain
+method      'protoSoundChannel:SetInputGain
+function    getSlot
+method      Cursor Methods:GotoKey
+method      Extras Drawer:LaunchPartEntry
+function    RegFolderChanged
+method      Cursor Methods:entry
+function    TrueSize
+function    GetUnitStartTime
+method      App method:AutoPutAway
+function    DefineGlobalConstant
+function    StrPos
+function    BusyBoxControl
+method      'endpoint:ReadyForOutput
+function    GetSynthSoundFrameSlow
+method      View method:AddUndoAction
+method      'transport:GetFolderName
+method      View method:IsDoubleClick
+function    GetCountryEntry
+function    transportNotify
+method      'findProto:FileAs
+method      Soup Methods:AddFlushedXmit
+method      Soup Methods:AddFlushedXmit
+method      'endpoint:ConnectionDone
+method      'endpoint:GetSyncChanges
+function    VBOUndoChanges
+function    UnpackRGB
+method      Soup Methods:GetIndexesModTime
+function    atan
+function    logb
+function    Real
+method      'list:ResolveClick
+method      View method:SyncChildren
+method      View method:RegisterOpenKeyboard
+method      'endpoint:Partial
+method      Store Methods:SetName
+method      Soup Methods:SetName
+function    RegisterViewDef
+function    RemoveAppAlarms
+function    GetSoupDef
+method      View method:MungePhone
+function    ldexp
+method      'TXView:Paste
+function    EndsWith
+function    AddDeferredAction deprecated
+function    exp
+function    ExtractByte
+method      'drawAppViewDef:RegPatterns
+function    fxColumns
+function    PlaySound
+method      Store Methods:TotalSize
+method      'drawAppViewDef:UnRegTool
+method      'endpoint:stop
+method      'protoSoundChannel:stop
+function    RegAuxButton
+function    RegDesktopConnTransport
+method      'endpoint:SetOptions
+function    IsPackage
+method      'ioBox:AddItem
+method      Soup Methods:AddTags
+function    MarkPackageBusy
+function    AddPersona
+function    BFindRight
+method      View method:MoveBehind
+method      View method:HandleInkWord
+function    RecognizePara
+function    BinEqual
+function    GetGreen
+method      Soup Methods:AddTagsXmit
+method      Soup Methods:AddTagsXmit
+function    GetSound11Deprecated
+function    Random
+function    Upcase
+method      'soundFrame:GetPlayingTime
+function    AliasUnit
+function    IsInteger
+method      'imageView:SetAnnotationMode
+method      App method:AddAuxButton
+function    BatteryLevel
+function    BinaryMunger
+function    TimeFrameStr
+function    TotalSeconds
+function    EntrySetHandler
+function    or
+function    inkConvert
+function    SplitInkAt
+function    StableSort
+method      View method:ShowFoundItem
+function    IsString
+method      'endpoint:DesktopType
+method      'endpoint:OutputFrame
+function    Substr
+function    RemoveStepView
+function    SetupCardSoups
+method      View method:ViewDropScript
+method      View method:ViewInkWordScript
+method      'TXView:IsRulerShown
+method      View method:viewScrollDownScript
+method      View method:ViewKeyUpScript
+function    GetGlobalFn
+method      'imageView:ToggleImage
+method      View method:viewOverviewScript
+function    BFetch
+method      'endpoint:IdleConnection
+method      'imageView:OpenImage
+function    fabs
+function    RemoveLocale
+function    SetLocalizationFrame
+method      'soundFrame:GetSamplingRate
+method      'list:AddEmptyTopic
+method      View method:GetActiveView
+function    OpenKeyPadFor
+function    RegPrefs
+function    cos
+function    ORD
+function    LongDateStr
+function    RegFormulas
+function    GetFunctionArgCount
+method      View method:viewDropChildScript
+function    SetBounds
+function    UnionRect
+method      'book:FindContentBySlot
+function    DoPopup
+method      Store Methods:GetSoup
+function    HourMinute
+function    RemoveSlot
+function    SetKeyView
+function    TextBounds
+method      View method:SetPopup
+function    DefGlobalVar
+method      View method:PointToWord
+function    PressButton
+method      View method:bcFullName
+function    EntrySoup
+method      'handler:EntrySoup
+function    ScaleShape
+function    GetCommConfig
+function    UnmapAmbiguousCharacters
+function    SetFontFace
+function    SetVariable
+function    LocObj
+method      Soup Methods:GetInfoModTime
+function    MakeRichString
+function    ExpandInk
+method      Store Methods:Lock
+method      'list:SetDone
+method      Store Methods:CreateSoup
+function    PictBounds
+function    floor
+method      Soup Methods:flush
+method      Soup Methods:flush
+method      'TXView:GetTotalWidth
+method      View method:PositionCaret
+method      Soup Methods:AddToStoreFlushedXmit
+function    PlaySoundIrregardless
+function    ArrayInsert
+function    GetVBOStore
+function    IsSameEntry
+method      'list:TopicBottom
+method      Store Methods:CreateSoupXmit
+function    SetVolume
+function    StuffWord
+function    SetCountryClass
+method      View method:ModalDialog
+function    PostKeyString
+function    BSearchRight
+function    ObjectPkgRef
+function    Clicker
+method      'ioBox:BeginBoxIO
+function    Capitalize
+function    UnitReference
+function    DefConst
+function    HitShape
+function    CHR
+function    Erf
+function    isa
+method      'list:ExpandTopic
+function    RegInboxApp
+function    SmartConcat deprecated
+function    AddToUserDictionary
+method      View method:SetupIdle
+function    IsEntryAlias
+function    StringToDate
+function    vfInset
+method      'dataDef:GetPrimaryValue
+method      'thumbnail:PrepareToScroll
+function    DoProgress
+function    IsPathExpr
+function    RegPowerOn
+function    ConvertDropToShape
+function    GetSynthSoundFrame
+function    stats
+function    StrokeBundleToInkWord
+method      View method:ViewDragFeedbackScript
+method      View method:SyncView
+method      'imageView:ZoomTo
+function    FindLocale
+method      'imageView:ZoomToBox
+method      'endpoint:WriteCommandHeader
+function    RemovePackage
+function    UnRegUserConfigChange
+method      Soup Methods:AddIndex
+method      Soup Methods:AddIndex
+function    BFetchRight
+method      'book:HiliteBlock
+function    IsValidDate
+method      View method:GlobalBox
+function    IsNameRef
+function    MakeBinaryFromHex
+function    SetDictionaryData
+method      Soup Methods:AddIndexXmit
+method      Soup Methods:AddIndexXmit
+method      'endpoint:DoConnection
+function    SaveExpandDictionary
+method      'endpoint:connect
+function    PlaySoundEffect
+function    BIntersect
+function    FeGetRound
+function    IsMagicPtr
+function    LoadUserDictionary
+function    CreateAppSoup
+function    MakeText
+method      'dataDef:New
+function    sin
+function    signum
+function    DeclareGlobalFn
+function    ExtractCString
+method      'endpoint:ReadCommandData
+function    MapCursor
+function    StuffByte
+function    log10
+method      'list:OldestSister
+function    rinttol
+function    SmartStart deprecated
+method      View method:pickCancelledScript
+function    AddFolder
+method      'list:SetPriority
+method      View method:ViewKeyStringScript
+function    BDelete
+method      'TXView:InsertPageBreak
+method      View method:VoteOnWordUnit
+function    scalb
+function    PrepRecConfig
+function    MakePict
+method      Store Methods:Overhead
+function    MakeStrokeBundle
+function    AddEmporium
+function    FeUpdateEnv
+method      View method:ViewPostQuitScript
+method      'context:Tapped
+function    EntryHandler
+function    BInsert
+method      'endpoint:Dispose
+method      'findProto:ShowOrdinalItem
+method      'TXView:UpdateRulerInfo
+function    ExpandUnit
+function    StrCompare
+function    MeasureString
+function    UnRegPowerOff
+function    TieViews
+function    CurrentException
+function    GetFontFamilySym
+method      'drawAppViewDef:UnRegStamps
+method      'imageView:ZoomBy
+function    ExtractPString
+function    GetStrokePoint
+function    SafeMovePackage
+function    EntryMove
+method      'handler:EntryMove
+function    GetStrokePointsArray
+method      'endpoint:RemoveProtocolExtension
+function    hasVariable
+method      View method:viewScrollUpScript
+function    EntryMoveXmit
+function    FindShape
+method      'book:FindPageByContent
+method      Store Methods:AtomicAction
+function    FeHoldExcept
+function    GetCaretInfo
+function    ModalConfirm
+function    GetDefs
+function    LSearch
+function    DefineUnit
+function    GetSoundFrame
+function    MakeRoundRect
+function    IsFinite
+function    log
+method      'endpoint:Instantiate
+function    PictToShape
+function    ReBoot
+method      View method:SetOrigin
+function    bxor
+method      'TXView:copy
+function    RefreshViews
+function    StringFilter
+function    GetRoot
+function    vfRound
+function    BDifference
+function    hypot
+function    Throw
+function    EntryUniqueID
+method      'handler:EntryUniqueID
+function    CountPoints
+function    GetExchangeRate
+method      Store Methods:NewPackage
+method      View method:RemoveKeyCommandFrame
+function    MakeLine
+function    LocationEntryChange
+function    LFetch
+function    SendKeyMessage
+method      'TXView:SetHiliteRange
+function    BreakLoop
+method      View method:DoDrawing
+method      View method:DrawShape
+function    GetPkgRef
+function    acos
+function    fmod
+function    GetViewFlags
+method      Soup Methods:GetTags
+method      Soup Methods:GetTags
+function    GetZoneFromName
+function    MakeExtrasIcons
+function    MakePhoneOption
+method      'TXView:FindString
+method      'TXViewFinder:FindString
+function    LessEqualOrGreater
+function    Array
+function    InkOn
+function    vfPen
+method      View method:KeyboardInput
+function    SetUserConfig
+method      'soundRecorder:OpenPlay
+function    PowerOff
+method      View method:TrackButton
+function    StrLen
+function    Sort
+method      View method:ViewDropMoveScript
+function    InsertionSort
+method      'list:YoungerSister
+function    MakeWedge
+method      'TXView:GetContinuousRun
+method      'endpoint:FlushOutput
+method      View method:RedoChildren
+method      View method:viewSetupFormScript
+function    PackRGB
+function    MakeCompactFont
+function    MakeBinary
+method      'ioBox:ItemCompleted
+function    OpenResFile
+function    ShapeBounds
+function    AddWordToDictionary
+method      'thumbnail:Update
+function    DrawIntoBitmap
+function    ExtractUniChar
+function    GlobalFnExists
+function    |ScreenShot:NTK|
+function    AlarmUser
+function    nearbyint
+function    FindStringInArray
+function    NBPGetLookupNames
+function    bnot
+function    BInsertRight
+function    BuildContext
+function    GetFolderStr
+method      'drawAppViewDef:RegTool
+function    SetDefaultStore
+method      'list:DirtyBelow
+function    IsPtInRect
+method      View method:dirty
+function    trunc
+method      View method:DirtyBox
+method      'ioBox:PostItem
+function    SetUnion
+function    SetFontSize
+function    StdButtonWidth
+function    GetUpdatedExchangeRates
+function    notesText
+function    SetDifference
+function    UnDefGlobalFn
+method      Store Methods:RestorePackage
+function    remainder
+function    Date
+method      View method:Drag
+function    CloseResFile
+method      'list:HasKids
+function    IsFrame
+method      Soup Methods:MakeKey
+method      Soup Methods:AddWithUniqueID
+function    MakeModemOption
+function    UnorderedGreaterOrEqual
+function    fontHeight
+method      Soup Methods:GetIndexes
+function    ExitBreakLoop
+method      'TXView:GetCountPages
+function    FeSetEnv
+function    NBPGetCount
+method      Soup Methods:AddWithUniqueIDXmit
+function    Intern
+method      View method:ViewIntoBitmap
+function    ExtractBytes
+function    StuffCString
+function    GetRouteFormats
+function    GetSysEntryData
+method      'endpoint:FlushInput
+method      'endpoint:WriteBytes
+function    GetMemorySlot
+function    KeyboardConnected
+method      'endpoint:InstallProtocolExtension
+function    EntrySetCachedObject
+function    MakeBitmap
+method      'endpoint:ExceptionHandler
+function    GetNamedResource
+function    FeGetExcept
+function    NBPGetNames
+method      View method:TrackHilite
+function    GetRed
+method      'TXView:GetTotalHeight
+method      'TXView:HideRuler
+method      Soup Methods:ModifyTag
+function    asin
+function    tanh
+method      'list:MarkerBounds
+function    Gestalt
+method      'overview:HitItem
+method      'overLayout:HitItem
+method      'infoButton:GenInfoAuxItems
+function    NStringCat
+method      Soup Methods:RemoveTags
+method      Cursor Methods:ResetToEnd
+method      'list:EnsureVisibleTopic
+method      Soup Methods:ModifyTagXmit
+method      Soup Methods:ModifyTagXmit
+method      View method:CopyBits
+method      Soup Methods:GetStore
+method      'endpoint:SetState
+method      View method:viewHiliteScript
+method      Soup Methods:RemoveTagsXmit
+method      Soup Methods:RemoveTagsXmit
+function    SetDefaultUserSettings
+function    UseCurrentPersona
+function    ProtoPerform
+function    StuffPString
+function    AddAlarm
+method      App method:RemoveAuxButton
+method      'book:AddBookmark
+function    EntryStore
+method      'handler:EntryStore
+function    GetPackages
+function    GetUnionSoupAlways
+method      'endpoint:BytesAvailable
+method      'list:MakeTopicFrame
+function    ReadStreamFile
+function    MapAmbiguousCharacters
+function    DeepClone
+function    MakeShape
+method      'TXView:GetScrollableRect
+function    UnRegisterDataDef
+method      View method:HandleRawInk
+method      View method:ViewDrawDragBackgroundScript
+function    DateFromSeconds
+function    AddMemoryItem
+function    MakePixFamily
+method      'ioBox:EndBoxIO
+method      View method:pickActionScript
+function    GetAppPrefs
+method      'list:ToggleTopic
+function    GetInkWordInfo
+method      'imageView:HasAnnotations
+method      View method:viewHideScript
+function    InsetRect
+function    StrConcat
+method      'book:PreviousPage
+function    RectsOverlap
+function    SyncPersonae
+function    GetStrokeBounds
+function    SetInkerPenSize
+method      'list:HandleCheck
+method      'thumbnail:Setup
+function    AddAlarmInSeconds
+function    GetItemTransport
+function    SetRemoteWriting
+method      View method:ViewRawInkScript
+function    SplitString
+method      View method:viewWordScript
+method      View method:Delete
+function    IsAlphaNumeric
+function    SetLocale
+method      Soup Methods:AddToDefaultStore
+method      'dataDef:DefaultOpenEditor
+method      'list:DeleteTopics
+function    GetAppParams
+function    GetPICTDepth
+method      Store Methods:GetInfo
+method      Soup Methods:GetInfo
+function    IsValid
+function    FindMailNetwork
+function    UnRegSoupChange
+method      View method:ViewCaretActivateScript
+function    FontAscent
+function    nextafterd
+function    OffsetRect
+function    ParsePhone
+function    StrReplace
+function    TotalClone
+function    MakeTextLines
+method      Soup Methods:AddToDefaultStoreXmit
+function    GetCorrectionWordInfo
+function    compound
+function    IsNormal
+function    IsNumber
+function    GetEntryDataView
+method      'TXView:Cut
+function    GetLayout
+function    ButtonBounds
+method      'endpoint:SetInputSpec
+function    ShortDateStr
+function    TextBox
+method      'endpoint:GetCurrentStore
+function    GetUserSettings
+method      'endpoint:OutputDone
+function    RegUserConfigChange
+function    BuildRecConfig
+function    NBPStopLookup
+method      View method:ViewDropApproveScript
+function    ViewAutopsy
+function    LocationEntryRemoveFromSoup
+function    GetPackageStore
+method      'TXView:Clear
+function    debug
+function    GetBitmapInfo
+function    CheckThatFolderExists
+function    MakeOval
+function    ExtractChar
+function    MungeBitmap
+function    IsReal
+function    GetRandomState
+method      'book:Bookmarks
+function    StrFilled
+method      'TXViewFinder:GetRangeText
+method      Store Methods:GetSignature
+method      Soup Methods:GetSignature
+function    StuffUniChar
+function    GetLocationSoupNames
+function    randomx
+function    EntryValid
+method      'handler:EntryValid
+method      View method:GrayShrink
+function    IsFunction
+function    SaveUserDictionary
+function    AddDelayedSend
+function    IsSymbol
+method      'thumbnail:ScrollTo
+method      'imageView:ScrollTo
+function    tsSize
+function    IsPackageActive
+function    AddAutoAdd
+method      'TXView:ShowRuler
+function    CountStrokes
+function    AddProcrastinatedSend
+function    GetSystemVolume
+function    AddInk
+method      'thumbnail:GetScalingInfo
+method      'imageView:GetScalingInfo
+function    GatherKeyCommands
+function    GetShapeInfo
+function    AddView
+function    RawDial
+function    ClearUndoStacks
+method      'thumbnail:ToggleThumbnail
+method      'book:AuthorData
+function    MungeShape
+function    GetPictAsBits
+method      'thumbnail:OpenThumbnail
+function    UnRegDataView
+function    UnRegFindApps
+function    SectRect
+function    min
+method      View method:LayoutTable
+function    MakePolygon
+method      'list:NewRelative
+function    RegPowerOff
+method      Soup Methods:RemoveIndex
+method      Soup Methods:RemoveIndex
+function    AddMemoryItemUnique
+function    EnsureInternal
+function    XmitSoupChange
+method      'drawAppViewDef:RegStamps
+method      Cursor Methods:Prev
+function    rint
+function    NBPStop
+method      Soup Methods:RemoveIndexXmit
+method      Soup Methods:RemoveIndexXmit
+method      View method:viewSetupChildrenScript
+function    ParseUtter
+method      Soup Methods:Query
+method      Soup Methods:Query
+function    EntryCachedObject
+function    EnableProfiling
+function    UnRegUnionSoup
+method      View method:viewShowScript
+function    GetGroupTransport
+function    GetSoundDeprecated
+method      'book:PageThumbnail
+method      'list:ClickBounds
+function    MakeEntryAlias
+method      'imageView:CanScroll
+method      View method:HandleInsertItems
+function    StringToDateFrame
+function    addArraySlot
+function    MakeFontMenu
+function    RemoveFolder
+method      'endpoint:WriteCommand
+function    DESCreatePasswordKey
+function    IsReadOnly
+method      View method:UnRegLogin
+function    IsCommandKeystroke
+method      'endpoint:State
+method      View method:LocalOuterBox
+function    ObjEntryClass
+function    CreateSoupFromSoupDef
+function    GetPoint
+function    ParamStr
+method      'imageView:ScrollBy
+function    getCurrentFormat
+function    SafeFreezePackage
+function    not
+method      'findProto:MoveTo
+function    GetPointsArray
+function    LongitudeToString
+function    sqrt
+method      View method:LayoutColumn
+function    GetDataDefs
+method      'dataDef:MakeNameRef
+function    UseCurrentEmporium
+function    ViewAllowsInkWords
+method      'TXView:GetLineRange
+function    IsSoupEntry
+function    PointsArrayToStroke
+method      'TXView:Replace
+method      Store Methods:GetAllInfo
+method      Soup Methods:GetAllInfo
+function    StackTrace
+function    Atanh
+function    SetRandomSeed
+function    IsGlobalConstant
+function    DeleteWordFromDictionary
+method      View method:ExtractRangeAsRichString
+method      'list:RevealTopic
+function    RelBounds
+function    SetLength
+function    ShortDate
+function    Translate
+function    UnRegTaskTemplate
+function    SPrintObject
+function    HasSlot
+function    AliasUnitSubset
+function    DeleteTransport
+function    GetLocationSoup
+function    UnorderedOrLess
+function    ReadCursiveOptions
+function    UnRegisterCardSoup
+method      'protoSoundChannel:start
+function    PurgeAreaCache
+function    SafeRemovePackage
+function    RethrowWithUserMessage
+method      Store Methods:SuckPackageFromBinary
+method      View method:ClearKeyCommands
+function    AddUndoSend
+function    IsCharacter
+function    EntryTextSize
+method      'handler:EntryTextSize
+function    Erfc
+function    FDim
+function    Load
+function    Compile
+method      'book:FindContentByValue
+function    IsNaN
+function    Sleep
+function    GetScoreArray
+NIL

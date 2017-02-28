@@ -1,7 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="6751" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -18,12 +20,6 @@
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="orderFrontStandardAboutPanel:" target="Ady-hI-5gd" id="Exp-CZ-Vem"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Report Bugs…" id="xg4-3m-1Gq">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="reportBugs:" target="Voe-Tx-rLC" id="aV2-IY-aVp"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
@@ -333,6 +329,12 @@ CA
                                                 <action selector="showHelp:" target="Ady-hI-5gd" id="y7X-2Q-9no"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Report Bugs…" id="4y5-jL-C2k">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="reportBugs:" target="Voe-Tx-rLC" id="q7K-mt-9hE"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -353,7 +355,6 @@ CA
                 <tabViewController title="Preferences" selectedTabViewItemIndex="0" tabStyle="toolbar" id="nK3-lR-SVO" sceneMemberID="viewController">
                     <tabViewItems>
                         <tabViewItem label="General" identifier="" image="NSPreferencesGeneral" id="roZ-jM-8wA"/>
-                        <tabViewItem label="Update" identifier="" image="UpdatePrefsViewController" id="LaX-vz-sLX"/>
                     </tabViewItems>
                     <tabView key="tabView" type="noTabsNoBorder" id="zJY-7i-cw9">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
@@ -363,7 +364,6 @@ CA
                     </tabView>
                     <connections>
                         <segue destination="6ql-d5-V07" kind="relationship" relationship="tabItems" id="ppm-zd-VFG"/>
-                        <segue destination="VBy-vq-NLn" kind="relationship" relationship="tabItems" id="pQJ-D0-Bbk"/>
                     </connections>
                 </tabViewController>
                 <customObject id="0uP-zo-5Ph" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -381,7 +381,7 @@ CA
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="sVu-OA-et3" userLabel="General">
                                 <rect key="frame" x="0.0" y="0.0" width="426" height="88"/>
                                 <subviews>
-                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Cjc-4e-ahR">
+                                    <textField verticalHuggingPriority="750" preferredMaxLayoutWidth="276" translatesAutoresizingMaskIntoConstraints="NO" id="Cjc-4e-ahR">
                                         <rect key="frame" x="135" y="20" width="280" height="20"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="276" id="bMa-hl-xMH"/>
@@ -393,7 +393,7 @@ CA
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gbx-xk-Ggr">
+                                    <textField verticalHuggingPriority="750" preferredMaxLayoutWidth="109" translatesAutoresizingMaskIntoConstraints="NO" id="gbx-xk-Ggr">
                                         <rect key="frame" x="18" y="50" width="113" height="18"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="18" id="7UN-wN-arr"/>
@@ -420,6 +420,9 @@ CA
                                                 </items>
                                             </menu>
                                         </popUpButtonCell>
+                                        <connections>
+                                            <action selector="updateSerialPort:" target="6ql-d5-V07" id="ldI-Jn-9de"/>
+                                        </connections>
                                     </popUpButton>
                                 </subviews>
                                 <constraints>
@@ -447,94 +450,8 @@ CA
             </objects>
             <point key="canvasLocation" x="1277" y="-106"/>
         </scene>
-        <!--Update Prefs-->
-        <scene sceneID="VTc-rC-mpP">
-            <objects>
-                <viewController title="Update Prefs" id="VBy-vq-NLn" customClass="UpdatePrefsViewController" sceneMemberID="viewController">
-                    <view key="view" id="cEf-nl-Unh">
-                        <rect key="frame" x="0.0" y="0.0" width="426" height="90"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="3hD-0s-2lt" userLabel="Update">
-                                <rect key="frame" x="0.0" y="0.0" width="426" height="90"/>
-                                <subviews>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="zSg-JE-4iH">
-                                        <rect key="frame" x="18" y="50" width="144" height="22"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="140" id="GeH-nN-VFm"/>
-                                            <constraint firstAttribute="height" constant="18" id="raE-Sy-4AH"/>
-                                        </constraints>
-                                        <buttonCell key="cell" type="check" title="Check for updates:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="hwU-ly-xAC">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                    </button>
-                                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nGN-vJ-HRc">
-                                        <rect key="frame" x="166" y="47" width="112" height="26"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="107" id="1gX-1N-RFs"/>
-                                            <constraint firstAttribute="height" constant="21" id="Ekc-0S-fQi"/>
-                                        </constraints>
-                                        <popUpButtonCell key="cell" type="push" title="Monthly" bezelStyle="rounded" alignment="left" lineBreakMode="clipping" state="on" borderStyle="borderAndBezel" tag="3" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="dMj-Ag-BXk" id="mb7-k1-jXu">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="menu"/>
-                                            <menu key="menu" title="OtherViews" id="rGr-25-0FE">
-                                                <items>
-                                                    <menuItem title="Daily" tag="1" id="j3c-fT-IRj"/>
-                                                    <menuItem title="Weekly" tag="2" id="sHx-MJ-xiZ"/>
-                                                    <menuItem title="Monthly" state="on" tag="3" id="dMj-Ag-BXk"/>
-                                                </items>
-                                            </menu>
-                                        </popUpButtonCell>
-                                        <connections>
-                                            <action selector="updateFrequency:" target="VBy-vq-NLn" id="OnT-wj-0oD"/>
-                                        </connections>
-                                    </popUpButton>
-                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iZ9-Nu-azQ">
-                                        <rect key="frame" x="165" y="14" width="112" height="32"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="100" id="6Cy-Ie-jUn"/>
-                                            <constraint firstAttribute="height" constant="21" id="mfw-cz-wWl"/>
-                                        </constraints>
-                                        <buttonCell key="cell" type="push" title="Check Now" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="gb8-5v-bsc">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="checkForUpdates:" target="TzB-zA-xNB" id="0IW-Iu-T3n"/>
-                                        </connections>
-                                    </button>
-                                </subviews>
-                                <constraints>
-                                    <constraint firstItem="zSg-JE-4iH" firstAttribute="top" secondItem="3hD-0s-2lt" secondAttribute="top" constant="20" id="9De-O1-o6w"/>
-                                    <constraint firstAttribute="width" constant="426" id="V8u-YY-cz1"/>
-                                    <constraint firstItem="iZ9-Nu-azQ" firstAttribute="top" secondItem="nGN-vJ-HRc" secondAttribute="bottom" constant="8" id="a3i-6m-sJ3"/>
-                                    <constraint firstItem="zSg-JE-4iH" firstAttribute="baseline" secondItem="nGN-vJ-HRc" secondAttribute="baseline" constant="2" id="axR-2k-IE9"/>
-                                    <constraint firstAttribute="height" constant="90" id="bog-Yo-6MJ"/>
-                                    <constraint firstItem="iZ9-Nu-azQ" firstAttribute="centerX" secondItem="nGN-vJ-HRc" secondAttribute="centerX" id="h59-1B-VkX"/>
-                                    <constraint firstItem="nGN-vJ-HRc" firstAttribute="leading" secondItem="zSg-JE-4iH" secondAttribute="trailing" constant="8" id="hwf-XY-AsV"/>
-                                    <constraint firstItem="zSg-JE-4iH" firstAttribute="leading" secondItem="3hD-0s-2lt" secondAttribute="leading" constant="20" id="x8B-Qs-iK0"/>
-                                </constraints>
-                            </customView>
-                        </subviews>
-                        <constraints>
-                            <constraint firstItem="3hD-0s-2lt" firstAttribute="leading" secondItem="cEf-nl-Unh" secondAttribute="leading" id="arp-Ru-2XV"/>
-                            <constraint firstItem="3hD-0s-2lt" firstAttribute="top" secondItem="cEf-nl-Unh" secondAttribute="top" id="hga-Q2-0mh"/>
-                        </constraints>
-                    </view>
-                    <connections>
-                        <outlet property="autoCheck" destination="zSg-JE-4iH" id="BIe-lW-vPS"/>
-                        <outlet property="frequencyPopUp" destination="nGN-vJ-HRc" id="cCp-Qz-tis"/>
-                    </connections>
-                </viewController>
-                <customObject id="Vci-5o-vVb" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <customObject id="TzB-zA-xNB" userLabel="SUUpdater" customClass="SUUpdater"/>
-            </objects>
-            <point key="canvasLocation" x="1277" y="105"/>
-        </scene>
     </scenes>
     <resources>
         <image name="NSPreferencesGeneral" width="32" height="32"/>
-        <image name="UpdatePrefsViewController" width="32" height="32"/>
     </resources>
 </document>
