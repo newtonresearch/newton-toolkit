@@ -21,7 +21,6 @@
 #import "Utilities.h"
 #import "NTXDocument.h"
 #import "NTK/ObjectHeap.h"
-#import "NTK/ROMData.h"
 
 extern "C" Ref		FIntern(RefArg inRcvr, RefArg inStr);
 extern "C" Ref		ArrayInsert(RefArg ioArray, RefArg inObj, ArrayIndex index);
@@ -32,6 +31,9 @@ extern	  Ref		ParseString(RefArg inStr);
 extern NSString *	MakeNSSymbol(RefArg inSym);
 
 extern Ref *		RSgConstantsFrame;
+extern Ref *		RSformInstallScript;
+extern Ref *		RSformRemoveScript;
+extern Ref *		RSautoInstallScript;
 
 
 #pragma mark - NTXProjectDocument
@@ -347,13 +349,13 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 
 	if ([typeName isEqualTo:@"public.plain-text"]) {
 		//	export a text representation of the project into a file named <projectName>.text
-		NSError * __autoreleasing err = nil;
+		NSError *__autoreleasing err = nil;
 		NSURL * path = [url.URLByDeletingPathExtension URLByAppendingPathExtension:@"text"];
 
 		FILE * fp = fopen(path.fileSystemRepresentation, "w");
 		if (fp) {
 			NSString * when = [NSDateFormatter localizedStringFromDate:[NSDate date] dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterShortStyle];
-			fprintf(fp, "// Text of project %s written on %s\n\n", path.lastPathComponent.UTF8String, when.UTF8String);
+			fprintf(fp, "// Text of project %s written on %s\n\n", url.lastPathComponent.UTF8String, when.UTF8String);
 
 			for (NTXProjectItem * item in [self.projectItems objectForKey:@"items"])
 			{
@@ -479,7 +481,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 		execute beforeScript, if it exists
 		process layout
 		execute afterScript, if it exists
-		create constant streamFile_<filename>
+		create constant layout_<filename>
 
 	resource
 		TBD
@@ -666,12 +668,12 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(InstallScript));
 				if (NOTNIL(devGlobal))
 					SetFrameSlot(partFrame, SYMA(devInstallScript), devGlobal);
-				SetFrameSlot(partFrame, SYMA(InstallScript), gConstNSData->formInstallScript);
+				SetFrameSlot(partFrame, SYMA(InstallScript), RA(formInstallScript));
 
 				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(RemoveScript));
 				if (NOTNIL(devGlobal))
 					SetFrameSlot(partFrame, SYMA(devRemoveScript), devGlobal);
-				SetFrameSlot(partFrame, SYMA(RemoveScript), gConstNSData->formRemoveScript);
+				SetFrameSlot(partFrame, SYMA(RemoveScript), RA(formRemoveScript));
 
 				// copy slots from global partFrame, if it exists, to the part frame
 				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(partFrame));
@@ -694,7 +696,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(InstallScript));
 				if (NOTNIL(devGlobal)) {
 					SetFrameSlot(partFrame, SYMA(devInstallScript), devGlobal);
-					SetFrameSlot(partFrame, SYMA(InstallScript), gConstNSData->autoInstallScript);
+					SetFrameSlot(partFrame, SYMA(InstallScript), RA(autoInstallScript));
 				}
 				// else should probably warn user
 				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(RemoveScript));
@@ -760,7 +762,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 		NSData * pkgData = [self buildPackageData];
 		if (pkgData) {
 			// write to package file
-			NSError * __autoreleasing err = nil;
+			NSError *__autoreleasing err = nil;
 			pkgURL = [self.fileURL.URLByDeletingPathExtension URLByAppendingPathExtension:@"newtonpkg"];
 			if ([pkgData writeToURL:pkgURL options:0 error:&err]) {
 				[self report:@"Build successful"];
