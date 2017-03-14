@@ -34,7 +34,7 @@
 // Build menu actions
 - (IBAction)installToolkit:(id)sender;
 - (IBAction)takeScreenshot:(id)sender;
-- (IBAction)disconnect:(id)sender;
+- (IBAction)untetherNewt:(id)sender;
 
 // UI
 - (void)showScreenshot:(NSImage *)inShot;

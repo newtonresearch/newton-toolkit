@@ -296,7 +296,7 @@ extern void PrintCode(RefArg inFunc);
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)inItem {
 	if (inItem.action == @selector(installToolkit:)
 	||  inItem.action == @selector(takeScreenshot:)
-	||  inItem.action == @selector(disconnect:)) {
+	||  inItem.action == @selector(untetherNewt:)) {
 		return gNTXNub.isTethered;
 	}
 	if (inItem.action == @selector(reportBugs:)) {
@@ -372,7 +372,7 @@ extern void PrintCode(RefArg inFunc);
 	Return:	--
 ----------------------------------------------------------------------------- */
 
-- (IBAction)disconnect:(id)sender {
+- (IBAction)untetherNewt:(id)sender {
 	[gNTXNub disconnect];
 }
 
