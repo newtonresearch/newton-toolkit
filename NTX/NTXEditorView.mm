@@ -35,19 +35,20 @@ GetGlobalVar(RefArg inSym)
 
 - (void)awakeFromNib {
 	[super awakeFromNib];
-
-	ntxView = AllocateFrame();
-	SetFrameSlot(ntxView, SYMA(_proto), GetGlobalVar(SYMA(protoEditor)));
-	SetFrameSlot(ntxView, SYMA(viewCObject), (Ref)self);
+	[self initProtoEditor];
 }
 
 - (id)initWithFrame:(NSRect)frameRect textContainer:(NSTextContainer *)container {
 	if (self = [super initWithFrame:frameRect textContainer:container]) {
-		ntxView = AllocateFrame();
-		SetFrameSlot(ntxView, SYMA(_proto), GetGlobalVar(SYMA(protoEditor)));
-		SetFrameSlot(ntxView, SYMA(viewCObject), (Ref)self);
+		[self initProtoEditor];
 	}
 	return self;
+}
+
+- (void)initProtoEditor {
+	ntxView = AllocateFrame();
+	SetFrameSlot(ntxView, SYMA(_proto), GetGlobalVar(SYMA(protoEditor)));
+	SetFrameSlot(ntxView, SYMA(viewCObject), (Ref)self);
 }
 
 
