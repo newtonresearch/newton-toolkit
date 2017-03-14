@@ -60,8 +60,8 @@
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                         <connections>
-                                            <binding destination="inJ-cq-jtf" name="enabled" keyPath="isConnected" id="NJR-e9-G2f"/>
                                             <binding destination="inJ-cq-jtf" name="image" keyPath="connectionIcon" id="uVA-Xu-qDd"/>
+                                            <binding destination="inJ-cq-jtf" name="enabled" keyPath="isConnected" id="NJR-e9-G2f"/>
                                         </connections>
                                     </button>
                                     <connections>
