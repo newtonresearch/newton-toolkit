@@ -289,7 +289,7 @@ CA
                                         </menuItem>
                                         <menuItem title="Disconnect" keyEquivalent="k" id="C1e-vV-H7i">
                                             <connections>
-                                                <action selector="disconnect:" target="Ady-hI-5gd" id="nUV-nf-fnO"/>
+                                                <action selector="untetherNewt:" target="Ady-hI-5gd" id="3dC-PV-FUB"/>
                                             </connections>
                                         </menuItem>
                                     </items>
