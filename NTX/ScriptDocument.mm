@@ -151,12 +151,17 @@ extern Ref		ParseFile(const char * inFilename);
 	// copy file
 	char buf[BUFSIZ];
 	size_t size;
+	BOOL endsWithNewLine = NO;
 	FILE * source = fopen(self.fileURL.fileSystemRepresentation, "rb");
 	while ((size = fread(buf, 1, BUFSIZ, source)) != 0) {
 		fwrite(buf, 1, size, fp);
+		endsWithNewLine = (buf[size-1] == '\n');
 	}
 	fclose(source);
 
+	if (!endsWithNewLine) {
+		fputc('\n', fp);
+	}
 	fprintf(fp, "// End of text file %s\n\n", filename);
 }
 
