@@ -103,7 +103,7 @@ PrintObject(RefArg inRef)
 - (int)evaluate
 { return -1; }
 
-- (void)exportToText:(FILE *)fp error:(NSError * __autoreleasing *)outError
+- (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError
 { }
 
 - (NSString *) storyboardName
@@ -215,8 +215,7 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 		isNamed = false;
 	}
 	CDataPtr nameStr(ASCIIString(name));
-	RefVar proto;
-	RefVar stepChildren;
+	RefVar proto, viewClass, stepChildren;
 	// beforeScript
 	RefVar script(GetFrameSlot(viewTemplate, MakeSymbol("beforeScript")));
 	if (NOTNIL(script)) {
@@ -224,42 +223,55 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 		fprintf(fp, "%s\n", BinaryData(ASCIIString(script)));
 	}
 	fprintf(fp, "%s :=\n    {", (char *)nameStr);
-	FOREACH_WITH_TAG(viewTemplate, tag, slot)
+	ArrayIndex index = 0, count = Length(slots);
+	FOREACH_WITH_TAG(slots, tag, slot)
 		RefVar value(GetFrameSlot(slot, SYMA(value)));
 		RefVar type(GetFrameSlot(slot, MakeSymbol("__ntDataType")));
 		CDataPtr typeStr(ASCIIString(type));
-		fprintf(fp, "%s: ", SymbolName(tag));
-
-		if (strncmp(typeStr, "TEXT", 4) == 0) {
-			fprintf(fp, "\"%s\"\n", BinaryData(ASCIIString(value)));
-		} else if (strncmp(typeStr, "EVAL", 4) == 0 || strncmp(typeStr, "SCPT", 4) == 0) {
-			fprintf(fp, "%s\n", BinaryData(ASCIIString(value)));
-		} else if (strncmp(typeStr, "NUMB", 4) == 0 || strncmp(typeStr, "INTG", 4) == 0) {
-			fprintf(fp, "%ld", RVALUE(value));
-		} else if (strncmp(typeStr, "REAL", 4) == 0) {
-		} else if (strncmp(typeStr, "BOOL", 4) == 0) {
-			fprintf(fp, "%s", ISNIL(value)? "false":"true");
-		} else if (strncmp(typeStr, "RECT", 4) == 0) {
-		} else if (strncmp(typeStr, "ARAY", 4) == 0) {
-		} else if (strncmp(typeStr, "PRTO", 4) == 0) {
+		++index;
+		if (strncmp(typeStr, "ARAY", 4) == 0) {
+			// it’s the stepChildren slot
+			stepChildren = value;
+		} else if (strncmp(typeStr, "PROT", 4) == 0) {
+			proto = value;
 		} else if (strncmp(typeStr, "CLAS", 4) == 0) {
-//		} else if (strncmp(typeStr, "FONT", 4) == 0) {
-//		} else if (strncmp(typeStr, "PICT", 4) == 0) {
+			viewClass = value;
+		} else {
+			fprintf(fp, "%s: ", SymbolName(tag));
+
+			if (strncmp(typeStr, "TEXT", 4) == 0) {
+				fprintf(fp, "\"%s\"", BinaryData(ASCIIString(value)));
+			} else if (strncmp(typeStr, "EVAL", 4) == 0) {
+				fprintf(fp, "%s", BinaryData(ASCIIString(value)));
+			} else if (strncmp(typeStr, "SCPT", 4) == 0) {
+				fprintf(fp, "\n%s", BinaryData(ASCIIString(value)));
+			} else if (strncmp(typeStr, "NUMB", 4) == 0 || strncmp(typeStr, "INTG", 4) == 0) {
+				fprintf(fp, "%ld", RVALUE(value));
+			} else if (strncmp(typeStr, "REAL", 4) == 0) {
+			} else if (strncmp(typeStr, "BOOL", 4) == 0) {
+				fprintf(fp, "%s", ISNIL(value)? "false":"true");
+			} else if (strncmp(typeStr, "RECT", 4) == 0) {
+				fprintf(fp, "{left:%ld, top:%ld, right:%ld, bottom:%ld}", RINT(GetFrameSlot(value,SYMA(left))), RINT(GetFrameSlot(value,SYMA(top))), RINT(GetFrameSlot(value,SYMA(right))), RINT(GetFrameSlot(value,SYMA(bottom))));
+	//		} else if (strncmp(typeStr, "FONT", 4) == 0) {
+	//		} else if (strncmp(typeStr, "PICT", 4) == 0) {
+			}
+			if (index < count) {
+				fprintf(fp, ",\n    ");
+			}
 		}
-		fprintf(fp, ",\n    ");
 	END_FOREACH;
 	// if name is not anon, add debug:<name> slot
 	if (isNamed) {
-		fprintf(fp, "debug:%s,\n    ", (char *)nameStr);
+		fprintf(fp, ",\n    debug: \"%s\"", (char *)nameStr);
 	}
-	// add viewClass/_proto
-
-	fprintf(fp, "};\n");
-
-	fprintf(fp, "AddStepForm(%s, %s)\n", parent, (char *)nameStr);
-	if (isDeclared) {
-		fprintf(fp, "StepDeclare(%s, %s, '%s)\n", parent, (char *)nameStr, (char *)nameStr);
+	// if we have a proto or viewClass, add it last
+	if (NOTNIL(proto)) {
+		fprintf(fp, ",\n    _proto: @%ld", RVALUE(proto));
+	} else if (NOTNIL(viewClass)) {
+		fprintf(fp, ",\n    viewClass: %ld", RVALUE(viewClass));
 	}
+	fprintf(fp, "\n    };\n");
+
 	// afterScript
 	script = GetFrameSlot(viewTemplate, MakeSymbol("afterScript"));
 	if (NOTNIL(script)) {
@@ -267,15 +279,24 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 		fprintf(fp, "%s\n", BinaryData(ASCIIString(script)));
 	}
 
+	if (parent) {
+		fprintf(fp, "AddStepForm(%s, %s)\n", parent, (char *)nameStr);
+		if (isDeclared) {
+			fprintf(fp, "StepDeclare(%s, %s, '%s)\n", parent, (char *)nameStr, (char *)nameStr);
+		}
+	}
 	fprintf(fp, "\n");
+
 	if (NOTNIL(stepChildren)) {
-		PrintViewTemplate(fp, stepChildren, (char *)nameStr, depth+1);
+		FOREACH(stepChildren, child)
+			PrintViewTemplate(fp, child, (char *)nameStr, depth+1);
+		END_FOREACH;
 	}
 	return name;
 }
 
 
-- (void)exportToText:(FILE *)fp error:(NSError * __autoreleasing *)outError
+- (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError
 {
 	NewtonErr err = noErr;
 	const char * filename = self.fileURL.lastPathComponent.UTF8String;
@@ -295,7 +316,7 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 	fprintf(fp, "// End of file %s\n\n", filename);
 
 	if (err && outError)
-		*outError = [NSError errorWithDomain: NSOSStatusErrorDomain code: err userInfo: nil];
+		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:err userInfo:nil];
 }
 
 @end
@@ -341,7 +362,7 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 	part entries, and build our representation.
 ----------------------------------------------------------------------------- */
 
-- (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError * __autoreleasing *)outError {
+- (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError *__autoreleasing *)outError {
 
 	NewtonPackage pkg(url.fileSystemRepresentation);
 	const PackageDirectory * dir = pkg.directory();
@@ -398,7 +419,7 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 	Packages were not originally exported to text at all.
 ----------------------------------------------------------------------------- */
 
-- (void)exportToText:(FILE *)fp error:(NSError * __autoreleasing *)outError
+- (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError
 {
 	const char * filename = self.fileURL.lastPathComponent.UTF8String;
 	fprintf(fp, "// Package file %s\n\n", filename);
@@ -443,7 +464,8 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 
 	// set text field with that string
 	_text = [[NSAttributedString alloc] initWithString:txt
-														 attributes:@{ NSFontAttributeName:[NSFont fontWithName:@"Menlo" size:NSFont.smallSystemFontSize], NSForegroundColorAttributeName:NSColor.blackColor }];
+														 attributes:@{ NSFontAttributeName:[NSFont fontWithName:@"Menlo" size:NSFont.smallSystemFontSize],
+																			NSForegroundColorAttributeName:NSColor.blackColor }];
 
 	if (err && outError)
 		*outError = [NSError errorWithDomain: NSOSStatusErrorDomain code: ioErr userInfo: nil];
@@ -484,7 +506,7 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 		|streamFile_<fileName>|:?Install();
 ----------------------------------------------------------------------------- */
 
-- (void)exportToText:(FILE *)fp error:(NSError * __autoreleasing *)outError
+- (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError
 {
 	const char * filename = self.fileURL.lastPathComponent.UTF8String;
 	const char * sym = self.symbol.UTF8String;
@@ -511,7 +533,7 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 	Create UI representation.
 ----------------------------------------------------------------------------- */
 
-- (BOOL) readFromURL: (NSURL *) url ofType: (NSString *) typeName error: (NSError * __autoreleasing *) outError
+- (BOOL) readFromURL: (NSURL *) url ofType: (NSString *) typeName error: (NSError *__autoreleasing *) outError
 {
 	NewtonErr err = noErr;
 	newton_try
@@ -597,7 +619,7 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 	For some reason this is commented out.
 ----------------------------------------------------------------------------- */
 
-- (void)exportToText:(FILE *)fp error:(NSError * __autoreleasing *)outError
+- (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError
 {
 	const char * filename = self.fileURL.lastPathComponent.UTF8String;
 	const char * sym = self.symbol.UTF8String;

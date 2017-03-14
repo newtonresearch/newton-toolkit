@@ -12,36 +12,7 @@
 
 #define NTXShowViewTemplateNotification @"EditViewTemplate"
 
-/* -----------------------------------------------------------------------------
-	N T X T e m p l a t e D e s c r i p t o r
------------------------------------------------------------------------------ */
-
-@implementation NTXTemplateDescriptor
-
--(id)init:(RefArg)descriptor {
-	if (self = [super init]) {
-		viewTemplateDescriptor = descriptor;
-	}
-	return self;
-}
-
--(Ref) value {
-	return GetFrameSlot(viewTemplateDescriptor, SYMA(value));
-}
-
--(NSString *) title {
-	RefVar proto(GetFrameSlot(viewTemplateDescriptor, MakeSymbol("__ntId")));
-	RefVar name(GetFrameSlot(viewTemplateDescriptor, MakeSymbol("__ntName")));
-	return [NSString stringWithFormat:@"%s : %@", SymbolName(proto), MakeNSString(name)];
-}
-
--(bool) hasChildren {
-	return FrameHasSlot(self.value, SYMA(stepChildren));
-}
-
-@end
-
-
+#pragma mark -
 /* -----------------------------------------------------------------------------
 	N T X L a y o u t V i e w C o n t r o l l e r
 	We want to be able to (un)collapse the view template list view.
@@ -52,6 +23,41 @@
 @end
 
 
+#pragma mark -
+/* -----------------------------------------------------------------------------
+	N T X T e m p l a t e D e s c r i p t o r
+	An item in the hierarchical list of view templates.
+----------------------------------------------------------------------------- */
+@implementation NTXTemplateDescriptor
+
+-(id)init:(RefArg)descriptor {
+	if (self = [super init]) {
+		viewTemplateDescriptor = descriptor;
+	}
+	return self;
+}
+
+-(Ref)value {
+	return GetFrameSlot(viewTemplateDescriptor, SYMA(value));
+}
+-(void)setValue:(Ref)inValue {
+	SetFrameSlot(viewTemplateDescriptor, SYMA(value), inValue);
+}
+
+-(NSString *)title {
+	RefVar proto(GetFrameSlot(viewTemplateDescriptor, MakeSymbol("__ntId")));
+	RefVar name(GetFrameSlot(viewTemplateDescriptor, MakeSymbol("__ntName")));
+	return [NSString stringWithFormat:@"%s : %@", SymbolName(proto), MakeNSString(name)];
+}
+
+-(bool)hasChildren {
+	return FrameHasSlot(self.value, SYMA(stepChildren));
+}
+
+@end
+
+
+#pragma mark -
 /* -----------------------------------------------------------------------------
 	N T X T e m p l a t e L i s t V i e w C o n t r o l l e r
 	A hierarchical list of view templates.
@@ -67,7 +73,6 @@
 										__ntDeclare: nil,
 										__ntExternalFile: nil}
 ----------------------------------------------------------------------------- */
-
 @implementation NTXTemplateListViewController
 
 - (void)viewWillAppear {
@@ -97,7 +102,7 @@
 }
 
 
-#pragma mark - NSOutlineView item insertion/deletion
+#pragma mark NSOutlineView item insertion/deletion
 /* -----------------------------------------------------------------------------
 	Handle menu items.
 ----------------------------------------------------------------------------- */
@@ -136,7 +141,7 @@
 }
 
 
-#pragma mark - NSOutlineViewDelegate protocol
+#pragma mark NSOutlineViewDelegate protocol
 /* -----------------------------------------------------------------------------
 	Determine whether an item is a group title.
 ----------------------------------------------------------------------------- */
@@ -165,7 +170,7 @@
 }
 
 
-#pragma mark - NSOutlineViewDataSource protocol
+#pragma mark NSOutlineViewDataSource protocol
 /* -----------------------------------------------------------------------------
 	Each item in the templateHierarchy is a ViewTemplateDescriptor.
 ----------------------------------------------------------------------------- */
@@ -276,10 +281,10 @@
 @end
 
 
+#pragma mark -
 /* -----------------------------------------------------------------------------
 	N T X S l o t D e s c r i p t o r
 ----------------------------------------------------------------------------- */
-
 @implementation NTXSlotDescriptor
 
 - (id)init:(RefArg)descriptor {
@@ -291,6 +296,9 @@
 
 - (Ref)value {
 	return GetFrameSlot(slotDescriptor, SYMA(value));
+}
+-(void)setValue:(Ref)inValue {
+	SetFrameSlot(slotDescriptor, SYMA(value), inValue);
 }
 
 @synthesize tag;
@@ -341,6 +349,10 @@
 	return RINT(GetFrameSlot(slotDescriptor, MakeSymbol("__ntFlags")));
 }
 
+#pragma mark -
+/* -----------------------------------------------------------------------------
+	T E X T
+----------------------------------------------------------------------------- */
 - (NSString *)text {
 	return MakeNSString(self.value);
 }
@@ -348,19 +360,41 @@
 	SetFrameSlot(slotDescriptor, SYMA(value), MakeString(str));
 }
 
+/* -----------------------------------------------------------------------------
+	N U M B
+----------------------------------------------------------------------------- */
 - (NSInteger)number {
 	return RINT(self.value);
 }
+- (void)setNumber:(NSInteger)inValue {
+	self.value = MAKEINT(inValue);
+}
 
+/* -----------------------------------------------------------------------------
+	B O O L
+----------------------------------------------------------------------------- */
 - (BOOL)boolean {
 	return NOTNIL(self.value);
 }
+- (void)setBoolean:(BOOL)inValue {
+	self.value = MAKEBOOLEAN(inValue);
+}
 
+#pragma mark -
+/* -----------------------------------------------------------------------------
+	R E C T
+----------------------------------------------------------------------------- */
 - (NSInteger)boundsLeft {
 	return RINT(GetFrameSlot(self.value, SYMA(left)));
 }
+- (void)setBoundsLeft:(NSInteger)inValue {
+	SetFrameSlot(self.value, SYMA(left), MAKEINT(inValue));
+}
 - (NSInteger)boundsRight {
 	return RINT(GetFrameSlot(self.value, SYMA(right)));
+}
+- (void)setBoundsRight:(NSInteger)inValue {
+	SetFrameSlot(self.value, SYMA(right), MAKEINT(inValue));
 }
 - (NSInteger)boundsWidth {
 	return self.boundsRight - self.boundsLeft;
@@ -368,22 +402,349 @@
 - (NSInteger)boundsTop {
 	return RINT(GetFrameSlot(self.value, SYMA(top)));
 }
+- (void)setBoundsTop:(NSInteger)inValue {
+	SetFrameSlot(self.value, SYMA(top), MAKEINT(inValue));
+}
 - (NSInteger)boundsBottom {
 	return RINT(GetFrameSlot(self.value, SYMA(bottom)));
 }
+- (void)setBoundsBottom:(NSInteger)inValue {
+	SetFrameSlot(self.value, SYMA(bottom), MAKEINT(inValue));
+}
 - (NSInteger)boundsHeight {
 	return self.boundsBottom - self.boundsTop;
+}
+
+#pragma mark -
+/* -----------------------------------------------------------------------------
+	viewFlags
+----------------------------------------------------------------------------- */
+#import "ViewFlags.h"
+
+- (BOOL)getFlag:(long)inBit {
+	return (RINT(self.value) & inBit) != 0;
+}
+- (void)setFlag:(long)inBit on:(BOOL)inSet {
+	long v = RINT(self.value);
+	if (inSet) {
+		FLAGSET(v, inBit);
+	} else {
+		FLAGCLEAR(v, inBit);
+	}
+	self.value = MAKEINT(v);
+}
+
+- (BOOL)_vVisible {
+	return [self getFlag:vVisible];
+}
+- (void)set_vVisible:(BOOL)inValue {
+	[self setFlag:vVisible on:inValue];
+}
+
+- (BOOL)_vReadOnly {
+	return [self getFlag:vReadOnly];
+}
+- (void)set_vReadOnly:(BOOL)inValue {
+	[self setFlag:vReadOnly on:inValue];
+}
+
+- (BOOL)_vApplication {
+	return [self getFlag:vApplication];
+}
+- (void)set_vApplication:(BOOL)inValue {
+	[self setFlag:vApplication on:inValue];
+}
+
+- (BOOL)_vCalculateBounds {
+	return [self getFlag:vCalculateBounds];
+}
+- (void)set_vCalculateBounds:(BOOL)inValue {
+	[self setFlag:vCalculateBounds on:inValue];
+}
+
+- (BOOL)_vClipping {
+	return [self getFlag:vClipping];
+}
+- (void)set_vClipping:(BOOL)inValue {
+	[self setFlag:vClipping on:inValue];
+}
+
+- (BOOL)_vFloating {
+	return [self getFlag:vFloating];
+}
+- (void)set_vFloating:(BOOL)inValue {
+	[self setFlag:vFloating on:inValue];
+}
+
+- (BOOL)_vWriteProtected {
+	return [self getFlag:vWriteProtected];
+}
+- (void)set_vWriteProtected:(BOOL)inValue {
+	[self setFlag:vWriteProtected on:inValue];
+}
+
+- (BOOL)_vSingleUnit {
+	return [self getFlag:vSingleUnit];
+}
+- (void)set_vSingleUnit:(BOOL)inValue {
+	[self setFlag:vSingleUnit on:inValue];
+}
+
+- (BOOL)_vClickable {
+	return [self getFlag:vClickable];
+}
+- (void)set_vClickable:(BOOL)inValue {
+	[self setFlag:vClickable on:inValue];
+}
+
+- (BOOL)_vStrokesAllowed {
+	return [self getFlag:vStrokesAllowed];
+}
+- (void)set_vStrokesAllowed:(BOOL)inValue {
+	[self setFlag:vStrokesAllowed on:inValue];
+}
+
+- (BOOL)_vGesturesAllowed {
+	return [self getFlag:vGesturesAllowed];
+}
+- (void)set_vGesturesAllowed:(BOOL)inValue {
+	[self setFlag:vGesturesAllowed on:inValue];
+}
+
+- (BOOL)_vCharsAllowed {
+	return [self getFlag:vCharsAllowed];
+}
+- (void)set_vCharsAllowed:(BOOL)inValue {
+	[self setFlag:vCharsAllowed on:inValue];
+}
+
+- (BOOL)_vNumbersAllowed {
+	return [self getFlag:vNumbersAllowed];
+}
+- (void)set_vNumbersAllowed:(BOOL)inValue {
+	[self setFlag:vNumbersAllowed on:inValue];
+}
+
+- (BOOL)_vLettersAllowed {
+	return [self getFlag:vLettersAllowed];
+}
+- (void)set_vLettersAllowed:(BOOL)inValue {
+	[self setFlag:vLettersAllowed on:inValue];
+}
+
+- (BOOL)_vPunctuationAllowed {
+	return [self getFlag:vPunctuationAllowed];
+}
+- (void)set_vPunctuationAllowed:(BOOL)inValue {
+	[self setFlag:vPunctuationAllowed on:inValue];
+}
+
+- (BOOL)_vShapesAllowed {
+	return [self getFlag:vShapesAllowed];
+}
+- (void)set_vShapesAllowed:(BOOL)inValue {
+	[self setFlag:vShapesAllowed on:inValue];
+}
+
+- (BOOL)_vMathAllowed {
+	return [self getFlag:vMathAllowed];
+}
+- (void)set_vMathAllowed:(BOOL)inValue {
+	[self setFlag:vMathAllowed on:inValue];
+}
+
+- (BOOL)_vAnythingAllowed {
+	return (RINT(self.value) & vAnythingAllowed) == vAnythingAllowed;
+}
+- (void)set_vAnythingAllowed:(BOOL)inValue {
+	if (inValue) {
+		[self setFlag:vAnythingAllowed on:YES];
+	}
+}
+
+- (BOOL)_vCapsRequired {
+	return [self getFlag:vCapsRequired];
+}
+- (void)set_vCapsRequired:(BOOL)inValue {
+	[self setFlag:vCapsRequired on:inValue];
+}
+
+- (BOOL)_vCustomDictionaries {
+	return [self getFlag:vCustomDictionaries];
+}
+- (void)set_vCustomDictionaries:(BOOL)inValue {
+	[self setFlag:vCustomDictionaries on:inValue];
+}
+
+- (BOOL)_vNoScripts {
+	return [self getFlag:vNoScripts];
+}
+- (void)set_vNoScripts:(BOOL)inValue {
+	[self setFlag:vNoScripts on:inValue];
+}
+
+- (NSInteger)_vField {
+	return RINT(self.value) & 0x007C0000;
+}
+- (void)set_vField:(NSInteger)inValue {
+	long v = RINT(self.value) & ~0x007C0000;
+	self.value = MAKEINT(v + (inValue & 0x007C0000));
+}
+
+#pragma mark -
+/* -----------------------------------------------------------------------------
+	viewFormat
+----------------------------------------------------------------------------- */
+
+- (NSInteger)_vfPen {
+	return (RINT(self.value) & vfPenMask) >> vfPenShift;
+}
+- (void)set_vfPen:(NSInteger)inValue {
+	long v = RINT(self.value) & ~vfPenMask;
+	self.value = MAKEINT(v + (vfPen(inValue) & vfPenMask));
+}
+
+- (NSInteger)_vfRoundness {
+	return (RINT(self.value) & vfRoundMask) >> vfRoundShift;
+}
+- (void)set_vfRoundness:(NSInteger)inValue {
+	long v = RINT(self.value) & ~vfRoundMask;
+	self.value = MAKEINT(v + (vfRound(inValue) & vfRoundMask));
+}
+
+- (NSInteger)_vfInset {
+	return (RINT(self.value) & vfInsetMask) >> vfInsetShift;
+}
+- (void)set_vfInset:(NSInteger)inValue {
+	long v = RINT(self.value) & ~vfInsetMask;
+	self.value = MAKEINT(v + (vfInset(inValue) & vfInsetMask));
+}
+
+- (NSInteger)_vfShadow {
+	return (RINT(self.value) & vfShadowMask) >> vfShadowShift;
+}
+- (void)set_vfShadow:(NSInteger)inValue {
+	long v = RINT(self.value) & ~vfShadowMask;
+	self.value = MAKEINT(v + (vfShadow(inValue) & vfShadowMask));
+}
+
+
+- (NSInteger)_vfFrame {
+	return (RINT(self.value) & vfFrameMask) >> vfFrameShift;
+}
+- (void)set_vfFrame:(NSInteger)inValue {
+	long v = RINT(self.value) & ~vfFrameMask;
+	self.value = MAKEINT(v + ((inValue << vfFrameShift) & vfFrameMask));
+}
+
+- (NSInteger)_vfFill {
+	return (RINT(self.value) & vfFillMask) >> vfFillShift;
+}
+- (void)set_vfFill:(NSInteger)inValue {
+	long v = RINT(self.value) & ~vfFillMask;
+	self.value = MAKEINT(v + ((inValue << vfFillShift) & vfFillMask));
+}
+
+- (NSInteger)_vfLines {
+	return (RINT(self.value) & vfLinesMask) >> vfLineShift;
+}
+- (void)set_vfLines:(NSInteger)inValue {
+	long v = RINT(self.value) & ~vfLinesMask;
+	self.value = MAKEINT(v + ((inValue << vfLineShift) & vfLinesMask));
+}
+
+
+#pragma mark -
+/* -----------------------------------------------------------------------------
+	viewJustify
+----------------------------------------------------------------------------- */
+#define vjSelfHShift			 0
+#define vjSelfVShift			 2
+#define vjParentHShift		 4
+#define vjParentVShift		 6
+#define vjSiblingHShift		 9
+#define vjSiblingVShift		12
+#define vjLineLimitShift	23
+
+- (NSInteger)_vjParentH {
+	return (RINT(self.value) & vjParentHMask) >> vjParentHShift;
+}
+- (void)set_vjParentH:(NSInteger)inValue {
+	long v = RINT(self.value) & ~vjParentHMask;
+	self.value = MAKEINT(v + ((inValue << vjParentHShift) & vjParentHMask));
+}
+
+- (NSInteger)_vjParentV {
+	return (RINT(self.value) & vjParentVMask) >> vjParentVShift;
+}
+- (void)set_vjParentV:(NSInteger)inValue {
+	long v = RINT(self.value) & ~vjParentVMask;
+	self.value = MAKEINT(v + ((inValue << vjParentVShift) & vjParentVMask));
+}
+
+- (NSInteger)_vjSiblingH {
+	return (RINT(self.value) & vjSiblingHMask) >> vjSiblingHShift;
+}
+- (void)set_vjSiblingH:(NSInteger)inValue {
+	long v = RINT(self.value) & ~vjSiblingHMask;
+	self.value = MAKEINT(v + ((inValue << vjSiblingHShift) & vjSiblingHMask));
+}
+
+- (NSInteger)_vjSiblingV {
+	return (RINT(self.value) & vjSiblingVMask) >> vjSiblingVShift;
+}
+- (void)set_vjSiblingV:(NSInteger)inValue {
+	long v = RINT(self.value) & ~vjSiblingVMask;
+	self.value = MAKEINT(v + ((inValue << vjSiblingVShift) & vjSiblingVMask));
+}
+
+- (NSInteger)_vjTextH {
+	return (RINT(self.value) & vjHMask);
+}
+- (void)set_vjTextH:(NSInteger)inValue {
+	long v = RINT(self.value) & ~vjHMask;
+	self.value = MAKEINT(v + (inValue & vjHMask));
+}
+
+- (NSInteger)_vjTextV {
+	return (RINT(self.value) & vjVMask) >> vjSelfVShift;
+}
+- (void)set_vjTextV:(NSInteger)inValue {
+	long v = RINT(self.value) & ~vjVMask;
+	self.value = MAKEINT(v + ((inValue >> vjSelfVShift) & vjVMask));
+}
+
+- (NSInteger)_vjTextLimits {
+	return (RINT(self.value) & vjLineLimitMask) >> vjLineLimitShift;
+}
+- (void)set_vjTextLimits:(NSInteger)inValue {
+	long v = RINT(self.value) & ~vjLineLimitMask;
+	self.value = MAKEINT(v + ((inValue << vjLineLimitShift) & vjLineLimitMask));
+}
+
+- (BOOL)_vjReflow {
+	return [self getFlag:vjReflow];
+}
+- (void)set_vjReflow:(BOOL)inValue {
+	[self setFlag:vjReflow on:inValue];
+}
+
+- (BOOL)_vjChildrenLasso {
+	return [self getFlag:vjChildrenLasso];
+}
+- (void)set_vjChildrenLasso:(BOOL)inValue {
+	[self setFlag:vjChildrenLasso on:inValue];
 }
 
 
 @end
 
 
+#pragma mark -
 /* -----------------------------------------------------------------------------
 	N T X S l o t L i s t V i e w C o n t r o l l e r
 	A list of slots in a view template.
 ----------------------------------------------------------------------------- */
-
 @implementation NTXSlotListViewController
 
 - (void)viewDidLoad {
@@ -420,12 +781,12 @@
 }
 
 
-#pragma mark - NSTableViewDelegate protocol
+#pragma mark NSTableViewDelegate protocol
 
 // override to validate current slection and prevent change on error
 //- (BOOL)selectionShouldChangeInTableView:(NSTableView *)tableView {}
 
-#pragma mark - NSTableViewDataSource protocol
+#pragma mark NSTableViewDataSource protocol
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
 	return slots.count;
@@ -445,10 +806,10 @@
 @end
 
 
+#pragma mark -
 /* -----------------------------------------------------------------------------
 	N T X S l o t E d i t o r V i e w C o n t r o l l e r
 ----------------------------------------------------------------------------- */
-
 @implementation NTXSlotEditorViewController
 
 - (void)viewDidLoad {

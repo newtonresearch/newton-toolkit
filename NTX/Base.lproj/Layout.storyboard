@@ -647,10 +647,10 @@
             </objects>
             <point key="canvasLocation" x="1602" y="2002"/>
         </scene>
-        <!--View Controller-->
+        <!--viewFormat-->
         <scene sceneID="Sek-oy-Ebw">
             <objects>
-                <viewController id="kBD-Dz-Sde" sceneMemberID="viewController">
+                <viewController title="viewFormat" id="kBD-Dz-Sde" sceneMemberID="viewController">
                     <view key="view" id="KBx-OK-eob">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="192"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -706,7 +706,7 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
-                                                <binding destination="Feb-4c-YcS" name="value" keyPath="representedObject.boundsLeft" id="bPm-3C-9s7"/>
+                                                <binding destination="kBD-Dz-Sde" name="value" keyPath="representedObject._vfPen" id="hjf-yH-2Xp"/>
                                             </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ja3-m9-zc6">
@@ -726,7 +726,7 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
-                                                <binding destination="Feb-4c-YcS" name="value" keyPath="representedObject.boundsLeft" id="4hZ-GB-51h"/>
+                                                <binding destination="kBD-Dz-Sde" name="value" keyPath="representedObject._vfRoundness" id="7Ho-WG-J1C"/>
                                             </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="391-sq-Jv1">
@@ -746,7 +746,7 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
-                                                <binding destination="Feb-4c-YcS" name="value" keyPath="representedObject.boundsLeft" id="92U-5a-X4O"/>
+                                                <binding destination="kBD-Dz-Sde" name="value" keyPath="representedObject._vfInset" id="QA1-Z7-ove"/>
                                             </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FRx-5v-H8S">
@@ -766,7 +766,7 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
-                                                <binding destination="Feb-4c-YcS" name="value" keyPath="representedObject.boundsLeft" id="TQJ-LJ-BRA"/>
+                                                <binding destination="kBD-Dz-Sde" name="value" keyPath="representedObject._vfShadow" id="9gd-Xu-63I"/>
                                             </connections>
                                         </textField>
                                         <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5BV-MN-DLV">
@@ -781,14 +781,20 @@
                                                     <items>
                                                         <menuItem title="None" state="on" id="m5o-zi-Ynt"/>
                                                         <menuItem isSeparatorItem="YES" id="IfT-OC-oVf"/>
-                                                        <menuItem title="White" id="avY-SN-5W1"/>
-                                                        <menuItem title="Light Gray" id="vex-AG-Xdb"/>
-                                                        <menuItem title="Gray" id="BU3-CY-Iu4"/>
-                                                        <menuItem title="Dark Gray" id="Egb-30-jcD"/>
-                                                        <menuItem title="Black" id="Kfz-4H-Elz"/>
+                                                        <menuItem title="White" tag="1" id="avY-SN-5W1"/>
+                                                        <menuItem title="Light Gray" tag="2" id="vex-AG-Xdb"/>
+                                                        <menuItem title="Gray" tag="3" id="BU3-CY-Iu4"/>
+                                                        <menuItem title="Dark Gray" tag="4" id="Egb-30-jcD"/>
+                                                        <menuItem title="Black" tag="5" id="Kfz-4H-Elz"/>
+                                                        <menuItem title="Dragger" tag="13" id="58F-dm-Gat"/>
+                                                        <menuItem title="Custom" tag="14" id="v0T-jY-YYq"/>
+                                                        <menuItem title="Matte" tag="15" id="z7E-VL-wbZ"/>
                                                     </items>
                                                 </menu>
                                             </popUpButtonCell>
+                                            <connections>
+                                                <binding destination="kBD-Dz-Sde" name="selectedTag" keyPath="representedObject._vfFrame" id="NzK-wO-yX1"/>
+                                            </connections>
                                         </popUpButton>
                                         <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8s2-oS-k6o">
                                             <rect key="frame" x="233" y="111" width="106" height="22"/>
@@ -802,14 +808,18 @@
                                                     <items>
                                                         <menuItem title="None" state="on" id="c9q-CQ-mKx"/>
                                                         <menuItem isSeparatorItem="YES" id="NP3-35-7Go"/>
-                                                        <menuItem title="White" id="Nen-2I-gY7"/>
-                                                        <menuItem title="Light Gray" id="pml-Zm-BG2"/>
-                                                        <menuItem title="Gray" id="zmG-V9-nMt"/>
-                                                        <menuItem title="Dark Gray" id="h5H-aR-rFs"/>
-                                                        <menuItem title="Black" id="Yze-bf-Jlq"/>
+                                                        <menuItem title="White" tag="1" id="Nen-2I-gY7"/>
+                                                        <menuItem title="Light Gray" tag="2" id="pml-Zm-BG2"/>
+                                                        <menuItem title="Gray" tag="3" id="zmG-V9-nMt"/>
+                                                        <menuItem title="Dark Gray" tag="4" id="h5H-aR-rFs"/>
+                                                        <menuItem title="Black" tag="5" id="Yze-bf-Jlq"/>
+                                                        <menuItem title="Custom" tag="14" id="mlC-mD-nyc"/>
                                                     </items>
                                                 </menu>
                                             </popUpButtonCell>
+                                            <connections>
+                                                <binding destination="kBD-Dz-Sde" name="selectedTag" keyPath="representedObject._vfFill" id="sKt-qP-GTP"/>
+                                            </connections>
                                         </popUpButton>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zeu-kg-XkE">
                                             <rect key="frame" x="166" y="90" width="64" height="14"/>
@@ -827,15 +837,19 @@
                                                 <menu key="menu" id="znw-vl-weh">
                                                     <items>
                                                         <menuItem title="None" state="on" id="bry-ku-LOl"/>
-                                                        <menuItem title="White" id="rgR-4r-0Wx"/>
                                                         <menuItem isSeparatorItem="YES" id="sxX-ng-L0D"/>
-                                                        <menuItem title="Light Gray" id="EAY-Bb-eCd"/>
-                                                        <menuItem title="Gray" id="u8h-j4-dX9"/>
-                                                        <menuItem title="Dark Gray" id="9Ie-Wa-r0T"/>
-                                                        <menuItem title="Black" id="cMP-mj-BDL"/>
+                                                        <menuItem title="White" tag="1" id="rgR-4r-0Wx"/>
+                                                        <menuItem title="Light Gray" tag="2" id="EAY-Bb-eCd"/>
+                                                        <menuItem title="Gray" tag="3" id="u8h-j4-dX9"/>
+                                                        <menuItem title="Dark Gray" tag="4" id="9Ie-Wa-r0T"/>
+                                                        <menuItem title="Black" tag="5" id="cMP-mj-BDL"/>
+                                                        <menuItem title="Custom" tag="14" id="7v2-d3-7Ud"/>
                                                     </items>
                                                 </menu>
                                             </popUpButtonCell>
+                                            <connections>
+                                                <binding destination="kBD-Dz-Sde" name="selectedTag" keyPath="representedObject._vfLines" id="OsK-6a-t0f"/>
+                                            </connections>
                                         </popUpButton>
                                     </subviews>
                                     <constraints>
@@ -1081,8 +1095,19 @@
                                                 <menu key="menu" id="0h3-Zx-LZq">
                                                     <items>
                                                         <menuItem title="None" state="on" id="YXR-pE-wNE"/>
-                                                        <menuItem title="Item 2" id="dhr-Z1-Mxb"/>
-                                                        <menuItem title="Item 3" id="SSB-fJ-PsY"/>
+                                                        <menuItem title="Custom" id="dhr-Z1-Mxb"/>
+                                                        <menuItem isSeparatorItem="YES" id="ds7-1S-PIb"/>
+                                                        <menuItem title="Checkerboard" id="SSB-fJ-PsY"/>
+                                                        <menuItem title="Barn Door Open" id="9Mp-6B-WRp"/>
+                                                        <menuItem title="Barn Door Close" id="4a9-Fc-SAw"/>
+                                                        <menuItem title="Venetian Blinds" id="hQ5-GK-sI7"/>
+                                                        <menuItem title="Iris Open" id="yU8-gd-tpQ"/>
+                                                        <menuItem title="Iris Close" id="q3m-Q6-xy9"/>
+                                                        <menuItem title="Pop Down" id="DZn-no-Zqw"/>
+                                                        <menuItem title="Drawer" id="0t9-qM-E0g"/>
+                                                        <menuItem title="Zoom Open" id="vYp-0T-AdH"/>
+                                                        <menuItem title="Zoom Close" id="LZq-5b-pBG"/>
+                                                        <menuItem title="Zoom Vertical" id="guY-ZX-FS5"/>
                                                     </items>
                                                 </menu>
                                             </popUpButtonCell>
@@ -1160,10 +1185,10 @@
             </objects>
             <point key="canvasLocation" x="649" y="2414.5"/>
         </scene>
-        <!--View Controller-->
+        <!--viewJustify-->
         <scene sceneID="MyB-AT-EcT">
             <objects>
-                <viewController id="BCx-hD-nXG" sceneMemberID="viewController">
+                <viewController title="viewJustify" id="BCx-hD-nXG" sceneMemberID="viewController">
                     <view key="view" id="Rdt-KE-htr">
                         <rect key="frame" x="0.0" y="0.0" width="486" height="248"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -1226,11 +1251,15 @@
                                                             <menu key="menu" id="ch5-kL-1dj">
                                                                 <items>
                                                                     <menuItem title="Left Relative" state="on" id="nmL-QA-xfU"/>
-                                                                    <menuItem title="Centre Relative" id="Irw-Y3-oEm"/>
-                                                                    <menuItem title="Right Relative" id="cRp-Tz-WPx"/>
+                                                                    <menuItem title="Centre Relative" tag="1" id="Irw-Y3-oEm"/>
+                                                                    <menuItem title="Right Relative" tag="2" id="cRp-Tz-WPx"/>
+                                                                    <menuItem title="Full Relative" tag="3" id="ppO-w1-YLp"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
+                                                        <connections>
+                                                            <binding destination="BCx-hD-nXG" name="selectedTag" keyPath="representedObject._vjParentH" id="Su1-IM-H94"/>
+                                                        </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6cs-Ek-hZJ">
                                                         <rect key="frame" x="327" y="35" width="100" height="22"/>
@@ -1241,11 +1270,16 @@
                                                             <menu key="menu" id="uTn-e4-2vO">
                                                                 <items>
                                                                     <menuItem title="None" state="on" id="lyo-6a-6D1"/>
-                                                                    <menuItem title="Item 2" id="stg-Mh-3uw"/>
-                                                                    <menuItem title="Item 3" id="OrQ-xx-te6"/>
+                                                                    <menuItem title="Left Relative" tag="4" id="EHG-au-sdN"/>
+                                                                    <menuItem title="Centre Relative" tag="1" id="n3m-KU-gjL"/>
+                                                                    <menuItem title="Right Relative" tag="2" id="vhz-5b-GTb"/>
+                                                                    <menuItem title="Full Relative" tag="3" id="YGb-GC-IwW"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
+                                                        <connections>
+                                                            <binding destination="BCx-hD-nXG" name="selectedTag" keyPath="representedObject._vjSiblingH" id="aYR-ci-f6j"/>
+                                                        </connections>
                                                     </popUpButton>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Zrr-gt-kLG">
                                                         <rect key="frame" x="95" y="18" width="44" height="14"/>
@@ -1274,11 +1308,15 @@
                                                             <menu key="menu" id="RVZ-tU-aSf">
                                                                 <items>
                                                                     <menuItem title="Top Relative" state="on" id="TlT-db-X86"/>
-                                                                    <menuItem title="Centre Relative" id="a81-f3-zDX"/>
-                                                                    <menuItem title="Bottom Relative" id="UQJ-zO-JaI"/>
+                                                                    <menuItem title="Centre Relative" tag="1" id="a81-f3-zDX"/>
+                                                                    <menuItem title="Bottom Relative" tag="2" id="UQJ-zO-JaI"/>
+                                                                    <menuItem title="Full Relative" tag="3" id="uil-MO-QSP"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
+                                                        <connections>
+                                                            <binding destination="BCx-hD-nXG" name="selectedTag" keyPath="representedObject._vjParentV" id="KXb-AE-Ql3"/>
+                                                        </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="10a-VP-dav">
                                                         <rect key="frame" x="327" y="13" width="100" height="22"/>
@@ -1289,11 +1327,16 @@
                                                             <menu key="menu" id="u0j-mi-D6V">
                                                                 <items>
                                                                     <menuItem title="None" state="on" id="aoH-l8-D8h"/>
-                                                                    <menuItem title="Item 2" id="ooO-fd-Is0"/>
-                                                                    <menuItem title="Item 3" id="WUV-PQ-cbc"/>
+                                                                    <menuItem title="Left Relative" tag="4" id="Jbn-N8-gsC"/>
+                                                                    <menuItem title="Centre Relative" tag="1" id="H8o-4U-e5B"/>
+                                                                    <menuItem title="Right Relative" tag="2" id="iE6-G6-rhr"/>
+                                                                    <menuItem title="Full Relative" tag="3" id="OoM-BQ-a1g"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
+                                                        <connections>
+                                                            <binding destination="BCx-hD-nXG" name="selectedTag" keyPath="representedObject._vjSiblingV" id="3Q8-TA-Ywe"/>
+                                                        </connections>
                                                     </popUpButton>
                                                 </subviews>
                                             </view>
@@ -1332,11 +1375,15 @@
                                                             <menu key="menu" id="7Gs-lF-Ab3">
                                                                 <items>
                                                                     <menuItem title="Left" state="on" id="sOI-tz-f5D"/>
-                                                                    <menuItem title="Centre" id="g6o-og-eY7"/>
-                                                                    <menuItem title="Right" id="SDW-IA-7VH"/>
+                                                                    <menuItem title="Centre" tag="1" id="g6o-og-eY7"/>
+                                                                    <menuItem title="Right" tag="2" id="SDW-IA-7VH"/>
+                                                                    <menuItem title="Full" tag="3" id="jT0-20-sci"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
+                                                        <connections>
+                                                            <binding destination="BCx-hD-nXG" name="selectedTag" keyPath="representedObject._vjTextH" id="jBl-6e-QVj"/>
+                                                        </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="97y-AJ-3EY">
                                                         <rect key="frame" x="88" y="37" width="100" height="22"/>
@@ -1347,11 +1394,15 @@
                                                             <menu key="menu" id="riZ-b0-oWc">
                                                                 <items>
                                                                     <menuItem title="Top" state="on" id="WwW-gD-hlA"/>
-                                                                    <menuItem title="Centre" id="V6R-0E-XXu"/>
-                                                                    <menuItem title="Bottom" id="XU7-FR-5Xa"/>
+                                                                    <menuItem title="Centre" tag="1" id="V6R-0E-XXu"/>
+                                                                    <menuItem title="Bottom" tag="2" id="XU7-FR-5Xa"/>
+                                                                    <menuItem title="Full" tag="3" id="ice-97-c0j"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
+                                                        <connections>
+                                                            <binding destination="BCx-hD-nXG" name="selectedTag" keyPath="representedObject._vjTextV" id="yaB-1V-Hpi"/>
+                                                        </connections>
                                                     </popUpButton>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gns-4Z-k7V">
                                                         <rect key="frame" x="24" y="18" width="61" height="14"/>
@@ -1371,10 +1422,14 @@
                                                             <menu key="menu" id="j8D-kb-jbA">
                                                                 <items>
                                                                     <menuItem title="No limit" state="on" id="d1A-7s-gxq"/>
-                                                                    <menuItem title="One line only" id="oq4-wI-HLQ"/>
+                                                                    <menuItem title="One line only" tag="1" id="oq4-wI-HLQ"/>
+                                                                    <menuItem title="One word only" tag="2" id="Tgm-QK-7Sr"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
+                                                        <connections>
+                                                            <binding destination="BCx-hD-nXG" name="selectedTag" keyPath="representedObject._vjTextLimits" id="EWa-93-deh"/>
+                                                        </connections>
                                                     </popUpButton>
                                                 </subviews>
                                             </view>
@@ -1393,6 +1448,9 @@
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <binding destination="BCx-hD-nXG" name="value" keyPath="representedObject._vjReflow" id="h8o-WV-V1u"/>
+                                                        </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4TS-DG-Fhg">
                                                         <rect key="frame" x="17" y="50" width="100" height="20"/>
@@ -1401,6 +1459,9 @@
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <binding destination="BCx-hD-nXG" name="value" keyPath="representedObject._vjChildrenLasso" id="kX6-FP-vhc"/>
+                                                        </connections>
                                                     </button>
                                                 </subviews>
                                             </view>
@@ -1422,10 +1483,10 @@
             </objects>
             <point key="canvasLocation" x="1165" y="2249"/>
         </scene>
-        <!--View Controller-->
+        <!--viewFlags-->
         <scene sceneID="E7u-cS-w29">
             <objects>
-                <viewController id="YCy-Ql-ON8" sceneMemberID="viewController">
+                <viewController title="viewFlags" id="YCy-Ql-ON8" sceneMemberID="viewController">
                     <view key="view" id="67A-Ac-IrY">
                         <rect key="frame" x="0.0" y="0.0" width="500" height="263"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -1445,6 +1506,9 @@
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="smallSystem"/>
                                                     </buttonCell>
+                                                    <connections>
+                                                        <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vVisible" id="Nfn-Ch-92v"/>
+                                                    </connections>
                                                 </button>
                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="B8C-hZ-bRn">
                                                     <rect key="frame" x="-3" y="117" width="87" height="18"/>
@@ -1452,6 +1516,9 @@
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="smallSystem"/>
                                                     </buttonCell>
+                                                    <connections>
+                                                        <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vApplication" id="36B-0M-xm1"/>
+                                                    </connections>
                                                 </button>
                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="Cwv-UD-h3C">
                                                     <rect key="frame" x="-3" y="97" width="117" height="18"/>
@@ -1459,6 +1526,9 @@
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="smallSystem"/>
                                                     </buttonCell>
+                                                    <connections>
+                                                        <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vCalculateBounds" id="FUt-sd-K90"/>
+                                                    </connections>
                                                 </button>
                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="WmY-5A-N6c">
                                                     <rect key="frame" x="-3" y="77" width="79" height="18"/>
@@ -1466,6 +1536,9 @@
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="smallSystem"/>
                                                     </buttonCell>
+                                                    <connections>
+                                                        <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vReadOnly" id="ETe-2x-hFk"/>
+                                                    </connections>
                                                 </button>
                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="M7z-4V-JaK">
                                                     <rect key="frame" x="-3" y="57" width="72" height="18"/>
@@ -1473,6 +1546,9 @@
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="smallSystem"/>
                                                     </buttonCell>
+                                                    <connections>
+                                                        <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vClipping" id="thz-kk-3Hw"/>
+                                                    </connections>
                                                 </button>
                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="dlk-Di-YHs">
                                                     <rect key="frame" x="-3" y="37" width="71" height="18"/>
@@ -1480,6 +1556,9 @@
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="smallSystem"/>
                                                     </buttonCell>
+                                                    <connections>
+                                                        <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vFloating" id="BnA-XA-kL0"/>
+                                                    </connections>
                                                 </button>
                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="c9D-Iu-Rub">
                                                     <rect key="frame" x="-3" y="17" width="108" height="18"/>
@@ -1487,6 +1566,9 @@
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="smallSystem"/>
                                                     </buttonCell>
+                                                    <connections>
+                                                        <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vWriteProtected" id="13O-VC-JE1"/>
+                                                    </connections>
                                                 </button>
                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="EMp-bA-gAz">
                                                     <rect key="frame" x="-3" y="-3" width="80" height="18"/>
@@ -1494,6 +1576,9 @@
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="smallSystem"/>
                                                     </buttonCell>
+                                                    <connections>
+                                                        <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vNoScripts" id="mba-id-Wo5"/>
+                                                    </connections>
                                                 </button>
                                             </subviews>
                                             <visibilityPriorities>
@@ -1532,6 +1617,9 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vSingleUnit" id="y5A-iW-UZr"/>
+                                                                </connections>
                                                             </button>
                                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="hvV-Er-Z6n">
                                                                 <rect key="frame" x="-3" y="97" width="76" height="18"/>
@@ -1539,6 +1627,9 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vClickable" id="TXL-yy-L6x"/>
+                                                                </connections>
                                                             </button>
                                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="r9r-VS-Ppg">
                                                                 <rect key="frame" x="-3" y="77" width="109" height="18"/>
@@ -1546,6 +1637,9 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vStrokesAllowed" id="mnv-4h-sYG"/>
+                                                                </connections>
                                                             </button>
                                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="7Fm-h1-FhU">
                                                                 <rect key="frame" x="-3" y="57" width="117" height="18"/>
@@ -1553,6 +1647,9 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vGesturesAllowed" id="pru-lK-QSf"/>
+                                                                </connections>
                                                             </button>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="wsZ-nN-FfE">
                                                                 <rect key="frame" x="0.0" y="40" width="127" height="12"/>
@@ -1566,6 +1663,9 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vPunctuationAllowed" id="kge-tW-KPV"/>
+                                                                </connections>
                                                             </button>
                                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="kgA-dg-eyW">
                                                                 <rect key="frame" x="-3" y="-3" width="115" height="18"/>
@@ -1573,6 +1673,9 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vAnythingAllowed" id="GqN-tb-Cjk"/>
+                                                                </connections>
                                                             </button>
                                                         </subviews>
                                                         <constraints>
@@ -1608,6 +1711,9 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vCharsAllowed" id="5yY-Tz-3bb"/>
+                                                                </connections>
                                                             </button>
                                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="TbX-Jd-cPz">
                                                                 <rect key="frame" x="-3" y="97" width="106" height="18"/>
@@ -1615,6 +1721,9 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vLettersAllowed" id="2AC-XP-Hqm"/>
+                                                                </connections>
                                                             </button>
                                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="sIX-w2-zO8">
                                                                 <rect key="frame" x="-3" y="77" width="96" height="18"/>
@@ -1622,6 +1731,9 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vMathAllowed" id="Y84-dY-XdP"/>
+                                                                </connections>
                                                             </button>
                                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="lU8-bl-WGp">
                                                                 <rect key="frame" x="-3" y="57" width="117" height="18"/>
@@ -1629,6 +1741,9 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vNumbersAllowed" id="vT1-vc-RYx"/>
+                                                                </connections>
                                                             </button>
                                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="QDP-EM-bUM">
                                                                 <rect key="frame" x="-3" y="37" width="108" height="18"/>
@@ -1636,6 +1751,9 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vShapesAllowed" id="Kkp-I8-Kxo"/>
+                                                                </connections>
                                                             </button>
                                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="nSA-ZT-rmk">
                                                                 <rect key="frame" x="-3" y="17" width="131" height="18"/>
@@ -1643,6 +1761,9 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vCustomDictionaries" id="u2Z-GL-Xbn"/>
+                                                                </connections>
                                                             </button>
                                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="liM-4h-89I">
                                                                 <rect key="frame" x="-3" y="-3" width="102" height="18"/>
@@ -1650,6 +1771,9 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <binding destination="YCy-Ql-ON8" name="value" keyPath="representedObject._vCapsRequired" id="Y6i-Yl-tTq"/>
+                                                                </connections>
                                                             </button>
                                                         </subviews>
                                                         <visibilityPriorities>
@@ -1683,14 +1807,17 @@
                                                                 <items>
                                                                     <menuItem title="None" state="on" id="gUE-0J-aHv"/>
                                                                     <menuItem isSeparatorItem="YES" id="2hk-nN-Czw"/>
-                                                                    <menuItem title="White" id="E59-Lr-9ac"/>
-                                                                    <menuItem title="Light Gray" id="3L4-iv-f9F"/>
-                                                                    <menuItem title="Gray" id="6dG-po-P9D"/>
-                                                                    <menuItem title="Dark Gray" id="Uqv-C3-fnl"/>
-                                                                    <menuItem title="Black" id="Hvw-Db-u8J"/>
+                                                                    <menuItem title="Phone" tag="262144" id="E59-Lr-9ac"/>
+                                                                    <menuItem title="Date" tag="524288" id="3L4-iv-f9F"/>
+                                                                    <menuItem title="Time" tag="1048576" id="6dG-po-P9D"/>
+                                                                    <menuItem title="Address" tag="2097152" id="Uqv-C3-fnl"/>
+                                                                    <menuItem title="Name" tag="4194304" id="Hvw-Db-u8J"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
+                                                        <connections>
+                                                            <binding destination="YCy-Ql-ON8" name="selectedTag" keyPath="representedObject._vField" id="dyA-In-kFW"/>
+                                                        </connections>
                                                     </popUpButton>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Jbg-jQ-kOh">
                                                         <rect key="frame" x="8" y="154" width="84" height="14"/>

@@ -22,14 +22,36 @@
 #import "NewtonKit.h"
 
 /* -----------------------------------------------------------------------------
+	N T X L a y o u t V i e w C o n t r o l l e r
+	We want to be able to (un)collapse the view template list view.
+----------------------------------------------------------------------------- */
+@interface NTXLayoutViewController : NSSplitViewController
+{
+	IBOutlet NSSplitViewItem * templateListItem;
+}
+- (void)toggleCollapsed;
+@end
+
+
+/* -----------------------------------------------------------------------------
 	N T X T e m p l a t e L i s t V i e w C o n t r o l l e r
 	A list of view templates, like Xcode’s.
 ----------------------------------------------------------------------------- */
+@interface NTXTemplateListViewController : NSViewController
+{
+	// outline sidebar
+	IBOutlet NSOutlineView * sidebarView;
+
+	RefStruct templateHierarchy;
+}
+@property(readonly) Ref selectedViewTemplate;
+@end
+
 @interface NTXTemplateDescriptor : NSObject
 {
 	RefStruct viewTemplateDescriptor;
 }
-@property(readonly) Ref value;
+@property(assign) Ref value;
 @property(readonly) NSString * title;
 @property(readonly) bool hasChildren;
 - (id)init:(RefArg)descriptor;
@@ -39,15 +61,19 @@
 {
 	RefStruct slotDescriptor;
 }
-@property(readonly) Ref value;
+@property(assign) Ref value;
 @property(strong) NSString * tag;
 @property(readonly) NSString * title;
 @property(readonly) NSString * type;
 @property(readonly) int flags;
 
+// TEXT
 @property(strong) NSString * text;
+// NUMB
 @property NSInteger number;
+// BOOL
 @property BOOL boolean;
+// RECT
 @property NSInteger boundsLeft;
 @property NSInteger boundsRight;
 @property(readonly) NSInteger boundsWidth;
@@ -55,18 +81,52 @@
 @property NSInteger boundsBottom;
 @property(readonly) NSInteger boundsHeight;
 
+// viewFlags
+@property BOOL _vVisible;
+@property BOOL _vReadOnly;
+@property BOOL _vApplication;
+@property BOOL _vCalculateBounds;
+@property BOOL _vNoKeys;
+@property BOOL _vClipping;
+@property BOOL _vFloating;
+@property BOOL _vWriteProtected;
+@property BOOL _vNoScripts;
+@property BOOL _vSingleUnit;
+@property BOOL _vClickable;
+@property BOOL _vStrokesAllowed;
+@property BOOL _vGesturesAllowed;
+@property BOOL _vCharsAllowed;
+@property BOOL _vNumbersAllowed;
+@property BOOL _vLettersAllowed;
+@property BOOL _vPunctuationAllowed;
+@property BOOL _vShapesAllowed;
+@property BOOL _vMathAllowed;
+@property BOOL _vAnythingAllowed;
+@property BOOL _vCapsRequired;
+@property BOOL _vCustomDictionaries;
+@property NSInteger _vField;
+
+// viewFormat
+@property NSInteger _vfPen;
+@property NSInteger _vfRoundness;
+@property NSInteger _vfInset;
+@property NSInteger _vfShadow;
+@property NSInteger _vfFrame;
+@property NSInteger _vfFill;
+@property NSInteger _vfLines;
+
+// viewJustify;
+@property NSInteger _vjParentH;
+@property NSInteger _vjParentV;
+@property NSInteger _vjSiblingH;
+@property NSInteger _vjSiblingV;
+@property NSInteger _vjTextH;
+@property NSInteger _vjTextV;
+@property NSInteger _vjTextLimits;
+@property BOOL _vjReflow;
+@property BOOL _vjChildrenLasso;
+
 - (id)init:(RefArg)descriptor;
-@end
-
-
-@interface NTXTemplateListViewController : NSViewController
-{
-	// outline sidebar
-	IBOutlet NSOutlineView * sidebarView;
-
-	RefStruct templateHierarchy;
-}
-@property(readonly) Ref selectedViewTemplate;
 @end
 
 
@@ -95,17 +155,5 @@
 {
 	IBOutlet NTXEditorView * slotView;
 }
-@end
-
-
-/* -----------------------------------------------------------------------------
-	N T X L a y o u t V i e w C o n t r o l l e r
-	We want to be able to (un)collapse the view template list view.
------------------------------------------------------------------------------ */
-@interface NTXLayoutViewController : NSSplitViewController
-{
-	IBOutlet NSSplitViewItem * templateListItem;
-}
-- (void)toggleCollapsed;
 @end
 
