@@ -9,7 +9,6 @@
 #import "SourceListViewController.h"
 #import "ProjectWindowController.h"
 #import "PreferenceKeys.h"
-#import "ProjectItem.h"
 #import "ProjectDocument.h"
 #import "NTXDocument.h"
 #import "Utilities.h"
@@ -32,8 +31,12 @@
 	wc.sourceSplitController = self;
 }
 
-- (void)toggleCollapsed {
-	sourceListItem.animator.collapsed = !sourceListItem.isCollapsed;
+- (void)toggleCollapsedSplit:(NSInteger)index {
+	if (index == 0) {
+		sourceListItem.animator.collapsed = !sourceListItem.isCollapsed;
+	} else {
+		infoItem.animator.collapsed = !infoItem.isCollapsed;
+	}
 }
 
 @end
@@ -46,22 +49,27 @@
 	in the project document.
 	It acts as the data source and delegate for the NSOutlineView.
 ----------------------------------------------------------------------------- */
+@interface NTXSourceListViewController ()
+{
+	// outline sidebar model
+	NSMutableArray<NSTreeNode *> * sourceList;	// each node represents an NTXProjectItem
+	NSTreeNode * projectNode;
+	NSArray *_draggedNodes;
+}
+@end
+
+
 @implementation NTXSourceListViewController
 
-
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
 	[super viewDidLoad];
 
 	// set up sidebar items ready to be populated when Newton connects
 	sourceList = [[NSMutableArray alloc] init];
 
-	// defer population until window has fully loaded
 	dispatch_async(dispatch_get_main_queue(), ^{
 		NTXProjectWindowController * wc = self.view.window.windowController;
 		wc.sourceListController = self;
-
-		[self populateSourceList];
 	});
 }
 
@@ -461,6 +469,7 @@ extern NSArray * gTypeNames;
 }
 
 
+#pragma mark - Dragging
 /* -----------------------------------------------------------------------------
 	Drag reordering.
 	Multiple drag images are supported by using this delegate method.
@@ -795,3 +804,25 @@ NSLog(@"-_performInsertWithDragInfo: %@", info.description);
 }
 
 @end
+
+
+#pragma mark - NTXInfoViewController
+/* -----------------------------------------------------------------------------
+	N T X I n f o V i e w C o n t r o l l e r
+	The info controller represents the currently selected NTXProjectItem.
+----------------------------------------------------------------------------- */
+
+@implementation NTXInfoViewController
+
+- (void)viewDidLoad {
+	[super viewDidLoad];
+
+	// defer population until window has fully loaded
+	dispatch_async(dispatch_get_main_queue(), ^{
+		NTXProjectWindowController * wc = self.view.window.windowController;
+		wc.sourceInfoController = self;
+	});
+}
+
+@end
+

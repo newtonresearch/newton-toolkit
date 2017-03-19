@@ -7,7 +7,6 @@
 */
 
 #import "ProjectItem.h"
-#import "NTXDocument.h"
 #import "ProjectTypes.h"
 
 /* -----------------------------------------------------------------------------
@@ -37,6 +36,7 @@ NSArray * gTypeNames;
 @synthesize url;
 @synthesize type;
 @synthesize isMainLayout;
+@synthesize isExcluded;
 
 /* -----------------------------------------------------------------------------
 	Read file type map (NSUInteger) -> (NSString *)
@@ -85,6 +85,14 @@ NSArray * gTypeNames;
 	return self;
 }
 
+
+- (Ref)build {
+	RefVar result = [self.document build];
+	if (self.isMainLayout) {
+		return result;
+	}
+	return NILREF;
+}
 
 - (BOOL)isContainer {
 	return self.type == kGroupType;
@@ -143,6 +151,16 @@ NSArray * gTypeNames;
 
 
 /* -----------------------------------------------------------------------------
+	For UI: so we can disable the Main Layout checkbox when not valid.
+	Args:		--
+	Return:	name
+----------------------------------------------------------------------------- */
+
+- (BOOL)isLayout {
+	return self.type == kLayoutFileType;
+}
+
+/* -----------------------------------------------------------------------------
 	Return the name for this item.
 	It’s the file name -- the URL’s last path component.
 	Args:		--
@@ -184,7 +202,7 @@ NSArray * gTypeNames;
 }
 
 
-#pragma mark NSPasteboardWriting support
+#pragma mark - NSPasteboardWriting support
 
 - (NSArray *)writableTypesForPasteboard:(NSPasteboard *)inPasteboard {
 	// These are the types we can write.
@@ -217,7 +235,7 @@ NSArray * gTypeNames;
 }
 
 
-#pragma mark  NSPasteboardReading support
+#pragma mark - NSPasteboardReading support
 
 + (NSArray *)readableTypesForPasteboard:(NSPasteboard *)inPasteboard {
 	// We allow creation from URLs so Finder items can be dragged to us
@@ -260,6 +278,7 @@ NSArray * gTypeNames;
 @end
 
 
+#pragma mark -
 /* -----------------------------------------------------------------------------
 	N T X P r o j e c t S e t t i n g s I t em
 ----------------------------------------------------------------------------- */

@@ -83,6 +83,12 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 														 selector:@selector(windowWillClose:)
 															  name:NSWindowWillCloseNotification
 															object:self.window];
+
+
+	// defer population until window has fully loaded
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[self.sourceListController populateSourceList];
+	});
 }
 
 - (void)setDocument:(id)inDocument
@@ -113,6 +119,7 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 ----------------------------------------------------------------------------- */
 
 - (void)sourceSelectionDidChange:(NTXProjectItem *)item {
+	self.sourceInfoController.representedObject = item;
 	if (item) {
 		NTXDocument * chosenDoc = item.document;
 		if (chosenDoc) {
@@ -207,10 +214,12 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 
 - (IBAction)toggleCollapsed:(id)sender {
 	NSInteger item = ((NSSegmentedControl *)sender).selectedSegment;
-	if (item == 1) {
+	if (item == 0) {
+		[self.sourceSplitController toggleCollapsedSplit:0];
+	} else if (item == 1) {
 		[self.inspectorSplitController toggleCollapsed];
-	} else {
-		[self.sourceSplitController toggleCollapsed];
+	} else if (item == 2) {
+		[self.sourceSplitController toggleCollapsedSplit:1];
 	}
 }
 
@@ -230,10 +239,6 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 
 - (BOOL)isConnected {
 	return _isConnected;
-}
-
-- (IBAction)disconnect:(id)sender {
-	[gNTXNub disconnect];
 }
 
 + (NSSet<NSString *> *)keyPathsForValuesAffectingIsConnected {

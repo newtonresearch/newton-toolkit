@@ -32,6 +32,7 @@
 // source split view controller (split view containing source list)
 @property NTXSourceSplitViewController * sourceSplitController;
 @property NTXSourceListViewController * sourceListController;
+@property NTXInfoViewController * sourceInfoController;
 // document editor content controller
 @property NTXContentViewController * contentController;
 // content split view controller (split view containing TellUser text)
