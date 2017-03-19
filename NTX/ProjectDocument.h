@@ -88,10 +88,10 @@ extern NSString * const NTXPackageFileType;
 //@property(strong) NSViewController * viewController;
 
 // Build menu actions
-- (IBAction) buildPackage: (id) sender;
-- (IBAction) downloadPackage: (id) sender;
-- (IBAction) exportPackage: (id) sender;
+- (IBAction)buildPackage:(id)sender;
+- (IBAction)downloadPackage:(id)sender;
+- (IBAction)exportPackage:(id)sender;
 
-- (NSURL *) build;								// build package/stream
-- (NSData *) buildPackageData;
+- (NSURL *)buildPkg;								// build package/stream
+- (NSData *)buildPackageData;
 @end

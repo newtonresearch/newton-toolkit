@@ -22,7 +22,7 @@
 #import "NTXDocument.h"
 #import "NTK/ObjectHeap.h"
 
-extern "C" Ref		FIntern(RefArg inRcvr, RefArg inStr);
+extern "C" Ref		FIntern(RefArg rcvr, RefArg inStr);
 extern "C" Ref		ArrayInsert(RefArg ioArray, RefArg inObj, ArrayIndex index);
 extern	  Ref		MakeStringOfLength(const UniChar * str, ArrayIndex numChars);
 extern	  Ref		MakeStringFromUTF8String(const char * inStr);
@@ -41,6 +41,49 @@ extern Ref *		RSautoInstallScript;
 	N T X P r o j e c t D o c u m e n t
 ----------------------------------------------------------------------------- */
 
+extern "C" {
+Ref	FGetLayout(RefArg rcvr, RefArg inFilename);
+Ref	FSetPartFrameSlot(RefArg rcvr, RefArg inTag, RefArg inValue);
+Ref	FGetPartFrameSlot(RefArg rcvr, RefArg inTag);
+}
+
+Ref
+FGetLayout(RefArg rcvr, RefArg inFilename)
+{ return NILREF; }
+
+
+Ref
+FSetPartFrameSlot(RefArg rcvr, RefArg inTag, RefArg inValue)
+{
+	RefVar partFrame(GetFrameSlot(RA(gVarFrame), SYMA(partFrame)));
+	if (ISNIL(partFrame)) {
+		partFrame = AllocateFrame();
+		SetFrameSlot(RA(gVarFrame), SYMA(partFrame), partFrame);
+	}
+	SetFrameSlot(partFrame, inTag, inValue);
+	return inValue;
+}
+
+inline Ref SetPartFrameSlot(RefArg inTag, RefArg inValue) {
+	return FSetPartFrameSlot(RA(NILREF), inTag, inValue);
+}
+
+
+Ref
+FGetPartFrameSlot(RefArg rcvr, RefArg inTag)
+{
+	RefVar partFrame(GetFrameSlot(RA(gVarFrame), SYMA(partFrame)));
+	if (ISNIL(partFrame)) {
+		return NILREF;
+	}
+	return GetFrameSlot(partFrame, inTag);
+}
+
+inline Ref GetPartFrameSlot(RefArg inTag) {
+	return FGetPartFrameSlot(RA(NILREF), inTag);
+}
+
+
 /*------------------------------------------------------------------------------
 	Define global constant for build.
 	Args:		inSym			global var
@@ -48,8 +91,8 @@ extern Ref *		RSautoInstallScript;
 	Return:	--
 ------------------------------------------------------------------------------*/
 extern "C" {
-Ref	FDefineGlobalConstant(RefArg inRcvr, RefArg inTag, RefArg inObj);
-Ref	FUnDefineGlobalConstant(RefArg inRcvr, RefArg inTag);
+Ref	FDefineGlobalConstant(RefArg rcvr, RefArg inTag, RefArg inObj);
+Ref	FUnDefineGlobalConstant(RefArg rcvr, RefArg inTag);
 }
 
 void
@@ -90,7 +133,7 @@ MakePathString(RefArg inPath)
 Date
 MakeDateType(NSDate * inDate)
 {
-NSLog(@"MakeDateType(%@) -> %u", [inDate description], kSecondsSince1904 + (Date)inDate.timeIntervalSince1970);
+//NSLog(@"MakeDateType(%@) -> %u", [inDate description], kSecondsSince1904 + (Date)inDate.timeIntervalSince1970);
 	return kSecondsSince1904 + (Date)inDate.timeIntervalSince1970;
 }
 
@@ -260,8 +303,12 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 				if (filetype < 0)	// plainC files may not be encoded correctly by Mac->Win converter
 					filetype = kNativeCodeFileType;
 				projectItem = [[NTXProjectItem alloc] initWithURL:itemURL type:filetype];
-				if (NOTNIL(GetFrameSlot(projItem, MakeSymbol("isMainLayout"))))
+				if (NOTNIL(GetFrameSlot(projItem, MakeSymbol("isMainLayout")))) {
 					projectItem.isMainLayout = YES;
+				}
+				if (NOTNIL(GetFrameSlot(projItem, MakeSymbol("isExcluded")))) {
+					projectItem.isExcluded = YES;
+				}
 				[projItems addObject: projectItem];
 // if groupLen > 0 then begin groupLen--; if groupLen == 0 then unstack sidebarItems end
 			} else if (EQ(ClassOf(fileRef), MakeSymbol("fileGroup"))) {
@@ -320,7 +367,12 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 		RefVar item(AllocateFrame());
 		SetFrameSlot(item, MakeSymbol("file"), fileRef);
 		SetFrameSlot(item, SYMA(type), MAKEINT(sourceItem.type));
-		SetFrameSlot(item, MakeSymbol("isMainLayout"), MAKEBOOLEAN(sourceItem.isMainLayout));
+		if (sourceItem.isMainLayout) {
+			SetFrameSlot(item, MakeSymbol("isMainLayout"), MAKEBOOLEAN(true));
+		}
+		if (sourceItem.isExcluded) {
+			SetFrameSlot(item, MakeSymbol("isExcluded"), MAKEBOOLEAN(true));
+		}
 		SetArraySlot(fileItems, i++, item);
 	}
 
@@ -428,7 +480,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 ----------------------------------------------------------------------------- */
 
 - (IBAction)buildPackage:(id)sender {
-	[self build];
+	[self buildPkg];
 }
 
 
@@ -439,7 +491,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 ----------------------------------------------------------------------------- */
 
 - (IBAction)downloadPackage:(id)sender {
-	NSURL * pkg = [self build];
+	NSURL * pkg = [self buildPkg];
 	if (pkg) {
 		if (gNTXNub != nil && gNTXNub.isTethered) {
 			[gNTXNub installPackage:pkg];
@@ -491,10 +543,15 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 				The result will be in gVarFrame somewhere.
 ----------------------------------------------------------------------------- */
 
-- (void)evaluate {
+- (Ref)evaluate {
+	RefVar mainLayout;
 	for (NTXProjectItem * item in [self.projectItems objectForKey:@"items"]) {
-		[item.document evaluate];
+		RefVar result([item build]);
+		if (item.isMainLayout) {
+			mainLayout = result;
+		}
 	}
+	return mainLayout;
 }
 
 
@@ -587,7 +644,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 				if necessary
 ----------------------------------------------------------------------------- */
 
-- (NSURL *)build {
+- (NSURL *)buildPkg {
 	// sync our projectItems with source list
 	[self updateProjectItems];
 
@@ -618,7 +675,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 		DefConst("language", GetFrameSlot(projectSettings, MakeSymbol("language")));		// string
 		// as build progresses it may add globals:
 		//	PT_<filename>
-		//	layout_<filename>
+		//	layout_<filename>, thisView
 		//	streamFile_<filename>
 		// partFrame, InstallScript, RemoveScript
 
@@ -652,42 +709,49 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 
 		case kOutputApplication:
 			{
+				SetFrameSlot(RA(gVarFrame), SYMA(partFrame), RA(NILREF));
+				// set the usual slots
+				SetPartFrameSlot(SYMA(text), GetFrameSlot(RA(gConstantsFrame), MakeSymbol("kAppName")));
+				SetPartFrameSlot(SYMA(app), GetFrameSlot(RA(gConstantsFrame), MakeSymbol("kAppSymbol")));
+				//icon
+
 				// evaluate all sources
-				[self evaluate];
+				RefVar mainLayout([self evaluate]);
 				// if there was an exception/error then bail now
 
-				RefVar partFrame(AllocateFrame());
-				// set the usual slots
-				SetFrameSlot(partFrame, SYMA(text), GetFrameSlot(RA(gConstantsFrame), MakeSymbol("kAppName")));
-				SetFrameSlot(partFrame, SYMA(app), GetFrameSlot(RA(gConstantsFrame), MakeSymbol("kAppSymbol")));
-				//icon
-				//theForm
-
-				// copy global InstallScript and RemoveScript, if they exist, to the part frame
 				RefVar devGlobal;
-				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(InstallScript));
-				if (NOTNIL(devGlobal))
-					SetFrameSlot(partFrame, SYMA(devInstallScript), devGlobal);
-				SetFrameSlot(partFrame, SYMA(InstallScript), RA(formInstallScript));
-
-				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(RemoveScript));
-				if (NOTNIL(devGlobal))
-					SetFrameSlot(partFrame, SYMA(devRemoveScript), devGlobal);
-				SetFrameSlot(partFrame, SYMA(RemoveScript), RA(formRemoveScript));
-
 				// copy slots from global partFrame, if it exists, to the part frame
 				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(partFrame));
 				if (IsFrame(devGlobal)) {
 					FOREACH_WITH_TAG(devGlobal, tag, value)
-						SetFrameSlot(partFrame, tag, value);
+						SetPartFrameSlot(tag, value);
 					END_FOREACH;
 				}
-				[self.parts addObject:[[NTXPackagePart alloc] initWith:partFrame type:"form" alignment:alignment]];
+
+				// copy the main layout to the part frame
+				if (NOTNIL(mainLayout)) {
+					SetPartFrameSlot(SYMA(theForm), mainLayout);
+				}
+
+				// copy global InstallScript and RemoveScript, if they exist, to the part frame
+				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(InstallScript));
+				if (NOTNIL(devGlobal))
+					SetPartFrameSlot(SYMA(devInstallScript), devGlobal);
+				SetPartFrameSlot(SYMA(InstallScript), RA(formInstallScript));
+
+				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(RemoveScript));
+				if (NOTNIL(devGlobal))
+					SetPartFrameSlot(SYMA(devRemoveScript), devGlobal);
+				SetPartFrameSlot(SYMA(RemoveScript), RA(formRemoveScript));
+
+				[self.parts addObject:[[NTXPackagePart alloc] initWith:GetFrameSlot(RA(gVarFrame), SYMA(partFrame)) type:"form" alignment:alignment]];
+				SetFrameSlot(RA(gVarFrame), SYMA(partFrame), RA(NILREF));
 			}
 			break;
 
 		case kOutputAutoPart:
 			{
+				SetFrameSlot(RA(gVarFrame), SYMA(partFrame), RA(NILREF));
 				// evaluate all sources
 				[self evaluate];
 
@@ -695,18 +759,19 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 				RefVar devGlobal;
 				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(InstallScript));
 				if (NOTNIL(devGlobal)) {
-					SetFrameSlot(partFrame, SYMA(devInstallScript), devGlobal);
-					SetFrameSlot(partFrame, SYMA(InstallScript), RA(autoInstallScript));
+					SetPartFrameSlot(SYMA(devInstallScript), devGlobal);
+					SetPartFrameSlot(SYMA(InstallScript), RA(autoInstallScript));
 				}
 				// else should probably warn user
 				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(RemoveScript));
 				if (NOTNIL(devGlobal))
-					SetFrameSlot(partFrame, SYMA(devRemoveScript), devGlobal);
+					SetPartFrameSlot(SYMA(devRemoveScript), devGlobal);
 				// copy global partData, if it exists, to the part frame .partData
 				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(partData));
 				if (NOTNIL(devGlobal))
-					SetFrameSlot(partFrame, SYMA(partData), devGlobal);
+					SetPartFrameSlot(SYMA(partData), devGlobal);
 				[self.parts addObject:[[NTXPackagePart alloc] initWith:partFrame type:"auto" alignment:alignment]];
+				SetFrameSlot(RA(gVarFrame), SYMA(partFrame), RA(NILREF));
 			}
 			break;
 

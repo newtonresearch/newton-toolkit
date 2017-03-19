@@ -1,5 +1,5 @@
 /*
-	File:		NTXDocument
+	File:		NTXDocument.h
 
 	Abstract:	An NTXDocument displays itself in the main project window using a view controller.
 
@@ -19,7 +19,7 @@
 @property(readonly) NSString * storyboardName;
 @property(readonly) NSString * symbol;
 
-- (int)evaluate;					// return error code
+- (Ref)build;
 - (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError;
 @end
 
@@ -80,6 +80,7 @@
 /* -----------------------------------------------------------------------------
 	N T X P a c k a g e D o c u m e n t
 ----------------------------------------------------------------------------- */
+#include "PkgPart.h"
 
 @interface NTXPackageDocument : NTXDocument
 @property(readonly) NSString * name;
@@ -89,7 +90,7 @@
 @property(readonly) NSString * copyright;
 @property(readonly) NSString * creationDate;
 @property(readonly) BOOL isCopyProtected;
-@property(readonly) NSMutableArray/*<PkgPart>*/ * parts;
+@property(readonly) NSMutableArray<PkgPart*> * parts;
 @end
 
 

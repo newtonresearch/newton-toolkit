@@ -16,3 +16,4 @@
 
 @interface NTXContentViewController : NSViewController
 @end
+

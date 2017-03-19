@@ -41,6 +41,33 @@ MakeNSSymbol(RefArg inSym)
 ------------------------------------------------------------------------------*/
 extern void	RedirectStdioOutTranslator(FILE * inFRef);
 
+NewtonErr
+PrintObject(FILE * inFP, RefArg inRef, int indent, Ref inLength, Ref inDepth)
+{
+	RedirectStdioOutTranslator(inFP);
+	Ref savedPrintDepth = GetFrameSlot(RA(gVarFrame), SYMA(printDepth));
+	Ref savedPrintLength = GetFrameSlot(RA(gVarFrame), SYMA(printLength));
+	SetFrameSlot(RA(gVarFrame), SYMA(printDepth), inDepth);
+	SetFrameSlot(RA(gVarFrame), SYMA(printLength), inLength);
+	NewtonErr err = noErr;
+	newton_try
+	{
+		PrintObject(inRef, indent);
+	}
+	newton_catch_all
+	{
+		REPprintf("\n*** Error printing object (%d). ***\n", CurrentException()->data);
+		err = (NewtonErr)(long)CurrentException()->data;;
+	}
+	end_try;
+	REPprintf("\n\n");
+	SetFrameSlot(RA(gVarFrame), SYMA(printDepth), savedPrintDepth);
+	SetFrameSlot(RA(gVarFrame), SYMA(printLength), savedPrintLength);
+	RedirectStdioOutTranslator(NULL);
+	return err;
+}
+
+
 NSString *
 PrintObject(RefArg inRef)
 {
@@ -55,25 +82,9 @@ PrintObject(RefArg inRef)
 		[NSFileManager.defaultManager createFileAtPath:path contents:[NSData data] attributes:fileAttrs];
 
 		FILE * newtout = fopen(path.fileSystemRepresentation, "w");
-		if (newtout)
-		{
-			RedirectStdioOutTranslator(newtout);
-			int savedPrintDepth = RVALUE(GetFrameSlot(RA(gVarFrame), SYMA(printDepth)));
-			SetFrameSlot(RA(gVarFrame), SYMA(printDepth), MAKEINT(1));
-			newton_try
-			{
-				REPprintf("\n");
-				PrintObject(inRef, 0);
-			}
-			newton_catch_all
-			{
-				REPprintf("\n*** Error printing object (%d). ***\n", CurrentException()->data);
-			}
-			end_try;
-			REPprintf("\n\n");
-			SetFrameSlot(RA(gVarFrame), SYMA(printDepth), MAKEINT(savedPrintDepth));
+		if (newtout) {
+			PrintObject(newtout, inRef, 0, NILREF, MAKEINT(1));
 			fclose(newtout);
-			RedirectStdioOutTranslator(NULL);
 		}
 
 		// create string with contents of that file
@@ -100,20 +111,23 @@ PrintObject(RefArg inRef)
 	Base class stubs.
 ----------------------------------------------------------------------------- */
 
-- (int)evaluate
-{ return -1; }
+- (Ref)build {
+	return NILREF;
+}
 
-- (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError
-{ }
+- (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError {
+}
 
-- (NSString *) storyboardName
-{ return @"Settings"; }
+- (NSString *)storyboardName {
+	return @"Settings";
+}
 
-- (NSString *)symbol
-{ return self.fileURL.URLByDeletingPathExtension.lastPathComponent; }
+- (NSString *)symbol {
+	return self.fileURL.URLByDeletingPathExtension.lastPathComponent;
+}
 
-- (void)makeWindowControllers
-{ }
+- (void)makeWindowControllers {
+}
 
 @end
 
@@ -134,21 +148,27 @@ PrintObject(RefArg inRef)
 
 @implementation NTXLayoutDocument
 
-- (Ref)layoutRef { return _layoutRef; }
-- (void)setLayoutRef: (Ref) inRef { _layoutRef = inRef; }
+- (Ref)layoutRef {
+	return _layoutRef;
+}
 
-- (NSString *)storyboardName
-{ return @"Layout"; }
+- (void)setLayoutRef:(Ref)inRef {
+	_layoutRef = inRef;
+}
 
-- (NSString *)symbol
-{ return [NSString stringWithFormat:@"layout_%@", super.symbol]; }
+- (NSString *)storyboardName {
+	return @"Layout";
+}
+
+- (NSString *)symbol {
+	return [NSString stringWithFormat:@"layout_%@", super.symbol];
+}
 
 /* -----------------------------------------------------------------------------
 	Read layout NSOF from disk.
 ----------------------------------------------------------------------------- */
 
-- (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError *__autoreleasing *)outError
-{
+- (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError *__autoreleasing *)outError {
 	NewtonErr err = noErr;
 	newton_try
 	{
@@ -162,7 +182,7 @@ PrintObject(RefArg inRef)
 	end_try;
 
 	if (err && outError)
-		*outError = [NSError errorWithDomain: NSOSStatusErrorDomain code: err userInfo: nil];
+		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:err userInfo:nil];
 
 	return err == noErr;
 }
@@ -171,11 +191,149 @@ PrintObject(RefArg inRef)
 /* -----------------------------------------------------------------------------
 	Compile our layout.
 ----------------------------------------------------------------------------- */
+extern Ref ParseString(RefArg inStr);
 
-- (int)evaluate
-{
-	DefConst(self.symbol.UTF8String, RA(NILREF));	// need to expand this!
-	return noErr;
+Ref
+AddStepForm(RefArg parent, RefArg child) {
+	if (!FrameHasSlot(parent, SYMA(stepChildren))) {
+		SetFrameSlot(parent, SYMA(stepChildren), AllocateArray(SYMA(stepChildren), 0));
+	}
+	AddArraySlot(GetFrameSlot(parent, SYMA(stepChildren)), child);
+}
+
+Ref
+StepDeclare(RefArg parent, RefArg child, RefArg tag) {
+}
+
+
+Ref
+BuildViewTemplate(RefArg viewTemplate, RefArg parent, int depth) {
+
+	RefVar slots(GetFrameSlot(viewTemplate, MakeSymbol("value")));
+	RefVar templateName(GetFrameSlot(viewTemplate, MakeSymbol("__ntName")));
+	bool isDeclared = false;
+	if (!IsString(templateName) || Length(templateName) == 0) {
+		templateName = NILREF;
+	}
+
+	RefVar thisView(AllocateFrame());
+	SetFrameSlot(RA(gVarFrame), MakeSymbol("thisView"), thisView);
+
+	// beforeScript
+	RefVar script(GetFrameSlot(viewTemplate, MakeSymbol("beforeScript")));
+	if (NOTNIL(script)) {
+		RefVar codeBlock(ParseString(script));
+		if (NOTNIL(codeBlock)) {
+			InterpretBlock(codeBlock, RA(NILREF));
+		}
+	}
+
+	RefVar regularSlot, proto, viewClass, stepChildren;
+	FOREACH_WITH_TAG(slots, tag, slot)
+		RefVar value(GetFrameSlot(slot, SYMA(value)));
+		RefVar type(GetFrameSlot(slot, MakeSymbol("__ntDataType")));
+		CDataPtr typeData(ASCIIString(type));
+		const char * typeStr = (const char *)typeData;
+		int selector = (typeStr[0] << 24) + (typeStr[1] << 16) + (typeStr[2] << 8) + typeStr[3];
+		switch (selector) {
+		case 'ARAY':
+			// it’s the stepChildren slot
+			stepChildren = value;
+			break;
+		case 'PROT':
+			proto = value;
+			break;
+		case 'CLAS':
+			viewClass = value;
+			break;
+		default:
+			switch (selector) {
+			case 'TEXT':
+				regularSlot = value;
+				break;
+			case 'EVAL':
+				regularSlot = InterpretBlock(ParseString(value), RA(NILREF));
+				break;
+			case 'SCPT':
+				regularSlot = ParseString(value);
+				break;
+			case 'NUMB':
+			case 'INTG':
+				regularSlot = value;
+				break;
+			case 'REAL':
+				;
+				break;
+			case 'BOOL':
+				regularSlot = MAKEBOOLEAN(NOTNIL(value));
+				break;
+			case 'RECT':
+				regularSlot = value;
+				break;
+	//		case 'FONT':
+	//		case 'PICT':
+				break;
+			default:
+				regularSlot = NILREF;
+			}
+			SetFrameSlot(thisView, tag, regularSlot);
+		}
+	END_FOREACH;
+
+	// if template is named, add debug:<name> slot
+	if (NOTNIL(templateName)) {
+		SetFrameSlot(thisView, SYMA(debug), templateName);
+	}
+
+	// if we have a proto or viewClass, add it last
+	if (NOTNIL(proto)) {
+		SetFrameSlot(thisView, SYMA(debug), proto);
+	} else if (NOTNIL(viewClass)) {
+		SetFrameSlot(thisView, SYMA(debug), viewClass);
+	}
+
+	// afterScript
+	script = GetFrameSlot(viewTemplate, MakeSymbol("afterScript"));
+	if (NOTNIL(script)) {
+		// set up thisView
+		RefVar codeBlock(ParseString(script));
+		if (NOTNIL(codeBlock)) {
+			InterpretBlock(codeBlock, RA(NILREF));
+		}
+	}
+
+	if (parent) {
+		AddStepForm(parent, thisView);
+//		if (isDeclared) {
+//			StepDeclare(parent, thisView, declaredSym);
+//		}
+	}
+
+	if (NOTNIL(stepChildren)) {
+		FOREACH(stepChildren, child)
+			BuildViewTemplate(child, thisView, depth+1);
+		END_FOREACH;
+	}
+	return thisView;
+}
+
+
+- (Ref)build {
+	NewtonErr err = noErr;
+	RefVar layout;
+	newton_try
+	{
+		RefVar viewTemplate(GetFrameSlot(self.layoutRef, MakeSymbol("templateHierarchy")));
+		layout = BuildViewTemplate(viewTemplate, NULL, 0);
+		DefConst(self.symbol.UTF8String, layout);
+	}
+	newton_catch_all
+	{
+		err = (NewtonErr)(long)CurrentException()->data;;
+		layout = NILREF;
+	}
+	end_try;
+	return layout;
 }
 
 
@@ -199,8 +357,8 @@ PrintObject(RefArg inRef)
 ----------------------------------------------------------------------------- */
 
 Ref
-PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth)
-{
+PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth) {
+
 	RefVar slots(GetFrameSlot(viewTemplate, MakeSymbol("value")));
 	RefVar name(GetFrameSlot(viewTemplate, MakeSymbol("__ntName")));
 	bool isNamed, isDeclared = false;
@@ -296,8 +454,11 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 }
 
 
-- (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError
-{
+/* -----------------------------------------------------------------------------
+	Export text representation of the layout.
+----------------------------------------------------------------------------- */
+
+- (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError {
 	NewtonErr err = noErr;
 	const char * filename = self.fileURL.lastPathComponent.UTF8String;
 	fprintf(fp, "// Beginning of file %s\n", filename);
@@ -332,30 +493,9 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 
 @implementation NTXPackageDocument
 
-- (NSString *)storyboardName
-{ return @"Package"; }
-
-/* -----------------------------------------------------------------------------
-	Load our storyboard.
------------------------------------------------------------------------------ */
-
-- (void)makeWindowControllers
-{
-//	NSStoryboard * sb = [NSStoryboard storyboardWithName:@"Package" bundle:nil];
-//
-//	// add view controller for package info
-//	NSViewController * viewController = [sb instantiateControllerWithIdentifier:@"PkgInfo"];
-//	viewController.representedObject = self;
-//	[ourController addChildViewController:viewController];
-//
-//	for (PkgPart * part in self.parts) {
-//		viewController = [sb instantiateControllerWithIdentifier:[self viewControllerNameFor:part.partType]];
-//		viewController.representedObject = part;
-//		[ourController addChildViewController:viewController];
-//	}
-//	[ourController loadView];
+- (NSString *)storyboardName {
+	return @"Package";
 }
-
 
 /* -----------------------------------------------------------------------------
 	Read the package file; extract info from its directory header and
@@ -400,7 +540,6 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 		partObj = [partObj init:thePart ref:pkg.partRef(partNum) data:pkg.partPkgData(partNum)->data sequence:partNum];
 		[_parts addObject:partObj];
 	}
-
 	return YES;
 }
 
@@ -409,9 +548,8 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 	The parts in this package should be added to the built package.
 ----------------------------------------------------------------------------- */
 
-- (int) evaluate
-{
-	return noErr;
+- (Ref)build {
+	return NILREF;
 }
 
 
@@ -419,8 +557,7 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 	Packages were not originally exported to text at all.
 ----------------------------------------------------------------------------- */
 
-- (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError
-{
+- (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError {
 	const char * filename = self.fileURL.lastPathComponent.UTF8String;
 	fprintf(fp, "// Package file %s\n\n", filename);
 }
@@ -434,11 +571,13 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 ----------------------------------------------------------------------------- */
 @implementation NTXStreamDocument
 
-- (NSString *) storyboardName
-{ return @"Stream"; }
+- (NSString *) storyboardName {
+	return @"Stream";
+}
 
-- (NSString *)symbol
-{ return [NSString stringWithFormat:@"streamFile_%@", super.symbol]; }
+- (NSString *)symbol {
+	return [NSString stringWithFormat:@"streamFile_%@", super.symbol];
+}
 
 
 /* -----------------------------------------------------------------------------
@@ -480,23 +619,24 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 		|streamFile_<fileName>|:?Install();
 ----------------------------------------------------------------------------- */
 
-- (int) evaluate
-{
+- (Ref)build {
 	NewtonErr err = noErr;
+	RefVar stream;
 	newton_try
 	{
 		CStdIOPipe pipe(self.fileURL.fileSystemRepresentation, "r");
-		RefVar stream(UnflattenRef(pipe));
+		stream = UnflattenRef(pipe);
 		DefConst(self.symbol.UTF8String, stream);
 		DoMessageIfDefined(stream, MakeSymbol("Install"), RA(NILREF), NULL);
 	}
 	newton_catch_all
 	{
-		err = (NewtonErr)(long)CurrentException()->data;;
+		err = (NewtonErr)(long)CurrentException()->data;
+		stream = NILREF;
 	}
 	end_try;
 
-	return err;
+	return stream;
 }
 
 
@@ -506,8 +646,7 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 		|streamFile_<fileName>|:?Install();
 ----------------------------------------------------------------------------- */
 
-- (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError
-{
+- (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError {
 	const char * filename = self.fileURL.lastPathComponent.UTF8String;
 	const char * sym = self.symbol.UTF8String;
 	fprintf(fp, "// Stream file %s\n"
@@ -524,8 +663,9 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 ----------------------------------------------------------------------------- */
 @implementation NTXNativeCodeDocument
 
-- (NSString *) storyboardName
-{ return @"NativeCode"; }
+- (NSString *)storyboardName {
+	return @"NativeCode";
+}
 
 
 /* -----------------------------------------------------------------------------
@@ -533,8 +673,7 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 	Create UI representation.
 ----------------------------------------------------------------------------- */
 
-- (BOOL) readFromURL: (NSURL *) url ofType: (NSString *) typeName error: (NSError *__autoreleasing *) outError
-{
+- (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError *__autoreleasing *)outError {
 	NewtonErr err = noErr;
 	newton_try
 	{
@@ -583,7 +722,7 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 	end_try;
 
 	if (err && outError)
-		*outError = [NSError errorWithDomain: NSOSStatusErrorDomain code: ioErr userInfo: nil];
+		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:ioErr userInfo:nil];
 
 	return err == noErr;
 }
@@ -594,22 +733,23 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 		DefConst('<filename>, <frameOfCodeFile>);
 ----------------------------------------------------------------------------- */
 
-- (int)evaluate
-{
+- (Ref)build {
 	NewtonErr err = noErr;
+	RefVar codeModule;
 	newton_try
 	{
 		CStdIOPipe pipe(self.fileURL.fileSystemRepresentation, "r");
-		RefVar codeModule(UnflattenRef(pipe));
+		codeModule = UnflattenRef(pipe);
 		DefConst(self.symbol.UTF8String, codeModule);
 	}
 	newton_catch_all
 	{
 		err = (NewtonErr)(long)CurrentException()->data;;
+		codeModule = NILREF;
 	}
 	end_try;
 
-	return err;
+	return codeModule;
 }
 
 
@@ -619,38 +759,27 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 	For some reason this is commented out.
 ----------------------------------------------------------------------------- */
 
-- (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError
-{
+- (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError {
 	const char * filename = self.fileURL.lastPathComponent.UTF8String;
 	const char * sym = self.symbol.UTF8String;
 	fprintf(fp, "// Native code module %s\n"
 				   "DefConst('|%s|, ", filename, sym);
 
-	RedirectStdioOutTranslator(fp);
-	Ref savedPrintDepth = GetFrameSlot(RA(gVarFrame), SYMA(printDepth));
-	Ref savedPrintLength = GetFrameSlot(RA(gVarFrame), SYMA(printLength));
-	SetFrameSlot(RA(gVarFrame), SYMA(printDepth), MAKEINT(16));
-	SetFrameSlot(RA(gVarFrame), SYMA(printLength), RA(NILREF));
 	NewtonErr err = noErr;
 	newton_try
 	{
 		CStdIOPipe pipe(self.fileURL.fileSystemRepresentation, "r");
 		RefVar codeModule(UnflattenRef(pipe));
-		PrintObject(codeModule, 4);
+		PrintObject(fp, codeModule, 4, NILREF, MAKEINT(16));
 	}
 	newton_catch_all
 	{
-		REPprintf("\n*** Error printing object (%d). ***\n", CurrentException()->data);
 		err = (NewtonErr)(long)CurrentException()->data;;
 	}
 	end_try;
-	REPprintf("\n\n");
-	SetFrameSlot(RA(gVarFrame), SYMA(printDepth), savedPrintDepth);
-	SetFrameSlot(RA(gVarFrame), SYMA(printLength), savedPrintLength);
-	RedirectStdioOutTranslator(NULL);
 
 	if (err && outError)
-		*outError = [NSError errorWithDomain: NSOSStatusErrorDomain code: ioErr userInfo: nil];
+		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:ioErr userInfo:nil];
 }
 
 @end

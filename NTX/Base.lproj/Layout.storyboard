@@ -13,8 +13,8 @@
             <objects>
                 <splitViewController title="Layout" id="OZ4-Ct-O5w" customClass="NTXLayoutViewController" sceneMemberID="viewController">
                     <splitViewItems>
-                        <splitViewItem holdingPriority="255" behavior="contentList" id="SbW-I2-1w2"/>
-                        <splitViewItem holdingPriority="260" id="lWR-kn-IdH"/>
+                        <splitViewItem holdingPriority="252" behavior="contentList" id="SbW-I2-1w2"/>
+                        <splitViewItem holdingPriority="251" id="lWR-kn-IdH"/>
                     </splitViewItems>
                     <splitView key="splitView" autosaveName="TemplateEditor" dividerStyle="thin" vertical="YES" id="miX-6w-fIx">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
