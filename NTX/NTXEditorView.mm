@@ -10,15 +10,7 @@
 #import "NTXEditorView.h"
 #import "PreferenceKeys.h"
 #import "NTK/Funcs.h"
-
-
-extern Ref * RSgVarFrame;
-
-Ref
-GetGlobalVar(RefArg inSym)
-{	
-	return GetFrameSlot(RA(gVarFrame),inSym);
-}
+#import "NTK/Globals.h"
 
 
 /*------------------------------------------------------------------------------
@@ -169,6 +161,8 @@ extern void REPExceptionNotify(Exception * inException);
 	txStyle.defaultTabInterval = (charWidth * tabWidth);
 
 	userTxAttrs = @{NSFontAttributeName:userTxFont, NSParagraphStyleAttributeName:txStyle.copy};
+	textView.automaticQuoteSubstitutionEnabled = NO;
+	textView.allowsUndo = YES;
 }
 
 @end
