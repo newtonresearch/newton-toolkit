@@ -19,7 +19,7 @@
 	IBOutlet NSSplitViewItem * inspectorItem;
 }
 @property NSString * tellUserText;
-- (void)toggleCollapsed;
+- (IBAction)toggleInspector:sender;
 @end
 
 @interface NTXSplitView : NSSplitView

@@ -12,6 +12,7 @@
 #import "stdioDirector.h"
 #import "Utilities.h"
 
+#define forDebug 0
 
 /* -----------------------------------------------------------------------------
 	N T X I n s p e c t o r S p l i t V i e w C o n t r o l l e r
@@ -40,7 +41,7 @@
 	return _tellUserText;
 }
 
-- (void)toggleCollapsed {
+- (IBAction)toggleInspector:sender {
 	inspectorItem.animator.collapsed = !inspectorItem.isCollapsed;
 }
 
@@ -127,7 +128,7 @@
 		[self loadText:itu];
 	}
 
-#if 1		// don’t redirect if you want an easy debug life
+#if !forDebug		// don’t redirect if you want an easy debug life
 	// redirect stdout to us
 	redirector = [NTXOutputRedirect redirect_stdout];
 	[redirector setListener:self];
