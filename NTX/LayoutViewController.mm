@@ -2,6 +2,15 @@
 	File:		LayoutViewController.mm
 
 	Abstract:	Implementation of NTXLayoutViewController subclasses.
+					Interesting __platform slots:
+						__ntDefaults: for RECT, SCPT, EVAL default values
+						templateArray: array of symbol, frame pairs naming and defining proto templates
+						viewClassArray: array of symbol, frame pairs naming and defining viewclass templates
+						scriptSlots: frame of template descriptors for well-known viewScripts -- includes __ntHelp
+						attributeSlots: frame of template descriptors for well-known slots -- includes __ntHelp
+						templates: like templateArray but in frame form
+						viewClasses: like viewClassArray but in frame form
+
 
 	Written by:		Newton Research, 2016.
 */
@@ -9,6 +18,8 @@
 #import "NTXDocument.h"
 #import "LayoutViewController.h"
 #import "Utilities.h"
+#import "NTK/Globals.h"
+
 
 #define NTXShowViewTemplateNotification @"EditViewTemplate"
 
@@ -18,7 +29,9 @@
 	We want to be able to (un)collapse the view template list view.
 ----------------------------------------------------------------------------- */
 @implementation NTXLayoutViewController
-- (void)toggleCollapsed {
+
+- (IBAction)toggleTemplates:(id)sender {
+	templateListItem.animator.collapsed = !templateListItem.isCollapsed;
 }
 @end
 
@@ -47,7 +60,11 @@
 -(NSString *)title {
 	RefVar proto(GetFrameSlot(viewTemplateDescriptor, MakeSymbol("__ntId")));
 	RefVar name(GetFrameSlot(viewTemplateDescriptor, MakeSymbol("__ntName")));
-	return [NSString stringWithFormat:@"%s : %@", SymbolName(proto), MakeNSString(name)];
+	NSString * titleStr = [NSString stringWithUTF8String:SymbolName(proto)];
+	if (NOTNIL(name)) {
+		titleStr = [NSString stringWithFormat:@"%@ : %@", titleStr, MakeNSString(name)];
+	}
+	return titleStr;
 }
 
 -(bool)hasChildren {
@@ -151,7 +168,7 @@
 }
 
 /* -----------------------------------------------------------------------------
-	Show the disclosure triangle for the project.
+	Show the disclosure triangle for the views with children.
 ----------------------------------------------------------------------------- */
 
 - (BOOL)outlineView:(NSOutlineView *)inView shouldShowOutlineCellForItem:(id)inItem {
@@ -211,7 +228,7 @@
 	for the entry at each index. Return the item at a given index.
 ----------------------------------------------------------------------------- */
 
-- (id)outlineView:(NSOutlineView *)inView child:(int)index ofItem:(id)inItem {
+- (id)outlineView:(NSOutlineView *)inView child:(NSInteger)index ofItem:(id)inItem {
 	RefVar viewTemplates = [self childrenForItem:inItem];
 	if (IsArray(viewTemplates)) {
 		return [[NTXTemplateDescriptor alloc] init:GetArraySlot(viewTemplates, index)];
@@ -277,6 +294,96 @@
 	NTXTemplateDescriptor * descriptor = [sidebarView itemAtRow:sidebarView.selectedRow];
 	return descriptor.value;
 }
+
+@end
+
+
+#pragma mark -
+/* -----------------------------------------------------------------------------
+	N T X P r o t o D e s c r i p t o r
+	Exposes array of strings = view classes/protos for binding to popup.
+----------------------------------------------------------------------------- */
+@interface NTXProtoDescriptor ()
+{
+	NSMutableArray<NSString *> * _protoNames;
+}
+@end
+
+
+@implementation NTXProtoDescriptor
+
+- (id)init:(RefArg)descriptor {
+	if (self = [super init:descriptor]) {
+		RefVar platform(GetGlobalVar(SYMA(__platform)));
+		RefVar classes(GetFrameSlot(platform, MakeSymbol("viewClasses")));
+		RefVar templates(GetFrameSlot(platform, MakeSymbol("templates")));
+		_protoNames = [[NSMutableArray alloc] initWithCapacity:Length(classes) + Length(templates) + 1];
+		FOREACH_WITH_TAG(classes, tag, slot)
+			[_protoNames addObject:[NSString stringWithCString:SymbolName(tag) encoding:NSMacOSRomanStringEncoding]];
+		END_FOREACH;
+		[_protoNames addObject:@"--"];
+		FOREACH_WITH_TAG(templates, tag, slot)
+			[_protoNames addObject:[NSString stringWithCString:SymbolName(tag) encoding:NSMacOSRomanStringEncoding]];
+		END_FOREACH;
+	}
+	return self;
+}
+
+- (NSMutableArray<NSString *> *) protoNames {
+	return _protoNames;
+}
+
+- (void)setProtoName:(NSString *)protoName {
+	Ref numericValue = 0;
+	const char * name = protoName.UTF8String;
+	RefVar platform(GetGlobalVar(SYMA(__platform)));
+	RefVar classes(GetFrameSlot(platform, MakeSymbol("viewClasses")));
+	RefVar templates(GetFrameSlot(platform, MakeSymbol("templates")));
+	FOREACH_WITH_TAG(classes, tag, slot)
+		if (strcmp(SymbolName(tag), name) == 0) {
+			numericValue = GetFrameSlot(slot, MakeSymbol("viewClass"));
+			break;
+		}
+	END_FOREACH;
+	if (numericValue == 0) {
+		FOREACH_WITH_TAG(templates, tag, slot)
+			if (strcmp(SymbolName(tag), name) == 0) {
+				numericValue = GetFrameSlot(slot, MakeSymbol("_proto"));
+				break;
+			}
+		END_FOREACH;
+	}
+	if (numericValue != 0) {
+		self.value = numericValue;
+	}
+}
+
+- (NSString *)protoName {
+	Ref numericValue = self.value;
+	RefVar foundSymbol;
+	RefVar platform(GetGlobalVar(SYMA(__platform)));
+	RefVar classes(GetFrameSlot(platform, MakeSymbol("viewClasses")));
+	RefVar templates(GetFrameSlot(platform, MakeSymbol("templates")));
+	FOREACH_WITH_TAG(classes, tag, slot)
+		if (GetFrameSlot(slot, MakeSymbol("viewClass")) == numericValue) {
+			foundSymbol = tag;
+			break;
+		}
+	END_FOREACH;
+	if (ISNIL(foundSymbol)) {
+		FOREACH_WITH_TAG(templates, tag, slot)
+			if (GetFrameSlot(slot, MakeSymbol("_proto")) == numericValue) {
+				foundSymbol = tag;
+				break;
+			}
+		END_FOREACH;
+	}
+	if (ISNIL(foundSymbol)) {
+		return @"clView";
+	}
+	return [NSString stringWithCString:SymbolName(foundSymbol) encoding:NSMacOSRomanStringEncoding];
+}
+
 
 @end
 
@@ -761,7 +868,16 @@
 		slots = [[NSMutableArray alloc] initWithCapacity:Length(viewTemplateValue)];
 		FOREACH_WITH_TAG(viewTemplateValue, tag, slot)
 			const char * slotName = SymbolName(tag);
-			if (strcmp(slotName, "stepChildren") != 0 && strncmp(slotName, "__", 2) != 0) {
+			if (strcmp(slotName, "__ntTemplate") == 0) {
+				// it’s the viewClass or _proto
+				NTXProtoDescriptor * descriptor = [[NTXProtoDescriptor alloc] init:slot];
+				if ([descriptor.type isEqualToString:@"PROT"]) {
+					descriptor.tag = @"_proto";
+				} else if ([descriptor.type isEqualToString:@"CLAS"]) {
+					descriptor.tag = @"viewClass";
+				}
+				[slots addObject:descriptor];
+			} else if (strcmp(slotName, "stepChildren") != 0) {
 				NTXSlotDescriptor * descriptor = [[NTXSlotDescriptor alloc] init:slot];
 				descriptor.tag = [NSString stringWithUTF8String:slotName];
 				[slots addObject:descriptor];
@@ -822,50 +938,25 @@
 	if (sender.window == self.view.window && [sender.delegate respondsToSelector:@selector(selectedSlot)]) {
 		NTXSlotDescriptor * chosenSlot = (NTXSlotDescriptor *)[sender.delegate performSelector:@selector(selectedSlot)];
 		if (chosenSlot != nil) {
-			NSString * segueName = chosenSlot.type;
-			if ([segueName isEqualToString:@"SCPT"] || [segueName isEqualToString:@"EVAL"]) {
-				segueName = @"TEXT";
-			} else if ([segueName isEqualToString:@"NUMB"] && ([chosenSlot.tag isEqualToString:@"viewFlags"] || [chosenSlot.tag isEqualToString:@"viewFormat"] || [chosenSlot.tag isEqualToString:@"viewJustify"] || [chosenSlot.tag isEqualToString:@"viewEffect"])) {
-				segueName = chosenSlot.tag;
+			NSString * tabName = chosenSlot.type;
+			if ([tabName isEqualToString:@"SCPT"] || [tabName isEqualToString:@"EVAL"]) {
+				tabName = @"TEXT";
+			} else if ([tabName isEqualToString:@"PROT"] || [tabName isEqualToString:@"CLAS"]) {
+				tabName = @"viewTemplate";
+			} else if ([tabName isEqualToString:@"NUMB"] && ([chosenSlot.tag isEqualToString:@"viewFlags"] || [chosenSlot.tag isEqualToString:@"viewFormat"] || [chosenSlot.tag isEqualToString:@"viewJustify"] || [chosenSlot.tag isEqualToString:@"viewEffect"])) {
+				tabName = chosenSlot.tag;
 			}
 
-			[self performSegueWithIdentifier:segueName sender:chosenSlot];
-		}
-	}
-}
-
-
-- (void)prepareForSegue:(NSStoryboardSegue *)segue sender:(id)sender
-{
-	NSViewController * toViewController = (NSViewController *)segue.destinationController;
-	toViewController.representedObject = sender;
-//	toViewController.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
-	NSViewController * fromViewController = (self.childViewControllers.count > 0)? [self.childViewControllers objectAtIndex:0] : nil;
-
-	[self addChildViewController:toViewController];
-//	[self transitionFromViewController:fromViewController toViewController:toViewController options:0 completionHandler:^{[fromViewController removeFromParentViewController];}];
-	[self transitionFromViewController:fromViewController toViewController:toViewController];
-}
-
-
-- (void) transitionFromViewController:(NSViewController *)fromViewController toViewController:(NSViewController *)toViewController
-{
-	// remove any previous item view
-	if (fromViewController) {
-		[fromViewController.view removeFromSuperview];
-		[fromViewController removeFromParentViewController];
-	}
-
-	if (toViewController) {
-		NSView * subview = toViewController.view;
-		// make sure our added subview is placed and resizes correctly
-		if (subview) {
-			[subview setTranslatesAutoresizingMaskIntoConstraints:NO];
-			[self.view addSubview:subview];
-			[self.view addConstraint:[NSLayoutConstraint constraintWithItem:subview attribute:NSLayoutAttributeLeft	 relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeLeft	multiplier:1 constant:0]];
-			[self.view addConstraint:[NSLayoutConstraint constraintWithItem:subview attribute:NSLayoutAttributeRight	 relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeRight	multiplier:1 constant:0]];
-			[self.view addConstraint:[NSLayoutConstraint constraintWithItem:subview attribute:NSLayoutAttributeTop	 relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeTop		multiplier:1 constant:0]];
-			[self.view addConstraint:[NSLayoutConstraint constraintWithItem:subview attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeBottom	multiplier:1 constant:0]];
+			// look up tab index from id
+			NSInteger index = [self.tabView indexOfTabViewItemWithIdentifier:tabName];
+			if (index == NSNotFound) {
+				NSLog(@"tab view not found!");
+				index = 0;
+			}
+			
+			NSViewController * toViewController = self.tabViewItems[index].viewController;
+			toViewController.representedObject = chosenSlot;
+			self.selectedTabViewItemIndex = index;
 		}
 	}
 }

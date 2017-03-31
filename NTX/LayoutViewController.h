@@ -29,7 +29,7 @@
 {
 	IBOutlet NSSplitViewItem * templateListItem;
 }
-- (void)toggleCollapsed;
+- (IBAction)toggleTemplates:(id)sender;
 @end
 
 
@@ -129,6 +129,11 @@
 - (id)init:(RefArg)descriptor;
 @end
 
+@interface NTXProtoDescriptor : NTXSlotDescriptor
+@property(readonly) NSMutableArray<NSString*>* protoNames;
+@property NSString* theProto;
+@end
+
 
 /* -----------------------------------------------------------------------------
 	N T X S l o t L i s t V i e w C o n t r o l l e r
@@ -149,11 +154,7 @@
 /* -----------------------------------------------------------------------------
 	N T X S l o t E d i t o r V i e w C o n t r o l l e r
 ----------------------------------------------------------------------------- */
-@class NTXEditorView;
 
-@interface NTXSlotEditorViewController : NSViewController
-{
-	IBOutlet NTXEditorView * slotView;
-}
+@interface NTXSlotEditorViewController : NSTabViewController
 @end
 

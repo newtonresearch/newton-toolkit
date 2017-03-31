@@ -329,86 +329,69 @@
         <!--Editor Container-->
         <scene sceneID="J5s-aE-qY2">
             <objects>
-                <viewController title="Editor Container" id="aKx-ra-Ibo" customClass="NTXSlotEditorViewController" sceneMemberID="viewController">
+                <viewController title="Editor Container" id="aKx-ra-Ibo" sceneMemberID="viewController">
                     <view key="view" id="TPe-4N-4jj">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="7ZB-X1-CiD">
-                                <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                                <rect key="frame" x="0.0" y="22" width="450" height="278"/>
+                                <connections>
+                                    <segue destination="qMy-ED-cwa" kind="embed" id="aVv-u2-icN"/>
+                                </connections>
                             </containerView>
+                            <box autoresizesSubviews="NO" boxType="custom" borderType="line" borderWidth="0.0" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="DV2-Fy-kCA">
+                                <rect key="frame" x="0.0" y="0.0" width="450" height="22"/>
+                                <view key="contentView" id="z4F-wE-Qcl">
+                                    <rect key="frame" x="0.0" y="0.0" width="450" height="22"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4su-se-7y7">
+                                            <rect key="frame" x="8" y="2" width="18" height="18"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="18" id="DeG-P8-fkh"/>
+                                                <constraint firstAttribute="height" constant="18" id="dpY-YW-bph"/>
+                                            </constraints>
+                                            <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="DVTViewNavigators_10_10" imagePosition="only" alignment="center" lineBreakMode="truncatingTail" state="on" inset="2" id="wge-qv-TNT">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="toggleTemplates:" target="kIE-OQ-GN6" id="wbq-RQ-xEa"/>
+                                            </connections>
+                                        </button>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="4su-se-7y7" firstAttribute="leading" secondItem="z4F-wE-Qcl" secondAttribute="leading" constant="8" id="8xQ-yq-V1P"/>
+                                        <constraint firstAttribute="bottom" secondItem="4su-se-7y7" secondAttribute="bottom" constant="2" id="fbs-MI-tfC"/>
+                                    </constraints>
+                                </view>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="22" id="gog-jZ-K0N"/>
+                                </constraints>
+                                <color key="borderColor" name="windowFrameColor" catalog="System" colorSpace="catalog"/>
+                                <color key="fillColor" red="0.94117647059999998" green="0.94117647059999998" blue="0.94117647059999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </box>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="DV2-Fy-kCA" firstAttribute="leading" secondItem="TPe-4N-4jj" secondAttribute="leading" id="CAh-bd-LCc"/>
                             <constraint firstItem="7ZB-X1-CiD" firstAttribute="top" secondItem="TPe-4N-4jj" secondAttribute="top" id="MgW-JO-4zc"/>
+                            <constraint firstAttribute="trailing" secondItem="DV2-Fy-kCA" secondAttribute="trailing" id="MyY-4W-ns2"/>
                             <constraint firstItem="7ZB-X1-CiD" firstAttribute="leading" secondItem="TPe-4N-4jj" secondAttribute="leading" id="OYq-XM-nGM"/>
-                            <constraint firstAttribute="bottom" secondItem="7ZB-X1-CiD" secondAttribute="bottom" id="RbZ-ft-TVP"/>
+                            <constraint firstAttribute="bottom" secondItem="7ZB-X1-CiD" secondAttribute="bottom" constant="22" id="RbZ-ft-TVP"/>
                             <constraint firstAttribute="trailing" secondItem="7ZB-X1-CiD" secondAttribute="trailing" id="dkd-cE-63S"/>
+                            <constraint firstAttribute="bottom" secondItem="DV2-Fy-kCA" secondAttribute="bottom" id="tMK-nI-vz9"/>
                         </constraints>
                     </view>
-                    <connections>
-                        <segue destination="YAf-XK-go7" kind="custom" identifier="TEXT" customClass="EmptySegue" id="NIH-hW-7XK"/>
-                        <segue destination="ypv-bs-G2w" kind="custom" identifier="NUMB" customClass="EmptySegue" id="vPG-4W-TXD"/>
-                        <segue destination="SaI-9Y-NKn" kind="custom" identifier="BOOL" customClass="EmptySegue" id="yUU-yR-6sY"/>
-                        <segue destination="Feb-4c-YcS" kind="custom" identifier="RECT" customClass="EmptySegue" id="Xsl-7a-ss1"/>
-                        <segue destination="kBD-Dz-Sde" kind="custom" identifier="viewFormat" customClass="EmptySegue" id="YVp-gf-gLE"/>
-                        <segue destination="YCy-Ql-ON8" kind="custom" identifier="viewFlags" customClass="EmptySegue" id="rgK-QM-Iph"/>
-                        <segue destination="BCx-hD-nXG" kind="custom" identifier="viewJustify" customClass="EmptySegue" id="0dW-ek-EYw"/>
-                        <segue destination="LU2-Pt-oTZ" kind="custom" identifier="viewEffect" customClass="EmptySegue" id="7gJ-O4-7AJ"/>
-                    </connections>
                 </viewController>
                 <customObject id="kIE-OQ-GN6" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1183" y="1548"/>
         </scene>
-        <!--TEXT-->
-        <scene sceneID="sox-fU-kDz">
-            <objects>
-                <viewController title="TEXT" storyboardIdentifier="StreamInfo" id="YAf-XK-go7" customClass="NTXPlainTextViewController" sceneMemberID="viewController">
-                    <scrollView key="view" focusRingType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="UEd-us-wWT">
-                        <rect key="frame" x="0.0" y="0.0" width="450" height="160"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <clipView key="contentView" focusRingType="none" id="72c-Ae-Vnd">
-                            <rect key="frame" x="1" y="1" width="448" height="158"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            <subviews>
-                                <textView focusRingType="none" importsGraphics="NO" richText="NO" id="lcT-8p-WLN">
-                                    <rect key="frame" x="0.0" y="0.0" width="448" height="158"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    <size key="minSize" width="448" height="158"/>
-                                    <size key="maxSize" width="519" height="10000000"/>
-                                    <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <connections>
-                                        <binding destination="YAf-XK-go7" name="value" keyPath="representedObject.text" id="G9q-xd-kGX"/>
-                                        <binding destination="YAf-XK-go7" name="fontName" keyPath="self.fontName" id="UJQ-Ji-wJF"/>
-                                        <binding destination="YAf-XK-go7" name="fontSize" keyPath="self.fontSize" previousBinding="UJQ-Ji-wJF" id="570-zq-YgV"/>
-                                    </connections>
-                                </textView>
-                            </subviews>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            <edgeInsets key="contentInsets" left="2" right="0.0" top="4" bottom="0.0"/>
-                        </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="LrR-WW-yfB">
-                            <rect key="frame" x="-100" y="-100" width="87" height="18"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </scroller>
-                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="0.5" horizontal="NO" id="SWQ-8h-BXC">
-                            <rect key="frame" x="433" y="1" width="16" height="158"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </scroller>
-                    </scrollView>
-                    <connections>
-                        <outlet property="textView" destination="lcT-8p-WLN" id="b6R-z8-rDe"/>
-                    </connections>
-                </viewController>
-                <customObject id="DHq-VP-6Qr" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1769" y="1373"/>
-        </scene>
         <!--NUMB-->
         <scene sceneID="Z2n-uf-rdc">
             <objects>
-                <viewController title="NUMB" id="ypv-bs-G2w" sceneMemberID="viewController">
+                <viewController title="NUMB" storyboardIdentifier="NUMB" id="ypv-bs-G2w" sceneMemberID="viewController">
                     <view key="view" id="PFh-4u-ghL">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="160"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -450,12 +433,55 @@
                 </viewController>
                 <customObject id="5SC-DV-2iO" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1809" y="1580"/>
+            <point key="canvasLocation" x="2412" y="2034"/>
+        </scene>
+        <!--viewTemplate-->
+        <scene sceneID="FQd-h9-GLn">
+            <objects>
+                <viewController title="viewTemplate" id="GN8-jV-RDS" sceneMemberID="viewController">
+                    <view key="view" id="C8k-AH-IPd">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="207"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="o1X-ml-z2Q">
+                                <rect key="frame" x="18" y="170" width="90" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="View template" id="dnl-uL-cit">
+                                    <font key="font" metaFont="smallSystem"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5qW-lo-oYx">
+                                <rect key="frame" x="111" y="164" width="206" height="22"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="ivF-bZ-vaL" id="Vhi-dh-Xg1">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystem"/>
+                                    <menu key="menu" id="YIK-6A-aEP">
+                                        <items>
+                                            <menuItem title="Item 1" state="on" id="ivF-bZ-vaL"/>
+                                            <menuItem title="Item 2" id="gGa-sm-e22"/>
+                                            <menuItem title="Item 3" id="pXE-v1-eSq"/>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <binding destination="GN8-jV-RDS" name="contentValues" keyPath="representedObject.protoNames" id="CHG-eX-Bgd"/>
+                                    <binding destination="GN8-jV-RDS" name="selectedValue" keyPath="representedObject.protoName" previousBinding="CHG-eX-Bgd" id="NaC-9w-XPL"/>
+                                </connections>
+                            </popUpButton>
+                        </subviews>
+                    </view>
+                </viewController>
+                <customObject id="vJs-nw-4MJ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2412" y="2382.5"/>
         </scene>
         <!--RECT-->
         <scene sceneID="OMl-bZ-9id">
             <objects>
-                <viewController title="RECT" id="Feb-4c-YcS" sceneMemberID="viewController">
+                <viewController title="RECT" storyboardIdentifier="RECT" id="Feb-4c-YcS" sceneMemberID="viewController">
                     <view key="view" id="ByZ-kT-MHW">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="120"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -645,12 +671,12 @@
                 </viewController>
                 <customObject id="K48-F0-yNF" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1602" y="2002"/>
+            <point key="canvasLocation" x="2412" y="1746"/>
         </scene>
         <!--viewFormat-->
         <scene sceneID="Sek-oy-Ebw">
             <objects>
-                <viewController title="viewFormat" id="kBD-Dz-Sde" sceneMemberID="viewController">
+                <viewController title="viewFormat" storyboardIdentifier="viewFormat" id="kBD-Dz-Sde" sceneMemberID="viewController">
                     <view key="view" id="KBx-OK-eob">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="192"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -907,12 +933,12 @@
                 </viewController>
                 <customObject id="4qM-PN-e3m" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1027" y="1966"/>
+            <point key="canvasLocation" x="1924" y="2050"/>
         </scene>
-        <!--View Controller-->
+        <!--viewEffect-->
         <scene sceneID="Nfu-FG-p7W">
             <objects>
-                <viewController id="LU2-Pt-oTZ" sceneMemberID="viewController">
+                <viewController title="viewEffect" storyboardIdentifier="viewEffect" id="LU2-Pt-oTZ" sceneMemberID="viewController">
                     <view key="view" id="ios-2k-Gof">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="207"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -1183,12 +1209,126 @@
                 </viewController>
                 <customObject id="6EJ-iS-e5J" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="649" y="2414.5"/>
+            <point key="canvasLocation" x="1913" y="2383"/>
+        </scene>
+        <!--Slot Editor View Controller-->
+        <scene sceneID="DL8-TW-JTh">
+            <objects>
+                <tabViewController selectedTabViewItemIndex="0" tabStyle="unspecified" canPropagateSelectedChildViewControllerTitle="NO" id="qMy-ED-cwa" customClass="NTXSlotEditorViewController" sceneMemberID="viewController">
+                    <tabViewItems>
+                        <tabViewItem identifier="NONE" id="1qg-hy-d7b"/>
+                        <tabViewItem identifier="TEXT" id="Qoj-2c-j0R"/>
+                        <tabViewItem identifier="BOOL" id="R9d-8e-uRp"/>
+                        <tabViewItem identifier="RECT" id="DDA-XH-LUT">
+                            <accessibility identifier="RECT"/>
+                        </tabViewItem>
+                        <tabViewItem identifier="NUMB" id="s84-lN-WkO"/>
+                        <tabViewItem identifier="viewFlags" id="uj7-un-Se2"/>
+                        <tabViewItem identifier="viewFormat" id="kJC-TW-6iE"/>
+                        <tabViewItem identifier="viewJustify" id="EZP-aD-SbS"/>
+                        <tabViewItem identifier="viewEffect" id="JWq-0m-Tzh"/>
+                        <tabViewItem identifier="viewTemplate" id="FzT-vR-xff"/>
+                    </tabViewItems>
+                    <viewControllerTransitionOptions key="transitionOptions" crossfade="YES"/>
+                    <tabView key="tabView" type="noTabsNoBorder" id="V2d-oc-hDf">
+                        <rect key="frame" x="9" y="0.0" width="441" height="279"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                        <font key="font" metaFont="message"/>
+                        <tabViewItems/>
+                    </tabView>
+                    <connections>
+                        <segue destination="NRj-Df-yOD" kind="relationship" relationship="tabItems" id="yV1-Bq-vbQ"/>
+                        <segue destination="i54-M4-oGW" kind="relationship" relationship="tabItems" id="Jpz-gU-pff"/>
+                        <segue destination="SaI-9Y-NKn" kind="relationship" relationship="tabItems" id="Zok-vP-2yo"/>
+                        <segue destination="Feb-4c-YcS" kind="relationship" relationship="tabItems" id="FpV-Hr-wEL"/>
+                        <segue destination="ypv-bs-G2w" kind="relationship" relationship="tabItems" id="9WH-9D-E2Y"/>
+                        <segue destination="YCy-Ql-ON8" kind="relationship" relationship="tabItems" id="dQ7-kD-9Ba"/>
+                        <segue destination="kBD-Dz-Sde" kind="relationship" relationship="tabItems" id="iuH-ge-RaI"/>
+                        <segue destination="BCx-hD-nXG" kind="relationship" relationship="tabItems" id="Mhh-1l-dRh"/>
+                        <segue destination="LU2-Pt-oTZ" kind="relationship" relationship="tabItems" id="dt7-Ie-P5t"/>
+                        <segue destination="GN8-jV-RDS" kind="relationship" relationship="tabItems" id="haW-D0-q9z"/>
+                    </connections>
+                </tabViewController>
+                <customObject id="zNS-I5-ntd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1748.5" y="1537.5"/>
+        </scene>
+        <!--NONE-->
+        <scene sceneID="JXN-uJ-83E">
+            <objects>
+                <viewController title="NONE" id="NRj-Df-yOD" sceneMemberID="viewController">
+                    <view key="view" id="xlF-gS-6uA">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="132"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nrT-y6-WAk">
+                                <rect key="frame" x="182" y="57" width="86" height="17"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="No Selection" id="md0-bS-6ru">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="knobColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="nrT-y6-WAk" firstAttribute="centerY" secondItem="xlF-gS-6uA" secondAttribute="centerY" id="HQR-57-OUi"/>
+                            <constraint firstItem="nrT-y6-WAk" firstAttribute="centerX" secondItem="xlF-gS-6uA" secondAttribute="centerX" id="uJ1-av-DQR"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <customObject id="A9i-U9-Tha" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2412" y="1135"/>
+        </scene>
+        <!--TEXT-->
+        <scene sceneID="ZSF-8w-ky5">
+            <objects>
+                <viewController title="TEXT" storyboardIdentifier="TEXT" id="i54-M4-oGW" customClass="NTXPlainTextViewController" sceneMemberID="viewController">
+                    <scrollView key="view" focusRingType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="5WD-WV-Z0s">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="160"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <clipView key="contentView" focusRingType="none" id="eT1-Sd-TK5">
+                            <rect key="frame" x="1" y="1" width="448" height="158"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <textView focusRingType="none" importsGraphics="NO" richText="NO" spellingCorrection="YES" id="gCP-eA-8vl" customClass="NTXEditorView">
+                                    <rect key="frame" x="0.0" y="0.0" width="448" height="158"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <size key="minSize" width="448" height="158"/>
+                                    <size key="maxSize" width="519" height="10000000"/>
+                                    <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <connections>
+                                        <binding destination="i54-M4-oGW" name="value" keyPath="representedObject.text" id="tR0-ZU-scw"/>
+                                        <binding destination="i54-M4-oGW" name="fontName" keyPath="self.fontName" id="sFA-sI-Gsr"/>
+                                        <binding destination="i54-M4-oGW" name="fontSize" keyPath="self.fontSize" previousBinding="sFA-sI-Gsr" id="1XC-Ax-rM6"/>
+                                    </connections>
+                                </textView>
+                            </subviews>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            <edgeInsets key="contentInsets" left="2" right="0.0" top="4" bottom="0.0"/>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="vqr-k8-NJB">
+                            <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="0.5" horizontal="NO" id="7jF-wY-yjJ">
+                            <rect key="frame" x="433" y="1" width="16" height="158"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
+                    <connections>
+                        <outlet property="textView" destination="gCP-eA-8vl" id="I6Q-gF-hqn"/>
+                    </connections>
+                </viewController>
+                <customObject id="Qib-WT-yNV" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2412" y="1345"/>
         </scene>
         <!--viewJustify-->
         <scene sceneID="MyB-AT-EcT">
             <objects>
-                <viewController title="viewJustify" id="BCx-hD-nXG" sceneMemberID="viewController">
+                <viewController title="viewJustify" storyboardIdentifier="viewJustify" id="BCx-hD-nXG" sceneMemberID="viewController">
                     <view key="view" id="Rdt-KE-htr">
                         <rect key="frame" x="0.0" y="0.0" width="486" height="248"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -1481,12 +1621,12 @@
                 </viewController>
                 <customObject id="Afa-0q-qAJ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1165" y="2249"/>
+            <point key="canvasLocation" x="1412" y="2466"/>
         </scene>
         <!--viewFlags-->
         <scene sceneID="E7u-cS-w29">
             <objects>
-                <viewController title="viewFlags" id="YCy-Ql-ON8" sceneMemberID="viewController">
+                <viewController title="viewFlags" storyboardIdentifier="viewFlags" id="YCy-Ql-ON8" sceneMemberID="viewController">
                     <view key="view" id="67A-Ac-IrY">
                         <rect key="frame" x="0.0" y="0.0" width="500" height="263"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -1866,12 +2006,12 @@
                 </viewController>
                 <customObject id="WVW-Ix-Jv0" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="512" y="2074"/>
+            <point key="canvasLocation" x="1412" y="2086"/>
         </scene>
         <!--BOOL-->
         <scene sceneID="qny-lf-cjQ">
             <objects>
-                <viewController title="BOOL" id="SaI-9Y-NKn" sceneMemberID="viewController">
+                <viewController title="BOOL" storyboardIdentifier="BOOL" id="SaI-9Y-NKn" sceneMemberID="viewController">
                     <view key="view" id="VUy-it-QFu">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="160"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -1924,10 +2064,11 @@
                 </viewController>
                 <customObject id="bOB-SE-Edi" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1746" y="1801"/>
+            <point key="canvasLocation" x="2412" y="1554"/>
         </scene>
     </scenes>
     <resources>
+        <image name="DVTViewNavigators_10_10" width="18" height="14"/>
         <image name="NSAddTemplate" width="11" height="11"/>
     </resources>
 </document>
