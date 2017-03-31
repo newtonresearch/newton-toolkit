@@ -151,6 +151,16 @@ NSArray * gTypeNames;
 
 
 /* -----------------------------------------------------------------------------
+	For UI: so we can disable items when not valid.
+	Args:		--
+	Return:	name
+----------------------------------------------------------------------------- */
+
+- (BOOL)isProject {
+	return self.type == kProjectFileType;
+}
+
+/* -----------------------------------------------------------------------------
 	For UI: so we can disable the Main Layout checkbox when not valid.
 	Args:		--
 	Return:	name

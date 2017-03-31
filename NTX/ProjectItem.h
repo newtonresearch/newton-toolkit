@@ -29,6 +29,7 @@
 // derived for UI
 @property(assign) NSString * name;			// url.lastPathComponent
 @property(readonly) BOOL isLayout;			// YES if type == layout
+@property(readonly) BOOL isProject;			// YES if type == project (or any reserved type)
 @property(readonly) NSImage * image;		// looked up from type
 @property(assign) BOOL isContainer;			// looked up from type (using private NTX code)
 
