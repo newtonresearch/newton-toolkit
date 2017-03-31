@@ -9,8 +9,10 @@
 #import "NTXDocument.h"
 #import "Utilities.h"
 #import "NTK/Funcs.h"
+#import "NTK/Globals.h"
 
 extern void DefConst(const char * inSym, RefArg inVal);
+extern "C" Ref FIntern(RefArg inRcvr, RefArg inStr);
 
 
 extern NSNumberFormatter * gNumberFormatter;
@@ -18,6 +20,8 @@ extern NSDateFormatter * gDateFormatter;
 
 #define kSecondsSince1904 2082844800
 
+
+extern Ref GetGlobalConstant(RefArg inTag);
 
 /*------------------------------------------------------------------------------
 	Make a NextStep string from a NewtonScript symbol.
@@ -45,10 +49,10 @@ NewtonErr
 PrintObject(FILE * inFP, RefArg inRef, int indent, Ref inLength, Ref inDepth)
 {
 	RedirectStdioOutTranslator(inFP);
-	Ref savedPrintDepth = GetFrameSlot(RA(gVarFrame), SYMA(printDepth));
-	Ref savedPrintLength = GetFrameSlot(RA(gVarFrame), SYMA(printLength));
-	SetFrameSlot(RA(gVarFrame), SYMA(printDepth), inDepth);
-	SetFrameSlot(RA(gVarFrame), SYMA(printLength), inLength);
+	Ref savedPrintDepth = GetGlobalVar(SYMA(printDepth));
+	Ref savedPrintLength = GetGlobalVar(SYMA(printLength));
+	DefGlobalVar(SYMA(printDepth), inDepth);
+	DefGlobalVar(SYMA(printLength), inLength);
 	NewtonErr err = noErr;
 	newton_try
 	{
@@ -61,8 +65,8 @@ PrintObject(FILE * inFP, RefArg inRef, int indent, Ref inLength, Ref inDepth)
 	}
 	end_try;
 	REPprintf("\n\n");
-	SetFrameSlot(RA(gVarFrame), SYMA(printDepth), savedPrintDepth);
-	SetFrameSlot(RA(gVarFrame), SYMA(printLength), savedPrintLength);
+	DefGlobalVar(SYMA(printDepth), savedPrintDepth);
+	DefGlobalVar(SYMA(printLength), savedPrintLength);
 	RedirectStdioOutTranslator(NULL);
 	return err;
 }
@@ -135,6 +139,7 @@ PrintObject(RefArg inRef)
 #pragma mark -
 /* -----------------------------------------------------------------------------
 	N T X L a y o u t D o c u m e n t
+	A hierarchy of view templates.
 ----------------------------------------------------------------------------- */
 #import "LayoutViewController.h"
 
@@ -167,6 +172,7 @@ PrintObject(RefArg inRef)
 /* -----------------------------------------------------------------------------
 	Read layout NSOF from disk.
 ----------------------------------------------------------------------------- */
+Ref ReadLayoutSettings(NSURL * url);
 
 - (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError *__autoreleasing *)outError {
 	NewtonErr err = noErr;
@@ -174,6 +180,51 @@ PrintObject(RefArg inRef)
 	{
 		CStdIOPipe pipe(url.fileSystemRepresentation, "r");
 		_layoutRef = UnflattenRef(pipe);
+
+		RefVar templateHierarchy(GetFrameSlot(self.layoutRef, MakeSymbol("templateHierarchy")));
+		if (ISNIL(templateHierarchy)) {
+			// could well be Mac layout file -- read layoutSettings from resource fork
+			RefVar macLayout(AllocateFrame());
+			SetFrameSlot(macLayout, MakeSymbol("layoutSettings"), ReadLayoutSettings(url));
+			SetFrameSlot(macLayout, MakeSymbol("templateHierarchy"), self.layoutRef);
+			_layoutRef = macLayout;
+		}
+	}
+	newton_catch_all
+	{
+		err = (NewtonErr)(long)CurrentException()->data;;
+	}
+	end_try;
+
+	if (err && outError)
+		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:err userInfo:nil];
+
+	return err == noErr;
+}
+
+
+/* -----------------------------------------------------------------------------
+	Write layout NSOF text to disk.
+	This will alter a Mac layout file so that NTK will no longer open it
+	(although NTX will be able to reopen it).
+----------------------------------------------------------------------------- */
+
+- (BOOL)writeToURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError **)outError
+{
+	NewtonErr err = noErr;
+	newton_try
+	{
+#if 0
+		// could do this to save in Mac format but we’d also need to update the resource fork
+		RefVar settings(GetFrameSlot(self.layoutRef, MakeSymbol("layoutSettings")));
+		Ref platform = GetFrameSlot(settings, MakeSymbol("ntkPlatform"));
+		if (platform == MAKEINT(0)) {
+			// is Mac layout file -- strip layoutSettings
+			_layoutRef = GetFrameSlot(self.layoutRef, MakeSymbol("templateHierarchy"));
+		}
+#endif
+		CStdIOPipe pipe(url.fileSystemRepresentation, "w");
+		FlattenRef(self.layoutRef, pipe);
 	}
 	newton_catch_all
 	{
@@ -193,39 +244,53 @@ PrintObject(RefArg inRef)
 ----------------------------------------------------------------------------- */
 extern Ref ParseString(RefArg inStr);
 
+static bool fgUseStepChildren;
+
 Ref
 AddStepForm(RefArg parent, RefArg child) {
-	if (!FrameHasSlot(parent, SYMA(stepChildren))) {
-		SetFrameSlot(parent, SYMA(stepChildren), AllocateArray(SYMA(stepChildren), 0));
+	RefVar childArraySym(fgUseStepChildren? SYMA(stepChildren) : SYMA(viewChildren));
+	if (!FrameHasSlot(parent, childArraySym)) {
+		SetFrameSlot(parent, childArraySym, AllocateArray(childArraySym, 0));
 	}
-	AddArraySlot(GetFrameSlot(parent, SYMA(stepChildren)), child);
+	AddArraySlot(GetFrameSlot(parent, childArraySym), child);
 }
 
 Ref
 StepDeclare(RefArg parent, RefArg child, RefArg tag) {
+	RefVar childContextArraySym(fgUseStepChildren? SYMA(stepAllocateContext) : SYMA(allocateContext));
+	if (!FrameHasSlot(parent, childContextArraySym)) {
+		SetFrameSlot(parent, childContextArraySym, MakeArray(0));
+	}
+	AddArraySlot(GetFrameSlot(parent, childContextArraySym), tag);
+	AddArraySlot(GetFrameSlot(parent, childContextArraySym), child);
 }
 
 
 Ref
-BuildViewTemplate(RefArg viewTemplate, RefArg parent, int depth) {
+BuildViewTemplate(RefArg viewTemplate, RefArg parent, RefArg namedViews, int depth) {
 
-	RefVar slots(GetFrameSlot(viewTemplate, MakeSymbol("value")));
-	RefVar templateName(GetFrameSlot(viewTemplate, MakeSymbol("__ntName")));
-	bool isDeclared = false;
-	if (!IsString(templateName) || Length(templateName) == 0) {
-		templateName = NILREF;
-	}
-
+	// build thisView...
 	RefVar thisView(AllocateFrame());
-	SetFrameSlot(RA(gVarFrame), MakeSymbol("thisView"), thisView);
+	DefGlobalVar(SYMA(thisView), thisView);
+
+	// ...from slots from the template
+	RefVar slots(Clone(GetFrameSlot(viewTemplate, SYMA(value))));	// we’re going to be removing before & after scripts
 
 	// beforeScript
-	RefVar script(GetFrameSlot(viewTemplate, MakeSymbol("beforeScript")));
+	RefVar script(GetFrameSlot(slots, SYMA(beforeScript)));
 	if (NOTNIL(script)) {
+		script = GetFrameSlot(script, SYMA(value));
+		RemoveSlot(slots, SYMA(beforeScript));
 		RefVar codeBlock(ParseString(script));
 		if (NOTNIL(codeBlock)) {
 			InterpretBlock(codeBlock, RA(NILREF));
 		}
+	}
+	// afterScript
+	script = GetFrameSlot(slots, SYMA(afterScript));
+	if (NOTNIL(script)) {
+		script = GetFrameSlot(script, SYMA(value));
+		RemoveSlot(slots, SYMA(afterScript));
 	}
 
 	RefVar regularSlot, proto, viewClass, stepChildren;
@@ -241,24 +306,21 @@ BuildViewTemplate(RefArg viewTemplate, RefArg parent, int depth) {
 			stepChildren = value;
 			break;
 		case 'PROT':
-			proto = value;
+			proto = MAKEMAGICPTR(RVALUE(value));
 			break;
 		case 'CLAS':
 			viewClass = value;
 			break;
 		default:
 			switch (selector) {
-			case 'TEXT':
-				regularSlot = value;
-				break;
 			case 'EVAL':
+			case 'SCPT':
 				regularSlot = InterpretBlock(ParseString(value), RA(NILREF));
 				break;
-			case 'SCPT':
-				regularSlot = ParseString(value);
-				break;
+			case 'TEXT':
 			case 'NUMB':
 			case 'INTG':
+			case 'RECT':
 				regularSlot = value;
 				break;
 			case 'REAL':
@@ -266,9 +328,6 @@ BuildViewTemplate(RefArg viewTemplate, RefArg parent, int depth) {
 				break;
 			case 'BOOL':
 				regularSlot = MAKEBOOLEAN(NOTNIL(value));
-				break;
-			case 'RECT':
-				regularSlot = value;
 				break;
 	//		case 'FONT':
 	//		case 'PICT':
@@ -280,38 +339,50 @@ BuildViewTemplate(RefArg viewTemplate, RefArg parent, int depth) {
 		}
 	END_FOREACH;
 
-	// if template is named, add debug:<name> slot
-	if (NOTNIL(templateName)) {
-		SetFrameSlot(thisView, SYMA(debug), templateName);
+	// if we have a proto or viewClass, add it
+	if (NOTNIL(proto)) {
+		SetFrameSlot(thisView, SYMA(_proto), proto);
+	} else if (NOTNIL(viewClass)) {
+		SetFrameSlot(thisView, SYMA(viewClass), viewClass);
 	}
 
-	// if we have a proto or viewClass, add it last
-	if (NOTNIL(proto)) {
-		SetFrameSlot(thisView, SYMA(debug), proto);
-	} else if (NOTNIL(viewClass)) {
-		SetFrameSlot(thisView, SYMA(debug), viewClass);
+	// if template is named, add debug:<name> slot
+	RefVar templateName(GetFrameSlot(viewTemplate, MakeSymbol("__ntName")));
+	if (!IsString(templateName) || Length(templateName) == 0) {
+		templateName = NILREF;
+	}
+
+	if (NOTNIL(templateName)) {
+		SetFrameSlot(thisView, SYMA(debug), templateName);
+		SetFrameSlot(namedViews, FIntern(RA(NILREF),templateName), thisView);
 	}
 
 	// afterScript
-	script = GetFrameSlot(viewTemplate, MakeSymbol("afterScript"));
 	if (NOTNIL(script)) {
-		// set up thisView
 		RefVar codeBlock(ParseString(script));
 		if (NOTNIL(codeBlock)) {
 			InterpretBlock(codeBlock, RA(NILREF));
 		}
 	}
 
-	if (parent) {
+	if (NOTNIL(parent)) {
 		AddStepForm(parent, thisView);
-//		if (isDeclared) {
-//			StepDeclare(parent, thisView, declaredSym);
-//		}
+	}
+
+	RefVar declaredTo(GetFrameSlot(viewTemplate, MakeSymbol("__ntDeclare")));
+	if (NOTNIL(declaredTo)) {
+		RefVar declaredToName(GetFrameSlot(declaredTo, MakeSymbol("__ntName")));
+		declaredTo = GetFrameSlot(namedViews, FIntern(RA(NILREF),declaredToName));
+
+		RefVar templateSym(FIntern(RA(NILREF),templateName));
+		SetFrameSlot(thisView, SYMA(preAllocatedContext), templateSym);
+		SetFrameSlot(declaredTo, templateSym, RA(NILREF));
+		StepDeclare(declaredTo, thisView, templateSym);
 	}
 
 	if (NOTNIL(stepChildren)) {
 		FOREACH(stepChildren, child)
-			BuildViewTemplate(child, thisView, depth+1);
+			BuildViewTemplate(child, thisView, namedViews, depth+1);
 		END_FOREACH;
 	}
 	return thisView;
@@ -323,15 +394,17 @@ BuildViewTemplate(RefArg viewTemplate, RefArg parent, int depth) {
 	RefVar layout;
 	newton_try
 	{
+		fgUseStepChildren = NOTNIL(GetGlobalConstant(MakeSymbol("kUseStepChildren")));
 		RefVar viewTemplate(GetFrameSlot(self.layoutRef, MakeSymbol("templateHierarchy")));
-		layout = BuildViewTemplate(viewTemplate, NULL, 0);
+		RefVar namedViews(AllocateFrame());
+		layout = BuildViewTemplate(viewTemplate, RA(NILREF), namedViews, 0);
 		DefConst(self.symbol.UTF8String, layout);
 	}
-	newton_catch_all
-	{
-		err = (NewtonErr)(long)CurrentException()->data;;
-		layout = NILREF;
-	}
+//	newton_catch_all
+//	{
+//		err = (NewtonErr)(long)CurrentException()->data;;
+//		layout = NILREF;
+//	}
 	end_try;
 	return layout;
 }
@@ -359,9 +432,9 @@ BuildViewTemplate(RefArg viewTemplate, RefArg parent, int depth) {
 Ref
 PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth) {
 
-	RefVar slots(GetFrameSlot(viewTemplate, MakeSymbol("value")));
+	RefVar slots(Clone(GetFrameSlot(viewTemplate, SYMA(value))));
 	RefVar name(GetFrameSlot(viewTemplate, MakeSymbol("__ntName")));
-	bool isNamed, isDeclared = false;
+	bool isNamed;
 	if (IsString(name) && Length(name) > 0) {
 		isNamed = true;
 	} else {
@@ -373,65 +446,89 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 		isNamed = false;
 	}
 	CDataPtr nameStr(ASCIIString(name));
+
 	RefVar proto, viewClass, stepChildren;
 	// beforeScript
-	RefVar script(GetFrameSlot(viewTemplate, MakeSymbol("beforeScript")));
+	RefVar script(GetFrameSlot(slots, SYMA(beforeScript)));
 	if (NOTNIL(script)) {
+		script = GetFrameSlot(script, SYMA(value));
+		RemoveSlot(slots, SYMA(beforeScript));
 		fprintf(fp, "// beforeScript for %s\n", (char *)nameStr);
 		fprintf(fp, "%s\n", BinaryData(ASCIIString(script)));
+	}
+	// afterScript
+	script = GetFrameSlot(slots, SYMA(afterScript));
+	if (NOTNIL(script)) {
+		script = GetFrameSlot(script, SYMA(value));
+		RemoveSlot(slots, SYMA(afterScript));
 	}
 	fprintf(fp, "%s :=\n    {", (char *)nameStr);
 	ArrayIndex index = 0, count = Length(slots);
 	FOREACH_WITH_TAG(slots, tag, slot)
 		RefVar value(GetFrameSlot(slot, SYMA(value)));
 		RefVar type(GetFrameSlot(slot, MakeSymbol("__ntDataType")));
-		CDataPtr typeStr(ASCIIString(type));
-		++index;
-		if (strncmp(typeStr, "ARAY", 4) == 0) {
+		CDataPtr typeData(ASCIIString(type));
+		const char * typeStr = (const char *)typeData;
+		int selector = (typeStr[0] << 24) + (typeStr[1] << 16) + (typeStr[2] << 8) + typeStr[3];
+		switch (selector) {
+		case 'ARAY':
 			// it’s the stepChildren slot
 			stepChildren = value;
-		} else if (strncmp(typeStr, "PROT", 4) == 0) {
+			break;
+		case 'PROT':
 			proto = value;
-		} else if (strncmp(typeStr, "CLAS", 4) == 0) {
+			break;
+		case 'CLAS':
 			viewClass = value;
-		} else {
+			break;
+		default:
+			if (index > 0) {
+				fprintf(fp, ",\n     ");
+			}
 			fprintf(fp, "%s: ", SymbolName(tag));
-
-			if (strncmp(typeStr, "TEXT", 4) == 0) {
+			switch (selector) {
+			case 'TEXT':
 				fprintf(fp, "\"%s\"", BinaryData(ASCIIString(value)));
-			} else if (strncmp(typeStr, "EVAL", 4) == 0) {
+				break;
+			case 'EVAL':
 				fprintf(fp, "%s", BinaryData(ASCIIString(value)));
-			} else if (strncmp(typeStr, "SCPT", 4) == 0) {
+				break;
+			case 'SCPT':
 				fprintf(fp, "\n%s", BinaryData(ASCIIString(value)));
-			} else if (strncmp(typeStr, "NUMB", 4) == 0 || strncmp(typeStr, "INTG", 4) == 0) {
+				break;
+			case 'NUMB':
+			case 'INTG':
 				fprintf(fp, "%ld", RVALUE(value));
-			} else if (strncmp(typeStr, "REAL", 4) == 0) {
-			} else if (strncmp(typeStr, "BOOL", 4) == 0) {
+				break;
+			case 'REAL':
+				;
+				break;
+			case 'BOOL':
 				fprintf(fp, "%s", ISNIL(value)? "false":"true");
-			} else if (strncmp(typeStr, "RECT", 4) == 0) {
-				fprintf(fp, "{left:%ld, top:%ld, right:%ld, bottom:%ld}", RINT(GetFrameSlot(value,SYMA(left))), RINT(GetFrameSlot(value,SYMA(top))), RINT(GetFrameSlot(value,SYMA(right))), RINT(GetFrameSlot(value,SYMA(bottom))));
-	//		} else if (strncmp(typeStr, "FONT", 4) == 0) {
-	//		} else if (strncmp(typeStr, "PICT", 4) == 0) {
+				break;
+			case 'RECT':
+				fprintf(fp, "{top:%ld, left:%ld, right:%ld, bottom:%ld}", RINT(GetFrameSlot(value,SYMA(top))), RINT(GetFrameSlot(value,SYMA(left))), RINT(GetFrameSlot(value,SYMA(right))), RINT(GetFrameSlot(value,SYMA(bottom))));
+				break;
+	//		case 'FONT':
+	//		case 'PICT':
+				break;
 			}
-			if (index < count) {
-				fprintf(fp, ",\n    ");
-			}
+			++index;
 		}
 	END_FOREACH;
 	// if name is not anon, add debug:<name> slot
 	if (isNamed) {
-		fprintf(fp, ",\n    debug: \"%s\"", (char *)nameStr);
+		fprintf(fp, ",\n     debug: \"%s\"", (char *)nameStr);
 	}
 	// if we have a proto or viewClass, add it last
 	if (NOTNIL(proto)) {
-		fprintf(fp, ",\n    _proto: @%ld", RVALUE(proto));
+		fprintf(fp, ",\n     _proto: @%ld", RVALUE(proto));
 	} else if (NOTNIL(viewClass)) {
-		fprintf(fp, ",\n    viewClass: %ld", RVALUE(viewClass));
+		fprintf(fp, ",\n     viewClass: %ld", RVALUE(viewClass));
 	}
 	fprintf(fp, "\n    };\n");
 
 	// afterScript
-	script = GetFrameSlot(viewTemplate, MakeSymbol("afterScript"));
 	if (NOTNIL(script)) {
 		fprintf(fp, "// afterScript for %s\nthisView := %s;\n", (char *)nameStr, (char *)nameStr);
 		fprintf(fp, "%s\n", BinaryData(ASCIIString(script)));
@@ -439,10 +536,15 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 
 	if (parent) {
 		fprintf(fp, "AddStepForm(%s, %s)\n", parent, (char *)nameStr);
-		if (isDeclared) {
-			fprintf(fp, "StepDeclare(%s, %s, '%s)\n", parent, (char *)nameStr, (char *)nameStr);
-		}
 	}
+
+	RefVar declaredTo(GetFrameSlot(viewTemplate, MakeSymbol("__ntDeclare")));
+	if (NOTNIL(declaredTo)) {
+		name = GetFrameSlot(declaredTo, MakeSymbol("__ntName"));
+		CDataPtr declaredToNameStr(ASCIIString(name));
+		fprintf(fp, "StepDeclare(%s, %s, '%s)\n", (char *)declaredToNameStr, (char *)nameStr, (char *)nameStr);
+	}
+
 	fprintf(fp, "\n");
 
 	if (NOTNIL(stepChildren)) {
@@ -486,6 +588,8 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 #pragma mark -
 /* -----------------------------------------------------------------------------
 	N T X P a c k a g e D o c u m e n t
+	A Newton package.
+	Read-only.
 ----------------------------------------------------------------------------- */
 #import "NTK/NewtonPackage.h"
 #import "PkgPart.h"
@@ -559,7 +663,20 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 
 - (void)exportToText:(FILE *)fp error:(NSError *__autoreleasing *)outError {
 	const char * filename = self.fileURL.lastPathComponent.UTF8String;
-	fprintf(fp, "// Package file %s\n\n", filename);
+	fprintf(fp, "// Package file %s\n", filename);
+
+	fprintf(fp, "// Name %s\n", self.name.UTF8String);
+	fprintf(fp, "// Version %s%s\n", self.version.UTF8String, self.isCopyProtected?" (copy protected)":"");
+	fprintf(fp, "// Size %s\n", self.size.UTF8String);
+	fprintf(fp, "// Created %s\n", self.creationDate.UTF8String);
+	fprintf(fp, "// %s\n", self.copyright.UTF8String);
+
+	ArrayIndex partNum = 0;
+	for (PkgPart * part in self.parts) {
+		fprintf(fp, "\n// Part %d\n", partNum);
+		PrintObject(fp, part.rootRef, 0, NILREF, MAKEINT(16));
+	}
+	fprintf(fp, "\n\n");
 }
 
 @end
@@ -568,6 +685,8 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 #pragma mark -
 /* -----------------------------------------------------------------------------
 	N T X S t r e a m D o c u m e n t
+	A Newton Streamed Object File (NSOF) object.
+	Read-only.
 ----------------------------------------------------------------------------- */
 @implementation NTXStreamDocument
 
@@ -660,6 +779,8 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 #pragma mark -
 /* -----------------------------------------------------------------------------
 	N T X N a t i v e C o d e D o c u m e n t
+	A C++ native (ie platform-specific) code module.
+	Read-only.
 ----------------------------------------------------------------------------- */
 @implementation NTXNativeCodeDocument
 
