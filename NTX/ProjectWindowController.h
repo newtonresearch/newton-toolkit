@@ -41,5 +41,4 @@
 
 // sidebar
 - (void)sourceSelectionDidChange:(NTXProjectItem *)item;
-
 @end

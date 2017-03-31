@@ -54,8 +54,7 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 	Initialize after nib has been loaded.
 ----------------------------------------------------------------------------- */
 
-- (void) windowDidLoad
-{
+- (void) windowDidLoad {
 	[super windowDidLoad];
 
 	// show toolbar items in title area
@@ -65,12 +64,6 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 	self.connectionIcon = [NSImage imageNamed:@"Disconnected"];
 
 	self.progress = [[NSProgress alloc] initWithParent:nil userInfo:nil];
-
-	// start listening for notifications re: nub status
-	[[NSNotificationCenter defaultCenter] addObserver:self
-														  selector:@selector(nubStatusDidChange:)
-																name:kNubStatusDidChangeNotification
-															 object:nil];
 
 	// start listening for notifications re: becoming key window
 	[[NSNotificationCenter defaultCenter] addObserver:self
@@ -91,8 +84,7 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 	});
 }
 
-- (void)setDocument:(id)inDocument
-{
+- (void)setDocument:(id)inDocument {
 	[super setDocument:inDocument];
 
 	NTXProjectDocument * theDocument = inDocument;
@@ -111,6 +103,10 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 
 }
 
+// save all documents represented in the project
+- (IBAction)saveAllDocuments:(id)sender {
+	[self.document saveAllProjectItems:sender];
+}
 
 #pragma mark Item View
 /* -----------------------------------------------------------------------------
@@ -142,8 +138,7 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 	Update the progress box when changes to the document’s progress are observed.
 ----------------------------------------------------------------------------- */
 
-- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if (context == ProgressObserverContext) {
 		[[NSOperationQueue mainQueue] addOperationWithBlock:^{
 			NSProgress * progres = object;
@@ -215,11 +210,11 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 - (IBAction)toggleCollapsed:(id)sender {
 	NSInteger item = ((NSSegmentedControl *)sender).selectedSegment;
 	if (item == 0) {
-		[self.sourceSplitController toggleCollapsedSplit:0];
+		[self.sourceSplitController toggleSourceList:sender];
 	} else if (item == 1) {
-		[self.inspectorSplitController toggleCollapsed];
+		[self.inspectorSplitController toggleInspector:sender];
 	} else if (item == 2) {
-		[self.sourceSplitController toggleCollapsedSplit:1];
+		[self.sourceSplitController toggleSourceInfo:sender];
 	}
 }
 
