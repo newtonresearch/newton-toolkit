@@ -87,11 +87,14 @@ extern NSString * const NTXPackageFileType;
 @property(strong) NTXProjectWindowController * windowController;
 //@property(strong) NSViewController * viewController;
 
+// File menu actions
+- (IBAction)saveAllProjectItems:(id)sender;
+
 // Build menu actions
 - (IBAction)buildPackage:(id)sender;
 - (IBAction)downloadPackage:(id)sender;
 - (IBAction)exportPackage:(id)sender;
 
 - (NSURL *)buildPkg;								// build package/stream
-- (NSData *)buildPackageData;
+- (NSData *)buildPackageData:(int)alignment;
 @end

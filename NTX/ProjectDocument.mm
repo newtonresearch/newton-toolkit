@@ -21,6 +21,7 @@
 #import "Utilities.h"
 #import "NTXDocument.h"
 #import "NTK/ObjectHeap.h"
+#import "NTK/Globals.h"
 
 extern "C" Ref		FIntern(RefArg rcvr, RefArg inStr);
 extern "C" Ref		ArrayInsert(RefArg ioArray, RefArg inObj, ArrayIndex index);
@@ -29,11 +30,15 @@ extern	  Ref		MakeStringFromUTF8String(const char * inStr);
 extern	  Ref		ParseString(RefArg inStr);
 
 extern NSString *	MakeNSSymbol(RefArg inSym);
+extern Ref			GetGlobalConstant(RefArg inTag);
+extern Ref			GetAllGlobalConstants(void);
 
-extern Ref *		RSgConstantsFrame;
+
 extern Ref *		RSformInstallScript;
 extern Ref *		RSformRemoveScript;
 extern Ref *		RSautoInstallScript;
+
+DeclareException(exCompilerData, exCompiler);
 
 
 #pragma mark - NTXProjectDocument
@@ -41,46 +46,27 @@ extern Ref *		RSautoInstallScript;
 	N T X P r o j e c t D o c u m e n t
 ----------------------------------------------------------------------------- */
 
-extern "C" {
-Ref	FGetLayout(RefArg rcvr, RefArg inFilename);
-Ref	FSetPartFrameSlot(RefArg rcvr, RefArg inTag, RefArg inValue);
-Ref	FGetPartFrameSlot(RefArg rcvr, RefArg inTag);
-}
-
-Ref
-FGetLayout(RefArg rcvr, RefArg inFilename)
-{ return NILREF; }
-
-
-Ref
-FSetPartFrameSlot(RefArg rcvr, RefArg inTag, RefArg inValue)
-{
-	RefVar partFrame(GetFrameSlot(RA(gVarFrame), SYMA(partFrame)));
-	if (ISNIL(partFrame)) {
-		partFrame = AllocateFrame();
-		SetFrameSlot(RA(gVarFrame), SYMA(partFrame), partFrame);
-	}
-	SetFrameSlot(partFrame, inTag, inValue);
-	return inValue;
-}
-
 inline Ref SetPartFrameSlot(RefArg inTag, RefArg inValue) {
-	return FSetPartFrameSlot(RA(NILREF), inTag, inValue);
-}
-
-
-Ref
-FGetPartFrameSlot(RefArg rcvr, RefArg inTag)
-{
-	RefVar partFrame(GetFrameSlot(RA(gVarFrame), SYMA(partFrame)));
-	if (ISNIL(partFrame)) {
-		return NILREF;
-	}
-	return GetFrameSlot(partFrame, inTag);
+	return NSCallGlobalFn(SYMA(SetPartFrameSlot), inTag, inValue);
+/*
+func(slot, value)
+begin
+if not GlobalVarExists('partFrame) then
+	DefGlobalVar('partFrame, {});
+GetGlobalVar('partFrame).(slot) := value;
+end
+*/
 }
 
 inline Ref GetPartFrameSlot(RefArg inTag) {
-	return FGetPartFrameSlot(RA(NILREF), inTag);
+	return NSCallGlobalFn(SYMA(GetPartFrameSlot), inTag);
+/*
+func(slot)
+begin
+if GlobalVarExists('partFrame) then
+	GetGlobalVar('partFrame).(slot);
+end
+*/
 }
 
 
@@ -235,9 +221,9 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 	NewtonErr err = noErr;
 	newton_try
 	{
-		NTXRsrcProject * data;
-		if ([url.pathExtension isEqualToString:@"ntk"] && (data = [[NTXRsrcProject alloc] initWithURL:url]) != nil) {
-		// the file has a resource fork so assume it’s a Mac NTK project
+		NTXRsrcProject * data = [[NTXRsrcProject alloc] initWithURL:url];
+		if (data) {
+			// the file appears to be a Mac NTK project
 			_projectRef = data.projectRef;
 		} else {
 			CStdIOPipe pipe(url.fileSystemRepresentation, "r");
@@ -452,6 +438,14 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 }
 
 
+- (IBAction)saveAllProjectItems:(id)sender {
+
+	for (NTXProjectItem * item in self.projectItems[@"items"]) {
+		[item.document saveDocument:self];
+	}
+}
+
+
 #pragma mark - Build menu actions
 
 /* -----------------------------------------------------------------------------
@@ -539,16 +533,18 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 		TBD
 
 	Args:		--
-	Return:	--
-				The result will be in gVarFrame somewhere.
+	Return:	the main layout, or NILREF
+				errors will be thrown
 ----------------------------------------------------------------------------- */
 
 - (Ref)evaluate {
 	RefVar mainLayout;
 	for (NTXProjectItem * item in [self.projectItems objectForKey:@"items"]) {
-		RefVar result([item build]);
-		if (item.isMainLayout) {
-			mainLayout = result;
+		if (!item.isExcluded) {
+			RefVar result([item build]);
+			if (item.isMainLayout) {
+				mainLayout = result;
+			}
 		}
 	}
 	return mainLayout;
@@ -643,6 +639,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 	Return:	URL of package file so it can be downloaded to tethered device
 				if necessary
 ----------------------------------------------------------------------------- */
+extern Ref ForwardReference(Ref r);
 
 - (NSURL *)buildPkg {
 	// sync our projectItems with source list
@@ -654,41 +651,50 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 	RefVar packageSettings(GetFrameSlot(_projectRef, MakeSymbol("packageSettings")));
 	RefVar outputSettings(GetFrameSlot(_projectRef, MakeSymbol("outputSettings")));
 
-	// set a separate build heap
-	int buildHeapSize = [NSUserDefaults.standardUserDefaults integerForKey:@"BuildHeapSize"] * KByte;
-	CObjectHeap * buildHeap = new CObjectHeap(buildHeapSize);
-	CObjectHeap * saveHeap = gHeap;
-	gHeap = buildHeap;
+	// youy can’t just set a separate build heap (even though the original does so somehow)
+//	int buildHeapSize = [NSUserDefaults.standardUserDefaults integerForKey:@"BuildHeapSize"] * KByte;
+//	CObjectHeap * buildHeap = new CObjectHeap(buildHeapSize);
+	// because creating a new CObjectHeap changes objRoot and leaves the vars obj dangling
+	// it might be thought through, but for now we’ll just use the same BIG heap and remove afterwards whatever we created during the build
+
+	RefVar origVars(Clone(gVarFrame));
+	RefVar origConsts(GetAllGlobalConstants());
+	// set build constants -- should we really be doing this in a build-constants frame?
+	DefConst("kAppName", GetFrameSlot(outputSettings, MakeSymbol("applicationName")));			// string
+	DefConst("kAppSymbol", FIntern(RA(NILREF), GetFrameSlot(outputSettings, MakeSymbol("applicationSymbol"))));	// symbol
+	DefConst("kAppString", GetFrameSlot(outputSettings, MakeSymbol("applicationSymbol")));		// string
+	DefConst("kPackageName", GetFrameSlot(packageSettings, MakeSymbol("packageName")));		// string
+	DefConst("kDebugOn", GetFrameSlot(projectSettings, MakeSymbol("debugBuild")));					// boolean
+	DefConst("kProfileOn", GetFrameSlot(profilerSettings, MakeSymbol("compileForProfiling")));		// boolean
+	DefConst("kIgnoreNativeKeyword", GetFrameSlot(projectSettings, MakeSymbol("ignoreNative")));		// boolean
+	DefConst("home", MakeStringFromUTF8String(self.fileURL.URLByDeletingLastPathComponent.fileSystemRepresentation));	// string
+	DefConst("language", GetFrameSlot(projectSettings, MakeSymbol("language")));		// string
+	// some more undocumented constants for the compiler
+	DefConst("kCheckGlobalFunctions", GetFrameSlot(projectSettings, MakeSymbol("checkGlobalFunctions")));
+	DefConst("kOldBuildRules", GetFrameSlot(projectSettings, MakeSymbol("oldBuildRules")));
+	DefConst("kUseStepChildren", GetFrameSlot(projectSettings, MakeSymbol("useStepChildren")));
+	DefConst("kSuppressByteCodes", GetFrameSlot(projectSettings, MakeSymbol("suppressByteCodes")));
+	DefConst("kFasterFunctions", GetFrameSlot(projectSettings, MakeSymbol("fasterFunctions")));
+
+	// as build progresses it may add globals:
+	//	PT_<filename>
+	//	layout_<filename>, thisView
+	//	streamFile_<filename>
+	// partFrame, InstallScript, RemoveScript
+
+	// say what we’re doing
+	RefVar packageNameStr(GetFrameSlot(packageSettings, MakeSymbol("packageName")));
+	[self report:[NSString stringWithFormat:@"Building package %@", MakeNSString(packageNameStr)]];
+
+	// build parts with appropriate pointer ref alignment
+	int alignment = NOTNIL(GetFrameSlot(packageSettings, MakeSymbol("fourByteAlignment"))) ? 4 : 8;
+
+	// clear parts array
+	self.parts = [[NSMutableArray alloc] init];
 
 	NewtonErr err = noErr;
 	newton_try
 	{
-		// set build constants
-		DefConst("kAppName", GetFrameSlot(outputSettings, MakeSymbol("applicationName")));			// string
-		DefConst("kAppSymbol", FIntern(RA(NILREF), GetFrameSlot(outputSettings, MakeSymbol("applicationSymbol"))));	// symbol
-		DefConst("kAppString", GetFrameSlot(outputSettings, MakeSymbol("applicationSymbol")));		// string
-		DefConst("kPackageName", GetFrameSlot(packageSettings, MakeSymbol("packageName")));		// string
-		DefConst("kDebugOn", GetFrameSlot(projectSettings, MakeSymbol("debugBuild")));					// boolean
-		DefConst("kProfileOn", GetFrameSlot(profilerSettings, MakeSymbol("compileForProfiling")));		// boolean
-		DefConst("kIgnoreNativeKeyword", GetFrameSlot(projectSettings, MakeSymbol("ignoreNative")));		// boolean
-		DefConst("home", MakeStringFromUTF8String(self.fileURL.URLByDeletingLastPathComponent.fileSystemRepresentation));	// string
-		DefConst("language", GetFrameSlot(projectSettings, MakeSymbol("language")));		// string
-		// as build progresses it may add globals:
-		//	PT_<filename>
-		//	layout_<filename>, thisView
-		//	streamFile_<filename>
-		// partFrame, InstallScript, RemoveScript
-
-		// say what we’re doing
-		RefVar packageNameStr(GetFrameSlot(packageSettings, MakeSymbol("packageName")));
-		[self report:[NSString stringWithFormat:@"Building package %@", MakeNSString(packageNameStr)]];
-
-		// clear parts array
-		self.parts = [[NSMutableArray alloc] init];
-
-		// build parts with appropriate pointer ref alignment
-		int alignment = NOTNIL(GetFrameSlot(packageSettings, MakeSymbol("fourByteAlignment"))) ? 4 : 8;
-
 		int partType = RINT(GetFrameSlot(outputSettings, SYMA(partType)));
 		switch (partType) {
 		case kOutputStreamFile:
@@ -699,7 +705,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 
 				// get the result
 				RefVar resultSlot(GetFrameSlot(outputSettings, MakeSymbol("topFrameExpression")));
-				RefVar result(GetFrameSlot(RA(gVarFrame), FIntern(RA(NILREF), resultSlot)));
+				RefVar result(GetGlobalVar(FIntern(RA(NILREF), resultSlot)));
 				// flatten to stream file
 				NSURL * streamURL = [self.fileURL.URLByDeletingPathExtension URLByAppendingPathExtension:@"newtonstream"];
 				CStdIOPipe pipe(streamURL.fileSystemRepresentation, "w");
@@ -709,69 +715,74 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 
 		case kOutputApplication:
 			{
-				SetFrameSlot(RA(gVarFrame), SYMA(partFrame), RA(NILREF));
-				// set the usual slots
-				SetPartFrameSlot(SYMA(text), GetFrameSlot(RA(gConstantsFrame), MakeSymbol("kAppName")));
-				SetPartFrameSlot(SYMA(app), GetFrameSlot(RA(gConstantsFrame), MakeSymbol("kAppSymbol")));
-				//icon
+				NSCallGlobalFn(SYMA(UnDefGlobalVar), SYMA(partFrame));
 
 				// evaluate all sources
-				RefVar mainLayout([self evaluate]);
+				RefVar theForm([self evaluate]);
 				// if there was an exception/error then bail now
+				// NTK seems to do this:
+				SetFrameSlot(theForm, SYMA(appSymbol), GetGlobalConstant(MakeSymbol("kAppSymbol")));
+
+				// set the usual slots
+				RefVar privatePartFrame(AllocateFrame());
+				SetFrameSlot(privatePartFrame, SYMA(app), GetGlobalConstant(MakeSymbol("kAppSymbol")));
+				SetFrameSlot(privatePartFrame, SYMA(text), GetGlobalConstant(MakeSymbol("kAppName")));
+				//icon
 
 				RefVar devGlobal;
-				// copy slots from global partFrame, if it exists, to the part frame
-				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(partFrame));
+				// if slots were added to the global partFrame, copy them to our part frame
+				devGlobal = NSCallGlobalFn(SYMA(GetGlobalVar), SYMA(partFrame));
 				if (IsFrame(devGlobal)) {
 					FOREACH_WITH_TAG(devGlobal, tag, value)
-						SetPartFrameSlot(tag, value);
+						SetFrameSlot(privatePartFrame, tag, value);
 					END_FOREACH;
 				}
 
 				// copy the main layout to the part frame
-				if (NOTNIL(mainLayout)) {
-					SetPartFrameSlot(SYMA(theForm), mainLayout);
+				if (NOTNIL(theForm)) {
+					SetFrameSlot(privatePartFrame, SYMA(theForm), theForm);
 				}
 
 				// copy global InstallScript and RemoveScript, if they exist, to the part frame
-				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(InstallScript));
+				devGlobal = NSCallGlobalFn(SYMA(GetGlobalVar), SYMA(InstallScript));
 				if (NOTNIL(devGlobal))
-					SetPartFrameSlot(SYMA(devInstallScript), devGlobal);
-				SetPartFrameSlot(SYMA(InstallScript), RA(formInstallScript));
+					SetFrameSlot(privatePartFrame, SYMA(devInstallScript), devGlobal);
+				SetFrameSlot(privatePartFrame, SYMA(InstallScript), RA(formInstallScript));
 
-				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(RemoveScript));
+				devGlobal = NSCallGlobalFn(SYMA(GetGlobalVar), SYMA(RemoveScript));
 				if (NOTNIL(devGlobal))
-					SetPartFrameSlot(SYMA(devRemoveScript), devGlobal);
-				SetPartFrameSlot(SYMA(RemoveScript), RA(formRemoveScript));
+					SetFrameSlot(privatePartFrame, SYMA(devRemoveScript), devGlobal);
+				SetFrameSlot(privatePartFrame, SYMA(RemoveScript), RA(formRemoveScript));
 
-				[self.parts addObject:[[NTXPackagePart alloc] initWith:GetFrameSlot(RA(gVarFrame), SYMA(partFrame)) type:"form" alignment:alignment]];
-				SetFrameSlot(RA(gVarFrame), SYMA(partFrame), RA(NILREF));
+				[self.parts addObject:[[NTXPackagePart alloc] initWith:privatePartFrame type:"form" alignment:alignment]];
+				NSCallGlobalFn(SYMA(UnDefGlobalVar), SYMA(partFrame));
 			}
 			break;
 
 		case kOutputAutoPart:
 			{
-				SetFrameSlot(RA(gVarFrame), SYMA(partFrame), RA(NILREF));
+				NSCallGlobalFn(SYMA(UnDefGlobalVar), SYMA(partFrame));
+
 				// evaluate all sources
 				[self evaluate];
 
-				RefVar partFrame(AllocateFrame());
+				RefVar privatePartFrame(AllocateFrame());
 				RefVar devGlobal;
-				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(InstallScript));
+				devGlobal = NSCallGlobalFn(SYMA(GetGlobalVar), SYMA(InstallScript));
 				if (NOTNIL(devGlobal)) {
-					SetPartFrameSlot(SYMA(devInstallScript), devGlobal);
-					SetPartFrameSlot(SYMA(InstallScript), RA(autoInstallScript));
+					SetFrameSlot(privatePartFrame, SYMA(devInstallScript), devGlobal);
+					SetFrameSlot(privatePartFrame, SYMA(InstallScript), RA(autoInstallScript));
 				}
 				// else should probably warn user
-				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(RemoveScript));
+				devGlobal = NSCallGlobalFn(SYMA(GetGlobalVar), SYMA(RemoveScript));
 				if (NOTNIL(devGlobal))
-					SetPartFrameSlot(SYMA(devRemoveScript), devGlobal);
+					SetFrameSlot(privatePartFrame, SYMA(devRemoveScript), devGlobal);
 				// copy global partData, if it exists, to the part frame .partData
-				devGlobal = GetFrameSlot(RA(gVarFrame), SYMA(partData));
+				devGlobal = NSCallGlobalFn(SYMA(GetGlobalVar), SYMA(partData));
 				if (NOTNIL(devGlobal))
-					SetPartFrameSlot(SYMA(partData), devGlobal);
-				[self.parts addObject:[[NTXPackagePart alloc] initWith:partFrame type:"auto" alignment:alignment]];
-				SetFrameSlot(RA(gVarFrame), SYMA(partFrame), RA(NILREF));
+					SetFrameSlot(privatePartFrame, SYMA(partData), devGlobal);
+				[self.parts addObject:[[NTXPackagePart alloc] initWith:privatePartFrame type:"auto" alignment:alignment]];
+				RemoveSlot(RA(gVarFrame), SYMA(partFrame));
 			}
 			break;
 
@@ -803,15 +814,25 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 				[self evaluate];
 
 				// result: top level frame is (outputSettings.topFrameExpression)
-				RefVar topFrameSlot(GetFrameSlot(outputSettings, MakeSymbol("topFrameExpression")));
-				RefVar partFrame(GetFrameSlot(RA(gVarFrame), FIntern(RA(NILREF), topFrameSlot)));
 				RefVar customPartType(GetFrameSlot(outputSettings, MakeSymbol("customPartType")));
 				char customPartTypeStr[8];
 				ConvertFromUnicode(GetUString(customPartType), customPartTypeStr);
+				RefVar topFrameSlot(GetFrameSlot(outputSettings, MakeSymbol("topFrameExpression")));
+				RefVar partFrame(NSCallGlobalFn(SYMA(GetGlobalVar), FIntern(RA(NILREF), topFrameSlot)));
 				[self.parts addObject:[[NTXPackagePart alloc] initWith:partFrame type:customPartTypeStr alignment:alignment]];
 			}
 			break;
 		}
+	}
+	newton_catch(exCompilerData)
+	{
+		RefStruct * r = (RefStruct *)CurrentException()->data;
+		err = RVALUE(GetFrameSlot(*r, SYMA(errorCode)));
+		const char * errText = BinaryData(ASCIIString(GetFrameSlot(*r, SYMA(value))));
+		const char * file = BinaryData(ASCIIString(GetFrameSlot(*r, SYMA(filename))));
+		int line = RVALUE(GetFrameSlot(*r, SYMA(lineNumber)));
+		REPprintf("Error in %s, line %d:\n%s\n", file, line, errText);
+		self.parts = nil;
 	}
 	newton_catch_all
 	{
@@ -820,11 +841,19 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 	}
 	end_try;
 
+	// clear build constants
+	RefVar consts(GetAllGlobalConstants());
+	FOREACH_WITH_TAG(consts, tag, value)
+		if (!FrameHasSlot(origConsts, tag)) {
+			FUnDefineGlobalConstant(RA(NILREF), tag);
+		}
+	END_FOREACH;
+
 	// package up the part and write out the package file
 	NSURL * pkgURL = nil;
 	if (self.parts != nil && self.parts.count > 0) {
 		// build package directory, part entries, etc
-		NSData * pkgData = [self buildPackageData];
+		NSData * pkgData = [self buildPackageData:alignment];
 		if (pkgData) {
 			// write to package file
 			NSError *__autoreleasing err = nil;
@@ -836,10 +865,6 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 			}
 		}
 	}
-
-	// can finally dispose the build heap
-	gHeap = saveHeap;
-	delete buildHeap;
 
 	if (err)
 		[self report:[NSString stringWithFormat:@"Build failed: %d", err]];
@@ -870,7 +895,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 ----------------------------------------------------------------------------- */
 const char * const kPackageMagicNumber = "package01";
 
-- (NSData *)buildPackageData {
+- (NSData *)buildPackageData:(int)alignment {
 	RefVar pkgSettings(GetFrameSlot(_projectRef, MakeSymbol("packageSettings")));
 	RefVar copyrightStr(GetFrameSlot(pkgSettings, MakeSymbol("copyright")));
 	RefVar packageNameStr(GetFrameSlot(pkgSettings, MakeSymbol("packageName")));
@@ -879,7 +904,7 @@ const char * const kPackageMagicNumber = "package01";
 	ArrayIndex nameStrLen = Length(packageNameStr);
 
 //	alloc directory as NSMutableData; can later -writeToURL:
-	NSMutableData * pkgData = [[NSMutableData alloc] initWithLength:sizeof(PackageDirectory)];
+	NSMutableData * pkgData = [[NSMutableData alloc] initWithLength:sizeof(PackageDirectory) + self.parts.count*sizeof(PartEntry)];
 // fill in directory
 	PackageDirectory * dir = (PackageDirectory *)pkgData.mutableBytes;
 	memcpy(dir->signature, kPackageMagicNumber, sizeof(dir->signature));
@@ -907,9 +932,11 @@ const char * const kPackageMagicNumber = "package01";
 	dir->numParts = self.parts.count;
 
 //	create part entries
+	PartEntry *  partEntry = dir->parts;
 	for (NTXPackagePart * part in self.parts) {
 		// append part entry
-		[pkgData appendBytes:part.entry length:sizeof(PartEntry)];
+		*partEntry = *part.entry;
+		++partEntry;
 	}
 
 //	add variable length part info
@@ -924,17 +951,22 @@ const char * const kPackageMagicNumber = "package01";
 	[pkgData appendBytes:GetUString(packageNameStr) length:nameStrLen];
 #endif
 
+// now, info for each part
+	dir = (PackageDirectory *)pkgData.mutableBytes;	// data may have moved
+	partEntry = dir->parts;
 	ULong partInfoOffset = copyrightStrLen + nameStrLen;
-	ULong partDataOffset = 0;
 	for (NTXPackagePart * part in self.parts) {
 		[pkgData appendBytes:part.info length:part.infoLen];
-		[part updateInfoOffset:&partInfoOffset dataOffset:&partDataOffset];
+		partEntry->info.offset = partInfoOffset;
+		partInfoOffset += part.infoLen;
+		++partEntry;
 	}
 
-// long-align pkgData
-	NSUInteger misalignment = pkgData.length & 3;
-	if (misalignment)
-		[pkgData increaseLengthBy:4-misalignment];
+// align pkgData
+	NSUInteger misalignment = pkgData.length & (alignment-1);
+	if (misalignment) {
+		[pkgData increaseLengthBy:alignment-misalignment];
+	}
 
 // backpatch dir.directorySize
 	dir = (PackageDirectory *)pkgData.mutableBytes;	// data may have moved
@@ -946,13 +978,26 @@ const char * const kPackageMagicNumber = "package01";
 //	}
 
 //	add part data
+	ArrayIndex partNum = 0;
+	ULong partDataOffset = 0;
 	for (NTXPackagePart * part in self.parts) {
-		// long-align pkgData
-		misalignment = pkgData.length & 3;
-		if (misalignment)
-			[pkgData increaseLengthBy:4-misalignment];
 		[part buildPartData:pkgData.length];
 		[pkgData appendBytes:part.data length:part.dataLen];
+		dir = (PackageDirectory *)pkgData.mutableBytes;	// data may have moved
+		partEntry = &dir->parts[partNum];
+		partEntry->offset = partDataOffset;
+		partDataOffset += part.dataLen;
+#if defined(hasByteSwapping)
+		partEntry->offset = BYTE_SWAP_LONG(partEntry->offset);
+		partEntry->size = BYTE_SWAP_LONG(partEntry->size);
+		partEntry->size2 = BYTE_SWAP_LONG(partEntry->size2);
+		partEntry->flags = BYTE_SWAP_LONG(partEntry->flags);
+		partEntry->info.offset = BYTE_SWAP_SHORT(partEntry->info.offset);
+		partEntry->info.length = BYTE_SWAP_SHORT(partEntry->info.length);
+		partEntry->compressor.offset = BYTE_SWAP_SHORT(partEntry->compressor.offset);
+		partEntry->compressor.length = BYTE_SWAP_SHORT(partEntry->compressor.length);
+#endif
+		++partNum;
 	}
 
 // backpatch dir.size
@@ -1160,8 +1205,6 @@ FixUpRef(Ref inRef, ArrayObject32 * &ioObjPtr, char * inBasePtr, RefOffsetMap &i
 }
 
 
-#define kInfoStr "Newton Toolkit 1.6.4; platform file Newton 2.1 v5"
-#define kInfoStrLen 50
 
 @implementation NTXPackagePart
 
@@ -1181,7 +1224,7 @@ FixUpRef(Ref inRef, ArrayObject32 * &ioObjPtr, char * inBasePtr, RefOffsetMap &i
 - (id)initWith:(RefArg)content type:(const char *)type alignment:(int)inAlignment {
 	if (self = [super init]) {
 		_dirEntry.type = type ? *(ULong *)type : 0;
-		_dirEntry.flags = kNOSPart;
+		_dirEntry.flags = kNOSPart + kNotifyFlag;
 		infoStr = nil;
 		_dirEntry.info.length = self.infoLen;
 
@@ -1209,12 +1252,6 @@ FixUpRef(Ref inRef, ArrayObject32 * &ioObjPtr, char * inBasePtr, RefOffsetMap &i
 }
 
 
-- (void)updateInfoOffset:(ULong *)ioInfoOffset dataOffset:(ULong *)ioDataOffset {
-	_dirEntry.info.offset = *ioInfoOffset;  *ioInfoOffset += _dirEntry.info.length;
-	_dirEntry.offset = *ioDataOffset;  *ioDataOffset += _dirEntry.size;
-}
-
-
 - (void)buildPartData:(NSUInteger)inBaseOffset {
 	// alloc 32-bit part data
 	partRoot = (ArrayObject32 *)malloc(_dirEntry.size);
@@ -1235,26 +1272,13 @@ FixUpRef(Ref inRef, ArrayObject32 * &ioObjPtr, char * inBasePtr, RefOffsetMap &i
 
 
 - (PartEntry *)entry {
-#if defined(hasByteSwapping)
-	static PartEntry pe = _dirEntry;
-	pe.offset = BYTE_SWAP_LONG(pe.offset);
-	pe.size = BYTE_SWAP_LONG(pe.size);
-	pe.size2 = pe.size;
-	pe.flags = BYTE_SWAP_LONG(pe.flags);
-	pe.info.offset = BYTE_SWAP_SHORT(pe.info.offset);
-	pe.info.length = BYTE_SWAP_SHORT(pe.info.length);
-	pe.compressor.offset = BYTE_SWAP_SHORT(pe.compressor.offset);
-	pe.compressor.length = BYTE_SWAP_SHORT(pe.compressor.length);
-	return &pe;
-#else
 	_dirEntry.size2 = _dirEntry.size;
 	return &_dirEntry;
-#endif
 }
 
 - (const char *)info {
 	if (infoStr == nil) {
-		RefVar pf(GetFrameSlot(RA(gConstantsFrame), MakeSymbol("platformVersion")));
+		RefVar pf(GetGlobalConstant(MakeSymbol("platformVersion")));
 		NSString * platformVerStr1 = MakeNSSymbol(GetFrameSlot(pf, MakeSymbol("platformFile")));
 		NSString * platformVerStr2 = MakeNSSymbol(GetFrameSlot(pf, SYMA(version)));
 		NSString * toolkitVerStr = [NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
