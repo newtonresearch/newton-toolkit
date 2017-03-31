@@ -110,28 +110,17 @@ extern Ref		ParseFile(const char * inFilename);
 
 
 /* -----------------------------------------------------------------------------
-	Document instantiation calls in here to make window controllers.
-	The project document owns the window, so make a view controller instead.
------------------------------------------------------------------------------ */
-
-- (void)makeWindowControllers
-{
-//	self.viewController = [[NTXScriptViewController alloc] initWithTextStorage:_textStorage];
-}
-
-
-/* -----------------------------------------------------------------------------
 	Evaluate our NewtonScript.
 ----------------------------------------------------------------------------- */
 
-- (int)evaluate
+- (Ref)build
 {
 //	always save before building -- there must be a better way to do this generically
 	NSError * __autoreleasing err = nil;
 	[self writeToURL:self.fileURL ofType:@"com.newton.script" error:&err];
 
 	ParseFile(self.fileURL.fileSystemRepresentation);
-	return noErr;
+	return NILREF;
 }
 
 
