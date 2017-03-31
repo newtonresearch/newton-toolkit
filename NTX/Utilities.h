@@ -1,7 +1,7 @@
 /*
 	File:		Utilities.h
 
-	Contains:	Utility functions for the NCX app.
+	Contains:	Utility functions for the NTX app.
 
 	Written by:	Newton Research Group, 2005.
 */
