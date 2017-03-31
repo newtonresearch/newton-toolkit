@@ -47,6 +47,7 @@
 #import "NTKProtocol.h"
 #import "DockErrors.h"
 #import "PreferenceKeys.h"
+#import "NTK/Globals.h"
 
 
 extern NewtonErr	GetPackageDetails(NSURL * inURL, NSString ** outName, unsigned int * outSize);
@@ -191,14 +192,6 @@ extern void			PrintFramesErrorMsg(const char * inStr, RefArg inData);
 @end
 
 
-/* -----------------------------------------------------------------------------
-	N o t i f i c a t i o n s
------------------------------------------------------------------------------ */
-
-NSString * const kNubStatusDidChangeNotification = @"NTX:NubStatus";
-NSString * const kNubOwnerDidChangeNotification = @"NTX:NubOwner";
-
-
 #pragma mark -
 /* -----------------------------------------------------------------------------
 	N T X T o o l k i t P r o t o c o l C o n t r o l l e r
@@ -215,9 +208,6 @@ NSString * const kNubOwnerDidChangeNotification = @"NTX:NubOwner";
 	NewtonErr exceptionError;
 	RefStruct exceptionObject;
 	NSString * exceptionMessage;
-
-//	package installation
-	unsigned int totalAmount, amountDone;
 }
 // feedback to UI
 @property(strong) id<NTXNubFeedback> delegate;
@@ -233,11 +223,13 @@ NTXToolkitProtocolController * gNTXNub = nil;
 ----------------------------------------------------------------------------- */
 
 + (BOOL)isAvailable {
+//return NO;
 	return gNTXNub.delegate == nil;
 }
 
 
 + (NTXToolkitProtocolController *)bind:(id<NTXNubFeedback>)inDelegate {
+//return nil;
 	if (gNTXNub == nil) {
 		gNTXNub = [[NTXToolkitProtocolController alloc] init];
 	}
@@ -253,6 +245,7 @@ NTXToolkitProtocolController * gNTXNub = nil;
 
 
 + (void)unbind:(id<NTXNubFeedback>)inDelegate {
+//return;
 	NSAssert(gNTXNub != nil, @"gNTXNub is nil");
 	if (self.isAvailable) {
 		// we’re not bound
@@ -520,19 +513,16 @@ if (inLength > 0) printf("[%ld] ", (unsigned long)inLength);
 
 - (void)waitForEvent {
 	__block NTXToolkitProtocolController *__weak weakself = self;	// use weak reference so async block does not retain self
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+	dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
 		[weakself doDockEventLoop];
 		// if we get here then the event queue has been flushed, so we can ditch it: there are no more events coming
-
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[NSNotificationCenter.defaultCenter postNotificationName:kNubStatusDidChangeNotification object:weakself.delegate userInfo:@{@"error":[NSNumber numberWithInt:kDockErrDisconnected]}];
-		});
 	});
 }
 
 - (void)doDockEventLoop {
 	NewtonErr	err;
-	char			exStr[256];
+	char			exName[256];
+	ULong			exNameLen, objLen;
 	EventType	evtCmd;
 	NSUInteger	evtLen;
 	while ((err = [self readCommand:&evtCmd length:&evtLen]) == noErr) {
@@ -552,16 +542,16 @@ if (inLength > 0) printf("[%ld] ", (unsigned long)inLength);
 		// + C string
 			while (evtLen > 0) {
 				NSUInteger strLen = MIN(evtLen, 255);
-				err = [ioStream read:exStr length:strLen];
-				exStr[strLen] = 0;
-				NSString * str = [NSString stringWithCString:exStr encoding:NSMacOSRomanStringEncoding];
+				err = [ioStream read:exName length:strLen];
+				exName[strLen] = 0;
+				NSString * str = [NSString stringWithCString:exName encoding:NSMacOSRomanStringEncoding];
 				dispatch_async(dispatch_get_main_queue(), ^{[self.delegate receivedText:str];});
 				evtLen -= strLen;
 			}
 		}
 		break;
 
-//			case 'fstk': ?? mentioned in Jake Borden’s NewtonInspector
+//			case 'fstk': Stack Trace mentioned in Jake Borden’s NewtonInspector
 		case kTObject: {
 		// + ref
 			toolkitObject = [self readRef:evtLen];
@@ -637,19 +627,23 @@ if (inLength > 0) printf("[%ld] ", (unsigned long)inLength);
 		// <tab> evt.ex.fr.intrp;type.ref.frame
 		// <tab> -48808
 
+			// read exception name
+			err = [self readWord:(int *)&exNameLen];
+			err = [ioStream read:exName length:exNameLen];
+			REPprintf("\n\t%s\n\t", exName);
+
+			// read error
 			NewtonErr exErr;
-			ULong exItemLen;
-			err = [self readWord:(int *)&exItemLen];
-			err = [ioStream read:exStr length:exItemLen];
 			err = [self readWord:(int *)&exErr];
 
 			const char * errStr;
 			if ((errStr = GetFramesErrorString(exErr)) != NULL) {
-				printf("\n\t");
-				PrintFramesErrorMsg(errStr, AllocateFrame());
+				RefVar value(AllocateFrame());
+				SetFrameSlot(value, SYMA(value), MAKEINT(exErr));
+				PrintFramesErrorMsg(errStr, value);
 			}
-printf("\n\t%s\n\t%d\n", exStr, exErr);
-//				NSString * str = [NSString stringWithFormat:@"\n\t%s\n\t%d\n", exStr, exErr];
+			REPprintf("\n\t%d\n", exErr);
+//				NSString * str = [NSString stringWithFormat:@"\n\t%s\n\t%d\n", exName, exErr];
 //				dispatch_async(dispatch_get_main_queue(), ^{[self.delegate receivedText:str];});
 		}
 		break;
@@ -660,40 +654,49 @@ printf("\n\t%s\n\t%d\n", exStr, exErr);
 		// + word = message length
 		// + char[] = message (nul-terminated)
 
-			ULong exItemLen;
-			err = [self readWord:(int *)&exItemLen];
-			err = [ioStream read:exStr length:exItemLen];
-			printf("\n\t%s\n\t",exStr);
+			// read exception name
+			err = [self readWord:(int *)&exNameLen];
+			err = [ioStream read:exName length:exNameLen];
+			REPprintf("\n\t%s\n\t", exName);
 
-			err = [self readWord:(int *)&exItemLen];
-			while (exItemLen > 0) {
-				NSUInteger strLen = MIN(exItemLen, 255);
-				err = [ioStream read:exStr length:strLen];
-				exStr[strLen] = 0;
-				printf("%s",exStr);
-				exItemLen -= strLen;
+			// read message
+			char msg[256];
+			ULong msgLen;
+			err = [self readWord:(int *)&msgLen];
+			while (msgLen > 0) {
+				NSUInteger strLen = MIN(msgLen, 255);
+				err = [ioStream read:msg length:strLen];
+				msg[strLen] = 0;
+				REPprintf("%s",msg);
+				msgLen -= strLen;
 			}
-			printf("\n");
+			REPprintf("\n");
 		}
 		break;
 
 		case kTExceptionRef: {
-// Jake Borden says:
-// + word = exception name length
-// + char[] = exception name (nul-terminated)
-// + word = ref length
+		// + word = exception name length
+		// + char[] = exception name (nul-terminated)
+		// + word = ref length
 		// + ref = exception frame
-			const char * str;
-			toolkitObject = [self readRef:evtLen];
-PrintObject(toolkitObject, 0);
-printf("\n");
 
+			// read exception name
+			err = [self readWord:(int *)&exNameLen];
+			err = [ioStream read:exName length:exNameLen];
+			REPprintf("\n\t%s\n\t", exName);
+
+			// read ref
+			ULong refLen;
+			err = [self readWord:(int *)&refLen];
+
+			toolkitObject = [self readRef:refLen];
+
+			const char * str;
 			RefVar exErr(GetFrameSlot(toolkitObject, SYMA(errorCode)));
 			if (ISINT(exErr) && (str = GetFramesErrorString(RINT(exErr))) != NULL) {
-				printf("\n\t");
 				PrintFramesErrorMsg(str, toolkitObject);
-				printf("\n");
 			}
+			REPprintf("\n");
 		}
 		break;
 
@@ -771,11 +774,53 @@ extern void REPExceptionNotify(Exception * inException);
 /* -----------------------------------------------------------------------------
 	Install a Newton package onto the tethered Newton device.
 ----------------------------------------------------------------------------- */
+#define kChunkSize 4*KByte
 
 - (void)installPackage:(NSURL *)inPackage {
-// build NSData of word:length data:pkg
-//	[self sendCommand:kTLoadPackage data:codeBlockData length:dataLength];
-// how are we going to provide feedback?!
+	NSString * pkgName = inPackage.lastPathComponent;
+	NSData * pkgData = [NSData dataWithContentsOfURL:inPackage];
+// send in chunks and provide progress feedback
+	self.delegate.progress.completedUnitCount = 0;
+	self.delegate.progress.totalUnitCount = (pkgData.length - 1) / kChunkSize + 1;
+	self.delegate.progress.localizedDescription = [NSString stringWithFormat:@"Downloading “%@”", pkgName];
+
+	dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+
+		NewtonErr err = [self sendCommand:kTLoadPackage length:pkgData.length];
+		if (err == noErr) {
+			[NSThread sleepForTimeInterval:1.0];	// wait for Newton...
+			int chunkSize, chunkIndex = 0;
+			for (int amountRemaining = pkgData.length, amountDone = 0; amountRemaining > 0; amountRemaining -= chunkSize, amountDone += chunkSize) {
+				chunkSize = kChunkSize;
+				if (chunkSize > amountRemaining)
+					chunkSize = amountRemaining;
+NSLog(@"-[NTXToolkitProtocolController installPackage:“%@”] sending %d bytes", pkgName, chunkSize);
+				err = [ioStream send:(char *)pkgData.bytes + amountDone length:chunkSize];
+				if (err) {
+					break;
+				}
+				++chunkIndex;
+				dispatch_async(dispatch_get_main_queue(), ^{ self.delegate.progress.completedUnitCount = chunkIndex; });
+			}
+		}
+		NSUInteger padLength = pkgData.length & 0x03;
+		if (padLength != 0) {
+		// pad with zeroes
+NSLog(@"-[NTXToolkitProtocolController installPackage:“%@”] padding %lu bytes", pkgName, 4-padLength);
+			uint32_t padding = 0;
+			err = [ioStream send:(char *)&padding length:4-padLength];
+		}
+		dispatch_async(dispatch_get_main_queue(), ^{
+			if (err == noErr) {
+				self.delegate.progress.completedUnitCount = 0;
+				self.delegate.progress.totalUnitCount = 0;
+				self.delegate.progress.localizedDescription = [NSString stringWithFormat:@"Downloaded “%@”", pkgName];
+			} else {
+				// leave the progress gauge where it is
+				self.delegate.progress.localizedDescription = [NSString stringWithFormat:@"Download failed: error %d", err];
+			}
+		});
+	});
 }
 
 

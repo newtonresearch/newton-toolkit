@@ -34,12 +34,6 @@
 
 
 /* -----------------------------------------------------------------------------
-	Keys for notifications sent by the communications layer.
------------------------------------------------------------------------------ */
-extern NSString * const kNubStatusDidChangeNotification;
-extern NSString * const kNubOwnerDidChangeNotification;
-
-/* -----------------------------------------------------------------------------
 	N T X N u b F e e d b a c k
 	Protocol for reporting received objects.
 ----------------------------------------------------------------------------- */
