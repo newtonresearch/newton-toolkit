@@ -120,7 +120,7 @@
 "-10404" = "Unexpected end of package part.";
 "-10405" = "Unexpected end of package.";
 "-10406" = "Part type already register.";
-"-10407" = "Part tpye not registered.";
+"-10407" = "Part type not registered.";
 "-10408" = "No such package.";
 "-10409" = "A newer package already exists.";
 "-10410" = "An older package already exists.";
