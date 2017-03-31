@@ -6,8 +6,15 @@
 	Written by:	Newton Research Group, 2014.
 */
 
-
-// outputSettings.partType codes
+/* -----------------------------------------------------------------------------
+	Part type in outputSettings.partType
+		0 Application
+		1 Book
+		2 Auto
+		3 Store
+		4 Stream
+		5 Custom
+----------------------------------------------------------------------------- */
 enum
 {
 	kOutputApplication,
@@ -19,15 +26,26 @@ enum
 };
 
 
-// projectItems.items.type codes
+/* -----------------------------------------------------------------------------
+	File type in projectItems.items.type
+		0 Layout file (also used for user-proto and print layout files)
+		1 Bitmap file
+		2 Metafile file (unused)
+		3 Sound file
+		4 Book file (deprecated in favor of script items)
+		5 Script file (NewtonScript source file)
+		6 Package file
+		7 Stream file
+		8 Native C++ code module file
+----------------------------------------------------------------------------- */
 enum
 {
-	kLayoutFileType,		// also used for user-proto and print layout files
+	kLayoutFileType,
 	kBitmapFileType,
-	kMetafileType,			//	unused
+	kMetafileType,
 	kSoundFileType,
-	kBookFileType,			// deprecated in favor of script items
-	kScriptFileType,		// NewtonScript source file
+	kBookFileType,
+	kScriptFileType,
 	kPackageFileType,
 	kStreamFileType,
 	kNativeCodeFileType,
