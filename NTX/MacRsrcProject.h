@@ -23,13 +23,13 @@ struct RsrcHeader
 	uint32_t	mapLength;
 //	char		reserved[112];
 //	char		applicationSpecificData[128];
-} __attribute__((packed));
+}__attribute__((packed));
 
 struct RsrcData
 {
 	uint32_t	dataLength;
 	char		data[];
-} __attribute__((packed));
+}__attribute__((packed));
 
 struct RsrcMap
 {
@@ -40,7 +40,7 @@ struct RsrcMap
 	uint16_t	typeListOffset;	// Offset to Type list (from beginning of resource map in bytes)
 	uint16_t	nameListOffset;	// Offset to Name list (from beginning of resource map in bytes)
 	char		data[];
-} __attribute__((packed));
+}__attribute__((packed));
 
 struct RsrcRef
 {
@@ -48,20 +48,20 @@ struct RsrcRef
 	uint16_t name;
 	uint32_t offset;
 	uint32_t handle;
-} __attribute__((packed));
+}__attribute__((packed));
 
 struct RsrcItem
 {
 	uint32_t	type;
 	uint16_t	count;				// Number of this type -1
 	uint16_t	offset;				// Offset to Reference List for Type
-} __attribute__((packed));
+}__attribute__((packed));
 
 struct RsrcList
 {
 	uint16_t	count;				// Number of items -1
 	RsrcItem	item[];
-} __attribute__((packed));
+}__attribute__((packed));
 
 // Resource attributes:
 /*
@@ -118,7 +118,7 @@ struct RsrcPJPF
 	uint8_t		fourByteAlignment;	// A boolean controlling package generation. It corresponds to the “Tighter Object Packing (2.0 Only)” check box of the Project Settings panel of the Project Settings dialog.
 	uint8_t		zippyCompression;		// A boolean controlling package generation. It corresponds to the “Faster Compression (2.0 Only)” check box of the Package Settings panel of the Project Settings dialog.
 	uint8_t		padding5;
-} __attribute__((packed));
+}__attribute__((packed));
 
 
 /* -----------------------------------------------------------------------------
@@ -130,7 +130,7 @@ struct FSSpecX
 	int16_t		vRefNum;
 	int32_t		parID;
 	Str63			name;
-} __attribute__((packed));
+}__attribute__((packed));
 
 struct FSInfoX
 {
@@ -142,7 +142,7 @@ struct FSInfoX
 									// 13 => path separator character
 	uint16_t		strLen;
 	char			str[];
-} __attribute__((packed));
+}__attribute__((packed));
 
 struct FSAliasX
 {
@@ -167,14 +167,54 @@ struct FSAliasX
 	uint16_t		volId;
 	int8_t		reserved1[10];
 	FSInfoX		extendedInfo[];
-} __attribute__((packed));
+}__attribute__((packed));
 
 
 /* -----------------------------------------------------------------------------
-	N T X R s r c P r o j e c t
+	For layout files:
 ----------------------------------------------------------------------------- */
 
-@interface NTXRsrcProject : NSObject
+struct VPoint
+{
+	int32_t		y, x;
+}__attribute__((packed));
+
+struct VRect
+{
+	int32_t		top, left, bottom, right;
+}__attribute__((packed));
+
+struct GridInfo
+{
+	uint32_t		scope;			// Unused
+	uint32_t		snap;				// True if gridding active
+	uint8_t		show;				// True if gridding shown
+	uint8_t		padding;
+	uint32_t		spacing;			// Grid spacing
+}__attribute__((packed));
+
+struct RsrcFMST
+{
+	uint32_t		size;
+	VRect			windowPosition;	// Layout window position. Bounding box of content region in global coordinates.
+	Str63			reserved1;			// Obsolete.
+	VPoint		layoutSize;			// Layout size.
+	uint16_t		version;				// File version (currently 7).
+	uint8_t		isLinked;			// A boolean indicating whether or not this layout is linked to a linkedSubview.
+	uint8_t		padding1;
+	Str255		linkedName;			// If this layout is linked to a linkedSubview, contains the name of the layout containing the linkedSubview.
+	GridInfo		grid[2];				// Two GridInfo structs containing information about the layout window.
+											// The first GridInfo contains information pertaining to vertical attributes of the layout window;
+											// the second GridInfo does likewise for the horizontal attributes.
+											// Note that both show fields are always both TRUE or both FALSE.
+}__attribute__((packed));
+
+
+/* -----------------------------------------------------------------------------
+	N T X R s r c F i l e
+----------------------------------------------------------------------------- */
+
+@interface NTXRsrcFile : NSObject
 {
 	FILE * fref;
 	int rsrcLen;
@@ -192,5 +232,12 @@ struct FSAliasX
 - (void *)readResource:(OSType)inType number:(uint16_t)inNumber;
 
 - (id)initWithURL:(NSURL *)inURL;
+@end
+
+/* -----------------------------------------------------------------------------
+	N T X R s r c P r o j e c t
+----------------------------------------------------------------------------- */
+
+@interface NTXRsrcProject : NTXRsrcFile
 @property(readonly) Ref projectRef;
 @end

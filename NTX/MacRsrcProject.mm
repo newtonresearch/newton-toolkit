@@ -93,16 +93,64 @@ FileTypeCode(const char * inPath)
 }
 
 
-#pragma mark - NTXRsrcProject
+Ref
+MakePoint(VPoint const& vpt)
+{
+	RefVar pt(AllocateFrame());
+	SetFrameSlot(pt, MakeSymbol("h"), MAKEINT(ntohl(vpt.x)));
+	SetFrameSlot(pt, MakeSymbol("v"), MAKEINT(ntohl(vpt.y)));
+	return pt;
+}
+
+Ref
+MakeRect(VRect const& vrect)
+{
+	RefVar rect(AllocateFrame());
+	SetFrameSlot(rect, SYMA(top), MAKEINT(ntohl(vrect.top)));
+	SetFrameSlot(rect, SYMA(left), MAKEINT(ntohl(vrect.left)));
+	SetFrameSlot(rect, SYMA(bottom), MAKEINT(ntohl(vrect.bottom)));
+	SetFrameSlot(rect, SYMA(right), MAKEINT(ntohl(vrect.right)));
+	return rect;
+}
+
+Ref
+ReadLayoutSettings(NSURL * url)
+{
+	NTXRsrcFile * rf = [[NTXRsrcFile alloc] initWithURL:url];
+	if (rf) {
+		RsrcFMST * rsrc = (RsrcFMST *)[rf readResource:'FMST' number:9999];
+		if (rsrc) {
+			// set up the settings frames
+			RefVar layoutSettings(AllocateFrame());
+			SetFrameSlot(layoutSettings, MakeSymbol("ntkPlatform"), MAKEINT(0));
+			SetFrameSlot(layoutSettings, MakeSymbol("fileVersion"), MAKEINT(ntohs(rsrc->version)));
+			SetFrameSlot(layoutSettings, MakeSymbol("windowRect"), MakeRect(rsrc->windowPosition));
+			SetFrameSlot(layoutSettings, MakeSymbol("layoutName"), MakeString(url.lastPathComponent));
+			SetFrameSlot(layoutSettings, MakeSymbol("layoutType"), MAKEINT(0));
+			SetFrameSlot(layoutSettings, MakeSymbol("layoutSize"), MakePoint(rsrc->layoutSize));
+			VPoint grid = {rsrc->grid[0].spacing, rsrc->grid[1].spacing};
+			SetFrameSlot(layoutSettings, MakeSymbol("gridSize"), MakePoint(grid));
+			SetFrameSlot(layoutSettings, MakeSymbol("gridState"), MAKEBOOLEAN(rsrc->grid[0].show));
+			SetFrameSlot(layoutSettings, MakeSymbol("gridSnap"), MAKEBOOLEAN(rsrc->grid[0].snap));
+
+//			uint8_t		isLinked;			// A boolean indicating whether or not this layout is linked to a linkedSubview.
+//			Str255		linkedName;			// If this layout is linked to a linkedSubview, contains the name of the layout containing the linkedSubview.
+
+			return layoutSettings;
+		}
+	}
+	return NILREF;
+}
+
+
+#pragma mark - NTXRsrcFile
 /* -----------------------------------------------------------------------------
-	N T X R s r c P r o j e c t
+	N T X R s r c F i l e
 	An object to read legacy Mac project resource data.
 ----------------------------------------------------------------------------- */
+@implementation NTXRsrcFile
 
-@implementation NTXRsrcProject
-
-- (id) initWithURL: (NSURL *) inURL
-{
+- (id)initWithURL:(NSURL *)inURL {
 	if (self = [super init]) {
 		rsrcImage = NULL;
 		rsrcData = NULL;
@@ -118,58 +166,48 @@ FileTypeCode(const char * inPath)
 		if (fref == NULL) {
 			return nil;
 		}
-		ULong format = self.read4Bytes;
-		if (format != 103) {
-			fclose(fref), fref = NULL;
-			return nil;
-		}
 	}
 	return self;
 }
 
-- (void) dealloc
-{
-	if (rsrcImage)
+- (void)dealloc {
+	if (rsrcImage) {
 		free(rsrcImage), rsrcImage = NULL;
-	if (fref)
+	}
+	if (fref) {
 		fclose(fref), fref = NULL;
+	}
 }
 
 
-- (int) read4Bytes
-{
+- (int)read4Bytes {
 	uint32_t v;
 	fread(&v, 1, 4, fref);
 	return ntohl(v);
 }
 
 
-- (int) read2Bytes
-{
+- (int)read2Bytes {
 	uint16_t v;
 	fread(&v, 1, 2, fref);
 	return ntohs(v);
 }
 
 
-- (int) readByte
-{
+- (int)readByte {
 	uint8_t v;
 	fread(&v, 1, 1, fref);
 	return v;
 }
 
-- (void) read: (NSUInteger) inCount into: (char *) inBuffer
-{
+- (void)read:(NSUInteger)inCount into:(char *)inBuffer {
 	fread(inBuffer, 1, inCount, fref);
 }
 
 
 // will have to do byte-swapping in here
-- (void *) readResource: (OSType) inType number: (uint16_t) inNumber
-{
-	if (rsrcImage == NULL)
-	{
+- (void *)readResource:(OSType)inType number:(uint16_t)inNumber {
+	if (rsrcImage == NULL) {
 		// allocate sufficient length
 		rsrcImage = (char *)malloc(rsrcLen);
 		// Read the resource fork image
@@ -185,16 +223,12 @@ FileTypeCode(const char * inPath)
 
 	// walk the resource type list
 	RsrcItem * r = rsrcTypeList->item;
-	for (int i = 0, icount = ntohs(rsrcTypeList->count); i <= icount; ++i, ++r)
-	{
-		if (ntohl(r->type) == inType)
-		{
+	for (int i = 0, icount = ntohs(rsrcTypeList->count); i <= icount; ++i, ++r) {
+		if (ntohl(r->type) == inType) {
 			// we have resources of the required type
 			RsrcRef * rr = (RsrcRef *)((char *)rsrcTypeList + ntohs(r->offset));
-			for (int j = 0, jcount = ntohs(r->count); j <= jcount; j++, rr++)
-			{
-				if (ntohs(rr->id) == inNumber)
-				{
+			for (int j = 0, jcount = ntohs(r->count); j <= jcount; j++, rr++) {
+				if (ntohs(rr->id) == inNumber) {
 					// we have a resource with the required number
 					return rsrcData + ntohl(rr->offset);
 				}
@@ -202,6 +236,27 @@ FileTypeCode(const char * inPath)
 		}
 	}
 	return NULL;
+}
+
+@end
+
+
+#pragma mark - NTXRsrcProject
+/* -----------------------------------------------------------------------------
+	N T X R s r c P r o j e c t
+----------------------------------------------------------------------------- */
+@implementation NTXRsrcProject
+
+
+- (id)initWithURL:(NSURL *)inURL {
+	if (self = [super initWithURL:inURL]) {
+		ULong format = self.read4Bytes;
+		if (format != 103) {
+			fclose(fref), fref = NULL;
+			return nil;
+		}
+	}
+	return self;
 }
 
 
@@ -212,8 +267,7 @@ FileTypeCode(const char * inPath)
 	Return:	project ref
 ----------------------------------------------------------------------------- */
 
-- (Ref)projectRef
-{
+- (Ref)projectRef {
 	//	stream in default project settings
 	NSURL * url = [NSBundle.mainBundle URLForResource: @"CanonicalProject" withExtension: @"stream"];
 	CStdIOPipe pipe(url.fileSystemRepresentation, "r");
@@ -232,20 +286,16 @@ FileTypeCode(const char * inPath)
 	RefVar protoFileRef(AllocateFrame());
 	SetClass(protoFileRef, MakeSymbol("fileReference"));
 	SetFrameSlot(protoFileRef, MakeSymbol("fullPath"), RA(NILREF));
-	for (ArrayIndex i = 0; i < itemCount; ++i)
-	{
+	for (ArrayIndex i = 0; i < itemCount; ++i) {
 		char * filename = NULL;
 		// read aliases -- add to projectRef.projectItems.items
 		ULong itemLen = self.read4Bytes;
-		if (itemLen == sizeof(FSSpecX))
-		{
+		if (itemLen == sizeof(FSSpecX)) {
 			// we must convert a filespec
 			FSSpecX fspec;
 			[self read:itemLen into:(char *)&fspec];
 			filename = (char *)&fspec.name[0];
-		}
-		else
-		{
+		} else {
 			// this is an alias
 			if (itemLen > KByte)
 				printf("ALIAS BUFFER OVERFLOW!\n");
@@ -254,8 +304,7 @@ FileTypeCode(const char * inPath)
 			FSAliasX * alias = (FSAliasX *)aliasData;
 			filename = (char *)&alias->fileName[0];
 		}
-		if (filename)
-		{
+		if (filename) {
 			const char * filePath;
 			char cstr[64];
 			size_t filenameLen = *(uint8_t *)filename;
@@ -264,8 +313,7 @@ FileTypeCode(const char * inPath)
 			filePath = [[basePath URLByAppendingPathComponent:[NSString stringWithCString:cstr encoding:NSMacOSRomanStringEncoding]] fileSystemRepresentation];
 			int fileType = 0;
 			//convert to index
-			switch (FileTypeCode(filePath))
-			{
+			switch (FileTypeCode(filePath)) {
 			case 'FLFM':
 			case 'PRTO':
 				fileType = kLayoutFileType;
@@ -300,8 +348,7 @@ FileTypeCode(const char * inPath)
 	}
 	ArrayIndex mainLayout = self.read2Bytes;	// 1-based -- applies to specified sort order, not necessarily build order
 															// so should sort fileItems to get this right
-	if (mainLayout != 0 && --mainLayout < Length(fileItems))
-	{
+	if (mainLayout != 0 && --mainLayout < Length(fileItems)) {
 		RefVar mainItem(GetArraySlot(fileItems, mainLayout));
 		SetFrameSlot(mainItem, MakeSymbol("isMainLayout"), TRUEREF);
 	}
@@ -330,8 +377,7 @@ FileTypeCode(const char * inPath)
 	int partType;
 	const char * partTypeStr;
 	char partTypeStrBuf[5];
-	switch (ntohl(rsrc->partType))
-	{
+	switch (ntohl(rsrc->partType)) {
 	case 'form':
 		partType = kOutputApplication;
 		partTypeStr = "form";
@@ -350,13 +396,11 @@ FileTypeCode(const char * inPath)
 		break;
 	default:
 		partTypeStr = "UNKN";
-		if (rsrc->makeStream)
+		if (rsrc->makeStream) {
 			partType = kOutputStreamFile;
-		else
-		{
+		} else {
 			partType = kOutputCustomPart;
-			if (rsrc->customPart)
-			{
+			if (rsrc->customPart) {
 				partTypeStrBuf[0] = rsrc->partType >> 24;
 				partTypeStrBuf[1] = rsrc->partType >> 16;
 				partTypeStrBuf[2] = rsrc->partType >>  8;
@@ -397,4 +441,3 @@ FileTypeCode(const char * inPath)
 }
 
 @end
-
