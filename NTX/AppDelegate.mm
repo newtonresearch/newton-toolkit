@@ -12,6 +12,7 @@
 #import "Preferences.h"
 #import "Utilities.h"
 #import "NTK/Pipes.h"
+#import "NTK/Globals.h"
 
 extern void	HoldSchedule(void);
 extern "C" void	StopScheduler(void);
@@ -126,14 +127,13 @@ extern void PrintCode(RefArg inFunc);
 ------------------------------------------------------------------------------*/
 
 - (BOOL)applicationCanSleep {
-	return YES;//(!isNewtConnected);
+	return YES;	//(!gNTXNub.isTethered);
 }
 
 - (void)applicationWillSleep {
-/*
-	if (isNewtConnected)
-		[docker disconnect];
-*/
+	if (gNTXNub.isTethered) {
+		[gNTXNub disconnect];
+	}
 }
 
 
@@ -146,7 +146,9 @@ extern void PrintCode(RefArg inFunc);
 ------------------------------------------------------------------------------
 
 - (NSApplicationTerminateReply) applicationShouldTerminate: (NSApplication *) sender {
-//	[docker die];
+	if (gNTXNub.isTethered) {
+		[gNTXNub disconnect];
+	}
 //	[[NSRunLoop currentRunLoop] runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.2]];
 	return NSTerminateNow;
 }*/
@@ -235,7 +237,7 @@ extern void PrintCode(RefArg inFunc);
 	RefVar installerFrame;
 	if (self.currentPlatform) {
 		// remove former platform
-		installerFrame = GetFrameSlot(RA(gVarFrame), SYMA(__platform));
+		installerFrame = GetGlobalVar(SYMA(__platform));
 		installerFrame = GetFrameSlot(installerFrame, MakeSymbol("installer"));
 		DoMessage(installerFrame, MakeSymbol("Remove"), RA(NILREF));
 	}
@@ -243,7 +245,7 @@ extern void PrintCode(RefArg inFunc);
 	self.currentPlatform = inPlatform;
 
 	//	stream in platform file definitions
-	NSURL * path = [NSBundle.mainBundle URLForResource: inPlatform withExtension: nil subdirectory: @"Platforms"];
+	NSURL * path = [NSBundle.mainBundle URLForResource:inPlatform withExtension:nil subdirectory:@"Platforms"];
 	CStdIOPipe pipe(path.fileSystemRepresentation, "r");
 	RefVar platform(UnflattenRef(pipe));
 
@@ -339,14 +341,14 @@ extern void PrintCode(RefArg inFunc);
 
 //		if inShot were an NSBitmapImageRep then we could:
 //		NSData *pngData = [inShot representationUsingType:NSPNGFileType properties:nil];
-		NSData * tiffData = [inShot TIFFRepresentationUsingCompression: NSTIFFCompressionLZW factor: 1.0];
+		NSData * tiffData = [inShot TIFFRepresentationUsingCompression:NSTIFFCompressionLZW factor:1.0];
 		if (tiffData) {
 #if 1
 			//	save into temporary file
-			NSString * fileName = [NSString stringWithFormat:@"Screenshot-%@.tiff", [[NSProcessInfo processInfo] globallyUniqueString]];
+			NSString * fileName = [NSString stringWithFormat:@"Screenshot-%@.tiff", NSProcessInfo.processInfo.globallyUniqueString];
 			NSURL * fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
 			//	open it in Preview
-			[[NSWorkspace sharedWorkspace] openURL:fileURL];
+			[NSWorkspace.sharedWorkspace openURL:fileURL];
 #else
 			//	save into file chosen by user
 			NSSavePanel * chooser = [NSSavePanel savePanel];
@@ -356,7 +358,7 @@ extern void PrintCode(RefArg inFunc);
 				// save image
 				if ([tiffData writeToURL:chooser.URL atomically:NO])
 				//	open it in Preview
-					[[NSWorkspace sharedWorkspace] openURL:chooser.URL];
+					[NSWorkspace.sharedWorkspace openURL:chooser.URL];
 			}
 #endif
 		}
