@@ -31,7 +31,8 @@
 	IBOutlet NSSplitViewItem * sourceListItem;
 	IBOutlet NSSplitViewItem * infoItem;
 }
-- (void)toggleCollapsedSplit:(NSInteger)index;
+- (IBAction)toggleSourceList:(id)sender;
+- (IBAction)toggleSourceInfo:(id)sender;
 @end
 
 

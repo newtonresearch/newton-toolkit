@@ -31,12 +31,12 @@
 	wc.sourceSplitController = self;
 }
 
-- (void)toggleCollapsedSplit:(NSInteger)index {
-	if (index == 0) {
-		sourceListItem.animator.collapsed = !sourceListItem.isCollapsed;
-	} else {
-		infoItem.animator.collapsed = !infoItem.isCollapsed;
-	}
+- (IBAction)toggleSourceList:(id)sender {
+	sourceListItem.animator.collapsed = !sourceListItem.isCollapsed;
+}
+
+- (IBAction)toggleSourceInfo:(id)sender {
+	infoItem.animator.collapsed = !infoItem.isCollapsed;
 }
 
 @end
@@ -54,6 +54,7 @@
 	// outline sidebar model
 	NSMutableArray<NSTreeNode *> * sourceList;	// each node represents an NTXProjectItem
 	NSTreeNode * projectNode;
+	NSTreeNode * infoNode;
 	NSArray *_draggedNodes;
 }
 @end
@@ -85,6 +86,7 @@
 		// create root node to represent the project settings
 		projectNode = [[NSTreeNode alloc] initWithRepresentedObject:[[NTXProjectSettingsItem alloc] initWithProject:doc]];
 		[sourceList addObject:projectNode];
+		infoNode = nil;
 
 		// build the source list tree from the document’s array of project items.
 		// add projectItems to the project root node
@@ -303,6 +305,16 @@ extern NSArray * gTypeNames;
 }
 
 
+// save currently selected project document
+- (IBAction)saveDocument:(id)sender {
+	NSInteger theRow = sidebarView.selectedRow;
+	if (theRow >= 0) {
+		NTXProjectItem * item = [[sidebarView itemAtRow:theRow] representedObject];
+		[item.document saveDocument:sender];
+	}
+}
+
+
 #pragma mark - NSOutlineView item insertion/deletion
 /* -----------------------------------------------------------------------------
 	Handle menu items.
@@ -456,16 +468,54 @@ extern NSArray * gTypeNames;
 /* -----------------------------------------------------------------------------
 	The selection changed -- update the content view accordingly.
 ----------------------------------------------------------------------------- */
+static void *InfoObserverContext = &InfoObserverContext;
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)inNotification
 {
+	// stop observing previous selection
+	if (infoNode) {
+		NTXProjectItem * item = [infoNode representedObject];
+		[item removeObserver:self forKeyPath:NSStringFromSelector(@selector(name)) context:InfoObserverContext];
+		[item removeObserver:self forKeyPath:NSStringFromSelector(@selector(type)) context:InfoObserverContext];
+	}
 	// remember the selected item while we’re here
 	NSMutableDictionary * projectItems = (NSMutableDictionary *)self.representedObject;
-	[projectItems setObject:[NSNumber numberWithInteger:sidebarView.selectedRow-1] forKey:@"selectedItem"];
+	NSInteger theRow = sidebarView.selectedRow;
+	NTXProjectItem * item;
+	if (theRow >= 0) {
+		infoNode = [sidebarView itemAtRow:theRow];
+		item = [infoNode representedObject];
 
-	NSTreeNode * theNode = [sidebarView itemAtRow:sidebarView.selectedRow];
-	NTXProjectItem * item = [theNode representedObject];
+	// observe item.name, item.type and reloadItem if they change
+		[item addObserver:self forKeyPath:NSStringFromSelector(@selector(name)) options:NSKeyValueObservingOptionInitial context:InfoObserverContext];
+		[item addObserver:self forKeyPath:NSStringFromSelector(@selector(type)) options:NSKeyValueObservingOptionInitial context:InfoObserverContext];
+		if (theRow > 0) {
+			// don’t count the project item
+			--theRow;
+		}
+	} else {
+		// there’s no selection
+		infoNode = nil;
+		item = nil;
+	}
+	[projectItems setObject:[NSNumber numberWithInteger:theRow] forKey:@"selectedItem"];
 	[self.view.window.windowController sourceSelectionDidChange:item];
+}
+
+
+/* -----------------------------------------------------------------------------
+	Update the selected item when changes are observed.
+----------------------------------------------------------------------------- */
+
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+	if (context == InfoObserverContext) {
+		[[NSOperationQueue mainQueue] addOperationWithBlock:^{
+			[sidebarView reloadItem:infoNode];
+	  }];
+	} else {
+		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+	}
 }
 
 
