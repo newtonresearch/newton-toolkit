@@ -1,1 +1,1 @@
-//	Set debug environmentbeginvars.printDepth := 16;vars.printLength := nil;vars.dbgKeepVarNames := true;//	vars.trace := 'functions;//	vars.printInstructions := true;//	vars.showCodeBlocks := true;end;
+//	Set debug environmentbeginvars.printDepth := 16;vars.printLength := nil;vars.dbgKeepVarNames := true;//	vars.trace := 'functions;vars.printInstructions := true;//	vars.showCodeBlocks := true;end;
