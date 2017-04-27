@@ -11,6 +11,7 @@
 	<string>package</string>
 	<string>stream</string>
 	<string>nativecode</string>
+	<string>resource</string>
 	<string>group</string>
 	<string>project</string>
 </array>
