@@ -64,7 +64,8 @@
 @property(assign) Ref value;
 @property(strong) NSString * tag;
 @property(readonly) NSString * title;
-@property(readonly) NSString * type;
+@property(readonly) int type;
+@property(readonly) const char * typeString;
 @property(readonly) int flags;
 
 // TEXT
@@ -126,13 +127,19 @@
 @property BOOL _vjReflow;
 @property BOOL _vjChildrenLasso;
 
-- (id)init:(RefArg)descriptor;
+- (id)initTag:(RefArg)tag value:(RefArg)descriptor;
 @end
 
-@interface NTXProtoDescriptor : NTXSlotDescriptor
-@property(readonly) NSMutableArray<NSString*>* protoNames;
-@property NSString* theProto;
-@end
+/* -----------------------------------------------------------------------------
+	Bit-flags describing slot access.
+----------------------------------------------------------------------------- */
+enum {
+	kSlotIsPlaceholder	= 1<<2,	// must be overridden
+	kSlotIsReadOnly		= 1<<3,
+	kSlotIsMandatory		= 1<<4,	// cannot be deleted
+	kSlotIsBeingEdited	= 1<<5,
+	kSlotIsInvisible		= 1<<6	// does not appear in the browser
+};
 
 
 /* -----------------------------------------------------------------------------
@@ -144,6 +151,7 @@
 {
 	// single-column table of slots in the view template
 	IBOutlet NSTableView * listView;
+	IBOutlet NSPopUpButton * slotPopup;
 
 	RefStruct viewTemplateValue;
 	NSMutableArray * slots;
@@ -156,5 +164,19 @@
 ----------------------------------------------------------------------------- */
 
 @interface NTXSlotEditorViewController : NSTabViewController
+@end
+
+
+
+/* -----------------------------------------------------------------------------
+	N T X V i e w T e m p l a t e C o n t r o l l e r
+	The viewClass / _proto chooser.
+----------------------------------------------------------------------------- */
+
+@interface NTXViewTemplateController : NSViewController
+{
+	IBOutlet NSPopUpButton * protoPopup;
+}
+@property(strong) NSString * protoName;
 @end
 

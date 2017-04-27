@@ -16,12 +16,12 @@
 */
 
 #import "NTXDocument.h"
+#import "AppDelegate.h"
 #import "LayoutViewController.h"
 #import "Utilities.h"
 #import "NTK/Globals.h"
+#import "MacRsrcTypes.h"
 
-
-#define NTXShowViewTemplateNotification @"EditViewTemplate"
 
 #pragma mark -
 /* -----------------------------------------------------------------------------
@@ -41,6 +41,8 @@
 	N T X T e m p l a t e D e s c r i p t o r
 	An item in the hierarchical list of view templates.
 ----------------------------------------------------------------------------- */
+extern const char * FilenameFromFSSpec(void * inFSpec, ArrayIndex inLen);
+
 @implementation NTXTemplateDescriptor
 
 -(id)init:(RefArg)descriptor {
@@ -58,13 +60,26 @@
 }
 
 -(NSString *)title {
-	RefVar proto(GetFrameSlot(viewTemplateDescriptor, MakeSymbol("__ntId")));
+	NSString * titleStr = [self protoName];
 	RefVar name(GetFrameSlot(viewTemplateDescriptor, MakeSymbol("__ntName")));
-	NSString * titleStr = [NSString stringWithUTF8String:SymbolName(proto)];
 	if (NOTNIL(name)) {
 		titleStr = [NSString stringWithFormat:@"%@ : %@", titleStr, MakeNSString(name)];
 	}
 	return titleStr;
+}
+
+-(NSString *)protoName {
+	RefVar vwTemplate(GetFrameSlot(viewTemplateDescriptor, MakeSymbol("__ntId")));
+	if (EQ(vwTemplate, MakeSymbol("userProto"))) {
+		// template is a slot descriptor whose value is an FSSpec
+		vwTemplate = GetFrameSlot(viewTemplateDescriptor, SYMA(value));
+		vwTemplate = GetFrameSlot(vwTemplate, MakeSymbol("__ntTemplate"));
+		// might want to assert that vwTemplate.__ntDataType = "USER"
+		RefVar value(GetFrameSlot(vwTemplate, SYMA(value)));
+		const char * filename = FilenameFromFSSpec(BinaryData(value), Length(value));
+		return [NSString stringWithCString:filename encoding:NSMacOSRomanStringEncoding];
+	}
+	return [NSString stringWithUTF8String:SymbolName(vwTemplate)];
 }
 
 -(bool)hasChildren {
@@ -300,145 +315,79 @@
 
 #pragma mark -
 /* -----------------------------------------------------------------------------
-	N T X P r o t o D e s c r i p t o r
-	Exposes array of strings = view classes/protos for binding to popup.
------------------------------------------------------------------------------ */
-@interface NTXProtoDescriptor ()
-{
-	NSMutableArray<NSString *> * _protoNames;
-}
-@end
-
-
-@implementation NTXProtoDescriptor
-
-- (id)init:(RefArg)descriptor {
-	if (self = [super init:descriptor]) {
-		RefVar platform(GetGlobalVar(SYMA(__platform)));
-		RefVar classes(GetFrameSlot(platform, MakeSymbol("viewClasses")));
-		RefVar templates(GetFrameSlot(platform, MakeSymbol("templates")));
-		_protoNames = [[NSMutableArray alloc] initWithCapacity:Length(classes) + Length(templates) + 1];
-		FOREACH_WITH_TAG(classes, tag, slot)
-			[_protoNames addObject:[NSString stringWithCString:SymbolName(tag) encoding:NSMacOSRomanStringEncoding]];
-		END_FOREACH;
-		[_protoNames addObject:@"--"];
-		FOREACH_WITH_TAG(templates, tag, slot)
-			[_protoNames addObject:[NSString stringWithCString:SymbolName(tag) encoding:NSMacOSRomanStringEncoding]];
-		END_FOREACH;
-	}
-	return self;
-}
-
-- (NSMutableArray<NSString *> *) protoNames {
-	return _protoNames;
-}
-
-- (void)setProtoName:(NSString *)protoName {
-	Ref numericValue = 0;
-	const char * name = protoName.UTF8String;
-	RefVar platform(GetGlobalVar(SYMA(__platform)));
-	RefVar classes(GetFrameSlot(platform, MakeSymbol("viewClasses")));
-	RefVar templates(GetFrameSlot(platform, MakeSymbol("templates")));
-	FOREACH_WITH_TAG(classes, tag, slot)
-		if (strcmp(SymbolName(tag), name) == 0) {
-			numericValue = GetFrameSlot(slot, MakeSymbol("viewClass"));
-			break;
-		}
-	END_FOREACH;
-	if (numericValue == 0) {
-		FOREACH_WITH_TAG(templates, tag, slot)
-			if (strcmp(SymbolName(tag), name) == 0) {
-				numericValue = GetFrameSlot(slot, MakeSymbol("_proto"));
-				break;
-			}
-		END_FOREACH;
-	}
-	if (numericValue != 0) {
-		self.value = numericValue;
-	}
-}
-
-- (NSString *)protoName {
-	Ref numericValue = self.value;
-	RefVar foundSymbol;
-	RefVar platform(GetGlobalVar(SYMA(__platform)));
-	RefVar classes(GetFrameSlot(platform, MakeSymbol("viewClasses")));
-	RefVar templates(GetFrameSlot(platform, MakeSymbol("templates")));
-	FOREACH_WITH_TAG(classes, tag, slot)
-		if (GetFrameSlot(slot, MakeSymbol("viewClass")) == numericValue) {
-			foundSymbol = tag;
-			break;
-		}
-	END_FOREACH;
-	if (ISNIL(foundSymbol)) {
-		FOREACH_WITH_TAG(templates, tag, slot)
-			if (GetFrameSlot(slot, MakeSymbol("_proto")) == numericValue) {
-				foundSymbol = tag;
-				break;
-			}
-		END_FOREACH;
-	}
-	if (ISNIL(foundSymbol)) {
-		return @"clView";
-	}
-	return [NSString stringWithCString:SymbolName(foundSymbol) encoding:NSMacOSRomanStringEncoding];
-}
-
-
-@end
-
-
-#pragma mark -
-/* -----------------------------------------------------------------------------
 	N T X S l o t D e s c r i p t o r
 ----------------------------------------------------------------------------- */
 @implementation NTXSlotDescriptor
 
-- (id)init:(RefArg)descriptor {
+- (id)initTag:(RefArg)name value:(RefArg)descriptor {
 	if (self = [super init]) {
 		slotDescriptor = descriptor;
+
+		if (EQ(name, MakeSymbol("__ntTemplate"))) {
+			// it’s the viewClass or _proto
+			if (self.type == 'CLAS') {
+				self.tag = @"viewClass";
+			} else {
+				// must be 'PROT' or 'USER'
+				self.tag = @"_proto";
+			}
+		} else {
+			self.tag = [NSString stringWithUTF8String:SymbolName(name)];
+		}
 	}
 	return self;
 }
 
+
 - (Ref)value {
-	return GetFrameSlot(slotDescriptor, SYMA(value));
+	// validate
+	RefVar v(GetFrameSlot(slotDescriptor, SYMA(value)));
+	if (self.type == 'NUMB' && NOTINT(v)) {
+		return 0;
+	}
+	return v;
 }
 -(void)setValue:(Ref)inValue {
 	SetFrameSlot(slotDescriptor, SYMA(value), inValue);
 }
 
-@synthesize tag;
 
 - (NSString *)title {
 	NSString * summary = nil;
-	NSString * slotType = self.type;
-	if ([slotType isEqualToString:@"NUMB"] || [slotType isEqualToString:@"INTG"]) {
+	switch (self.type) {
+	case 'NUMB':
+	case 'INTG':
 		summary = [NSString stringWithFormat:@"%ld", (long)self.number];
-//	} else if ([slotType isEqualToString:@"REAL"]) {
-	} else if ([slotType isEqualToString:@"BOOL"]) {
+		break;
+	case 'REAL':
+		break;
+	case 'BOOL':
 		summary = self.boolean? @"true" : @"nil";
-	} else if ([slotType isEqualToString:@"TEXT"]) {
+		break;
+	case 'TEXT':
 		summary = self.text;
 		if (summary.length > 30) {
 			summary = [[summary substringToIndex:30] stringByAppendingString:@"…"];
 		}
-//	} else if ([slotType isEqualToString:@"EVAL"]) {
+		break;
+//	case 'EVAL':
 //		summary = self.text;
-	} else if (IsFrame(self.value)) {
-		RefVar frame(self.value);
-		if (Length(frame) <= 4) {
-			summary = @"{";
-			FOREACH_WITH_TAG(frame, stag, slot)
-				if (ISINT(slot)) {
-					summary = [NSString stringWithFormat:@"%@ %s:%ld,", summary, SymbolName(stag), RVALUE(slot)];
-				} else {
-					summary = nil;
-					break;
+//		break;
+	default: {
+			RefVar frame(self.value);
+			if (IsFrame(frame) && Length(frame) <= 4) {
+				summary = @"{";
+				FOREACH_WITH_TAG(frame, stag, slot)
+					if (ISINT(slot)) {
+						summary = [NSString stringWithFormat:@"%@ %s:%ld,", summary, SymbolName(stag), RVALUE(slot)];
+					} else {
+						summary = nil;
+						break;
+					}
+				END_FOREACH
+				if (summary != nil) {
+					summary = [NSString stringWithFormat:@"%@ }", [summary substringToIndex:summary.length-1]];
 				}
-			END_FOREACH;
-			if (summary != nil) {
-				summary = [NSString stringWithFormat:@"%@ }", [summary substringToIndex:summary.length-1]];
 			}
 		}
 	}
@@ -448,8 +397,13 @@
 	return self.tag;
 }
 
-- (NSString *)type {
-	return MakeNSString(GetFrameSlot(slotDescriptor, MakeSymbol("__ntDataType")));
+- (const char *)typeString {
+	return BinaryData(ASCIIString(GetFrameSlot(slotDescriptor, MakeSymbol("__ntDataType"))));
+}
+
+- (int)type {
+	const char * typeStr = self.typeString;
+	return (typeStr[0] << 24) + (typeStr[1] << 16) + (typeStr[2] << 8) + typeStr[3];
 }
 
 - (int)flags {
@@ -856,8 +810,58 @@
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(templateSelectionDidChange:) name:NSOutlineViewSelectionDidChangeNotification object:nil];
-	[listView setSortDescriptors:[NSArray arrayWithObject: [NSSortDescriptor sortDescriptorWithKey:@"title" ascending:YES selector:@selector(caseInsensitiveCompare:)]]];
+	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(templateSelectionDidChange:) name:NSOutlineViewSelectionDidChangeNotification object:nil];
+	[listView setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"title" ascending:YES selector:@selector(caseInsensitiveCompare:)]]];
+
+	// build add-slot menu
+	NSArray * sortDescr = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:nil ascending:YES selector:@selector(caseInsensitiveCompare:)]];
+
+	RefVar platform(GetGlobalVar(MakeSymbol("__platform")));
+	RefVar slotDefs(GetFrameSlot(platform, MakeSymbol("scriptSlots")));
+	NSMutableArray * items = [[NSMutableArray alloc] initWithCapacity:Length(slotDefs)];
+	if (IsFrame(slotDefs)) {
+		FOREACH_WITH_TAG(slotDefs, tag, value)
+			[items addObject:[NSString stringWithUTF8String:SymbolName(tag)]];
+		END_FOREACH
+		[items sortUsingDescriptors:sortDescr];
+	}
+	NSMenu * scriptMenu = [[NSMenu alloc] initWithTitle:@"Script"];
+	for (NSString * title in items) {
+		[scriptMenu addItemWithTitle:title action:@selector(addScript:) keyEquivalent:@""].target = self;
+	}
+	scriptMenu.autoenablesItems = NO;
+
+	slotDefs = GetFrameSlot(platform, MakeSymbol("attributeSlots"));
+	items = [[NSMutableArray alloc] initWithCapacity:Length(slotDefs)];
+	if (IsFrame(slotDefs)) {
+		FOREACH_WITH_TAG(slotDefs, tag, value)
+			[items addObject:[NSString stringWithUTF8String:SymbolName(tag)]];
+		END_FOREACH
+		[items sortUsingDescriptors:sortDescr];
+	}
+	NSMenu * attributeMenu = [[NSMenu alloc] initWithTitle:@"Attribute"];
+	for (NSString * title in items) {
+		[attributeMenu addItemWithTitle:title action:@selector(addAttribute:) keyEquivalent:@""].target = self;
+	}
+	attributeMenu.autoenablesItems = NO;
+
+	NSMenu * typeMenu = [[NSMenu alloc] initWithTitle:@"Add Slot"];
+	for (NSString * title in @[@"Script", @"Text", @"Number", @"Booolean", @"Rectangle", @"-", @"Evaluate"]) {
+		if ([title isEqualToString:@"-"]) {
+			[typeMenu addItem:[NSMenuItem separatorItem]];
+		} else {
+			[typeMenu addItemWithTitle:title action:@selector(addSlot:) keyEquivalent:@""].target = self;
+		}
+	}
+	typeMenu.autoenablesItems = NO;
+
+	NSMenu * slotMenu = [[NSMenu alloc] initWithTitle:@"Add"];
+	[slotMenu setSubmenu:typeMenu forItem:[slotMenu addItemWithTitle:@"Add Slot" action:nil keyEquivalent:@""]];
+	[slotMenu addItem:[NSMenuItem separatorItem]];
+	[slotMenu setSubmenu:scriptMenu forItem:[slotMenu addItemWithTitle:@"Script" action:nil keyEquivalent:@""]];
+	[slotMenu setSubmenu:attributeMenu forItem:[slotMenu addItemWithTitle:@"Attribute" action:nil keyEquivalent:@""]];
+
+	slotPopup.menu = slotMenu;
 }
 
 
@@ -867,22 +871,14 @@
 		viewTemplateValue = (Ref)[sender.delegate performSelector:@selector(selectedViewTemplate)];
 		slots = [[NSMutableArray alloc] initWithCapacity:Length(viewTemplateValue)];
 		FOREACH_WITH_TAG(viewTemplateValue, tag, slot)
-			const char * slotName = SymbolName(tag);
-			if (strcmp(slotName, "__ntTemplate") == 0) {
-				// it’s the viewClass or _proto
-				NTXProtoDescriptor * descriptor = [[NTXProtoDescriptor alloc] init:slot];
-				if ([descriptor.type isEqualToString:@"PROT"]) {
-					descriptor.tag = @"_proto";
-				} else if ([descriptor.type isEqualToString:@"CLAS"]) {
-					descriptor.tag = @"viewClass";
-				}
-				[slots addObject:descriptor];
-			} else if (strcmp(slotName, "stepChildren") != 0) {
-				NTXSlotDescriptor * descriptor = [[NTXSlotDescriptor alloc] init:slot];
-				descriptor.tag = [NSString stringWithUTF8String:slotName];
+			Ref flags = GetFrameSlot(slot, MakeSymbol("__ntFlags"));
+			if (ISINT(flags) && FLAGTEST(RVALUE(flags), kSlotIsInvisible)) {
+				// don’t show it
+			} else {
+				NTXSlotDescriptor * descriptor = [[NTXSlotDescriptor alloc] initTag:tag value:slot];
 				[slots addObject:descriptor];
 			}
-		END_FOREACH;
+		END_FOREACH
 		[slots sortUsingDescriptors:listView.sortDescriptors];
 		[listView deselectAll:self];
 		[listView reloadData];
@@ -894,6 +890,19 @@
 		return nil;
 	}
 	return [slots objectAtIndex:listView.selectedRow];
+}
+
+
+- (IBAction)addSlot:(id)sender {
+NSLog(@"-[ addSlot:]");
+}
+
+- (IBAction)addScript:(id)sender {
+NSLog(@"-[ addScript:]");
+}
+
+- (IBAction)addAttribute:(id)sender {
+NSLog(@"-[ addAttribute:]");
 }
 
 
@@ -938,13 +947,22 @@
 	if (sender.window == self.view.window && [sender.delegate respondsToSelector:@selector(selectedSlot)]) {
 		NTXSlotDescriptor * chosenSlot = (NTXSlotDescriptor *)[sender.delegate performSelector:@selector(selectedSlot)];
 		if (chosenSlot != nil) {
-			NSString * tabName = chosenSlot.type;
-			if ([tabName isEqualToString:@"SCPT"] || [tabName isEqualToString:@"EVAL"]) {
+			NSString * tabName = [NSString stringWithFormat:@"%s", chosenSlot.typeString];
+			switch (chosenSlot.type) {
+			case 'SCPT':
+			case 'EVAL':
 				tabName = @"TEXT";
-			} else if ([tabName isEqualToString:@"PROT"] || [tabName isEqualToString:@"CLAS"]) {
+				break;
+			case 'PROT':
+			case 'CLAS':
+			case 'USER':
+			case 'LINK':
 				tabName = @"viewTemplate";
-			} else if ([tabName isEqualToString:@"NUMB"] && ([chosenSlot.tag isEqualToString:@"viewFlags"] || [chosenSlot.tag isEqualToString:@"viewFormat"] || [chosenSlot.tag isEqualToString:@"viewJustify"] || [chosenSlot.tag isEqualToString:@"viewEffect"])) {
-				tabName = chosenSlot.tag;
+				break;
+			case 'NUMB':
+				if ([chosenSlot.tag isEqualToString:@"viewFlags"] || [chosenSlot.tag isEqualToString:@"viewFormat"] || [chosenSlot.tag isEqualToString:@"viewJustify"] || [chosenSlot.tag isEqualToString:@"viewEffect"]) {
+					tabName = chosenSlot.tag;
+				}
 			}
 
 			// look up tab index from id
@@ -962,3 +980,147 @@
 }
 
 @end
+
+
+#pragma mark -
+/* -----------------------------------------------------------------------------
+	N T X V i e w T e m p l a t e C o n t r o l l e r
+	The viewClass / _proto chooser.
+----------------------------------------------------------------------------- */
+#import "ProjectDocument.h"
+#define kUserProtoBaseRef 999
+
+@implementation NTXViewTemplateController
+
+- (void)viewDidLoad {
+	[super viewDidLoad];
+
+	// build proto template menu
+	NSMenu * protoMenu = [[NSMenu alloc] initWithTitle:@"View Template"];
+	protoMenu.autoenablesItems = NO;
+	NSArray * sortDescr = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"title" ascending:YES selector:@selector(caseInsensitiveCompare:)]];
+	NSMutableArray<NSDictionary*> * items;
+
+	NTXProjectDocument * doc = ((NSViewController *)self.parentViewController).view.window.windowController.document;
+	NSArray<NTXProjectItem*> * userProtos = doc.userProtos;
+
+	if (userProtos.count > 0) {
+		items = [[NSMutableArray alloc] initWithCapacity:userProtos.count];
+		int fakeRef = kUserProtoBaseRef;
+		for (NTXProjectItem * item in userProtos) {
+			[items addObject:@{@"title":item.name, @"value":[NSNumber numberWithInt:fakeRef++]}];
+		}
+		[items sortUsingDescriptors:sortDescr];
+		for (NSDictionary * slot in items) {
+			NSMenuItem * item = [protoMenu addItemWithTitle:[slot objectForKey:@"title"] action:@selector(updateTemplate:) keyEquivalent:@""];
+			item.tag = [[slot objectForKey:@"value"] intValue];
+			item.target = self;
+		}
+
+		[protoMenu addItem:[NSMenuItem separatorItem]];
+	}
+	
+	RefVar platform(GetGlobalVar(MakeSymbol("__platform")));
+	RefVar classes(GetFrameSlot(platform, MakeSymbol("viewClasses")));
+	items = [[NSMutableArray alloc] initWithCapacity:Length(classes)];
+	FOREACH_WITH_TAG(classes, tag, value)
+		Ref viewClass = GetFrameSlot(value, SYMA(viewClass));
+		[items addObject:@{@"title":[NSString stringWithUTF8String:SymbolName(tag)], @"value":[NSNumber numberWithInt:viewClass]}];
+	END_FOREACH
+	[items sortUsingDescriptors:sortDescr];
+	for (NSDictionary * slot in items) {
+		NSMenuItem * item = [protoMenu addItemWithTitle:[slot objectForKey:@"title"] action:@selector(updateTemplate:) keyEquivalent:@""];
+		item.tag = [[slot objectForKey:@"value"] intValue];
+		item.target = self;
+	}
+
+	[protoMenu addItem:[NSMenuItem separatorItem]];
+
+	RefVar templates(GetFrameSlot(platform, MakeSymbol("templates")));
+	items = [[NSMutableArray alloc] initWithCapacity:Length(templates)];
+	FOREACH_WITH_TAG(templates, tag, value)
+		Ref viewProto = GetFrameSlot(value, SYMA(_proto));
+		[items addObject:@{@"title":[NSString stringWithUTF8String:SymbolName(tag)], @"value":[NSNumber numberWithInt:viewProto]}];
+	END_FOREACH
+	[items sortUsingDescriptors:sortDescr];
+	for (NSDictionary * slot in items) {
+		NSMenuItem * item = [protoMenu addItemWithTitle:[slot objectForKey:@"title"] action:@selector(updateTemplate:) keyEquivalent:@""];
+		item.tag = [[slot objectForKey:@"value"] intValue];
+		item.target = self;
+	}
+
+	protoPopup.menu = protoMenu;
+	[protoPopup selectItemWithTag:((NTXSlotDescriptor*)self.representedObject).value];
+}
+
+
+- (IBAction)updateTemplate:(id)sender {
+	Ref proto = (Ref)[(NSMenuItem*)sender tag];
+	if (proto >= kUserProtoBaseRef) {
+		;	// hmmm... make an FSAliasX to put in the value; or even better an NSURL
+	} else {
+		((NTXSlotDescriptor*)self.representedObject).value = proto;
+	}
+	// need to update selected row in NTXTemplateListViewController
+}
+
+
+@end
+
+
+// may come in handy one day...
+
+#if 0
+- (void)setProtoName:(NSString *)protoName {
+	Ref numericValue = 0;
+	const char * name = protoName.UTF8String;
+	RefVar platform(GetGlobalVar(SYMA(__platform)));
+	RefVar classes(GetFrameSlot(platform, MakeSymbol("viewClasses")));
+	RefVar templates(GetFrameSlot(platform, MakeSymbol("templates")));
+	FOREACH_WITH_TAG(classes, tag, slot)
+		if (strcmp(SymbolName(tag), name) == 0) {
+			numericValue = GetFrameSlot(slot, MakeSymbol("viewClass"));
+			break;
+		}
+	END_FOREACH
+	if (numericValue == 0) {
+		FOREACH_WITH_TAG(templates, tag, slot)
+			if (strcmp(SymbolName(tag), name) == 0) {
+				numericValue = GetFrameSlot(slot, MakeSymbol("_proto"));
+				break;
+			}
+		END_FOREACH
+	}
+	if (numericValue != 0) {
+		NTXSlotDescriptor * descr = self.representedObject;
+		descr.value = numericValue;
+	}
+}
+
+- (NSString *)protoName {
+	NTXSlotDescriptor * descr = self.representedObject;
+	Ref numericValue = descr.value;
+	RefVar foundSymbol;
+	RefVar platform(GetGlobalVar(SYMA(__platform)));
+	RefVar classes(GetFrameSlot(platform, MakeSymbol("viewClasses")));
+	RefVar templates(GetFrameSlot(platform, MakeSymbol("templates")));
+	FOREACH_WITH_TAG(classes, tag, slot)
+		if (GetFrameSlot(slot, MakeSymbol("viewClass")) == numericValue) {
+			foundSymbol = tag;
+			break;
+		}
+	END_FOREACH
+	if (ISNIL(foundSymbol)) {
+		FOREACH_WITH_TAG(templates, tag, slot)
+			if (GetFrameSlot(slot, MakeSymbol("_proto")) == numericValue) {
+				foundSymbol = tag;
+				break;
+			}
+		END_FOREACH
+	}
+	if (ISNIL(foundSymbol)) {
+		return @"clView";
+	}
+	return [NSString stringWithCString:SymbolName(foundSymbol) encoding:NSMacOSRomanStringEncoding];
+}
+#endif
