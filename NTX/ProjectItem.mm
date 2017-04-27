@@ -33,11 +33,6 @@ NSArray * gTypeNames;
 ----------------------------------------------------------------------------- */
 @implementation NTXProjectItem
 
-@synthesize url;
-@synthesize type;
-@synthesize isMainLayout;
-@synthesize isExcluded;
-
 /* -----------------------------------------------------------------------------
 	Read file type map (NSUInteger) -> (NSString *)
 	Args:		--
