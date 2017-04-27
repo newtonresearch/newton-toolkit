@@ -13,6 +13,8 @@
 		F40100031BA702C400555CBC /* Disconnected.pdf in Resources */ = {isa = PBXBuildFile; fileRef = F401FFFF1BA702C400555CBC /* Disconnected.pdf */; };
 		F40100041BA702C400555CBC /* PrintDepth.pdf in Resources */ = {isa = PBXBuildFile; fileRef = F40100001BA702C400555CBC /* PrintDepth.pdf */; };
 		F40100051BA702C400555CBC /* PrintLength.pdf in Resources */ = {isa = PBXBuildFile; fileRef = F40100011BA702C400555CBC /* PrintLength.pdf */; };
+		F40E8B491EAF5F0800C66881 /* resource.iconset in Resources */ = {isa = PBXBuildFile; fileRef = F40E8B481EAF5F0800C66881 /* resource.iconset */; };
+		F40E8B4B1EAFA89800C66881 /* CanonicalProject.newtonstream in Resources */ = {isa = PBXBuildFile; fileRef = F40E8B4A1EAFA29500C66881 /* CanonicalProject.newtonstream */; };
 		F41121E21E5C9319004D3596 /* GlobalInit.newtonscript in Resources */ = {isa = PBXBuildFile; fileRef = F41121E11E5C9312004D3596 /* GlobalInit.newtonscript */; };
 		F41121E61E5C956D004D3596 /* NTK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F41121E51E5C956D004D3596 /* NTK.framework */; };
 		F41121E81E5CA76E004D3596 /* NTK.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = F41121E51E5C956D004D3596 /* NTK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -43,7 +45,6 @@
 		F477F5AC1E5F66A500208D48 /* UpdatePrefsViewController.png in Resources */ = {isa = PBXBuildFile; fileRef = F477F5AB1E5F66A500208D48 /* UpdatePrefsViewController.png */; };
 		F47FDD970A25A12400E24349 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F47FDC4B0A25A01B00E24349 /* SystemConfiguration.framework */; };
 		F4A3DEC31DDDCA6C0060BFDC /* Toolkit.newtonpkg in Copy NewtonScripts */ = {isa = PBXBuildFile; fileRef = F4A3DEC21DDDCA6C0060BFDC /* Toolkit.newtonpkg */; };
-		F4A58F9A18ACEFD1008B0832 /* CanonicalProject.stream in Copy NewtonScripts */ = {isa = PBXBuildFile; fileRef = F4A58F9918ACEF21008B0832 /* CanonicalProject.stream */; };
 		F4A58FEA18BE0867008B0832 /* project.iconset in Resources */ = {isa = PBXBuildFile; fileRef = F4A58FE518BE0867008B0832 /* project.iconset */; };
 		F4A58FEB18BE0867008B0832 /* proto.iconset in Resources */ = {isa = PBXBuildFile; fileRef = F4A58FE618BE0867008B0832 /* proto.iconset */; };
 		F4A58FEC18BE0867008B0832 /* script.iconset in Resources */ = {isa = PBXBuildFile; fileRef = F4A58FE718BE0867008B0832 /* script.iconset */; };
@@ -94,7 +95,6 @@
 			dstSubfolderSpec = 7;
 			files = (
 				F4A3DEC31DDDCA6C0060BFDC /* Toolkit.newtonpkg in Copy NewtonScripts */,
-				F4A58F9A18ACEFD1008B0832 /* CanonicalProject.stream in Copy NewtonScripts */,
 				F4A5F23F17D63E300004B6DB /* EditorCommands in Copy NewtonScripts */,
 				F4A5F24017D63E330004B6DB /* GlobalData.newtonscript in Copy NewtonScripts */,
 				F4A5F24117D63E360004B6DB /* GlobalFunctions.newtonscript in Copy NewtonScripts */,
@@ -140,6 +140,8 @@
 		F40100011BA702C400555CBC /* PrintLength.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = PrintLength.pdf; path = NTX/Images/PrintLength.pdf; sourceTree = "<group>"; };
 		F401FFFE1BA702C400555CBC /* Connected.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = Connected.pdf; path = NTX/Images/Connected.pdf; sourceTree = "<group>"; };
 		F401FFFF1BA702C400555CBC /* Disconnected.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = Disconnected.pdf; path = NTX/Images/Disconnected.pdf; sourceTree = "<group>"; };
+		F40E8B481EAF5F0800C66881 /* resource.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = resource.iconset; path = NTX/Images.xcassets/resource.iconset; sourceTree = "<group>"; };
+		F40E8B4A1EAFA29500C66881 /* CanonicalProject.newtonstream */ = {isa = PBXFileReference; lastKnownFileType = file; path = CanonicalProject.newtonstream; sourceTree = "<group>"; };
 		F41121E01E5C910C004D3596 /* PreferenceKeys.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PreferenceKeys.h; path = NTX/PreferenceKeys.h; sourceTree = "<group>"; };
 		F41121E11E5C9312004D3596 /* GlobalInit.newtonscript */ = {isa = PBXFileReference; lastKnownFileType = text; path = GlobalInit.newtonscript; sourceTree = "<group>"; };
 		F41121E51E5C956D004D3596 /* NTK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NTK.framework; sourceTree = "<group>"; };
@@ -182,7 +184,6 @@
 		F47FDC4B0A25A01B00E24349 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
 		F48435840954427100777EB8 /* Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utilities.h; path = NTX/Utilities.h; sourceTree = "<group>"; };
 		F4A3DEC21DDDCA6C0060BFDC /* Toolkit.newtonpkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = Toolkit.newtonpkg; sourceTree = "<group>"; };
-		F4A58F9918ACEF21008B0832 /* CanonicalProject.stream */ = {isa = PBXFileReference; lastKnownFileType = file; path = CanonicalProject.stream; sourceTree = "<group>"; };
 		F4A58F9B18B24E82008B0832 /* ProjectTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ProjectTypes.h; path = NTX/ProjectTypes.h; sourceTree = "<group>"; };
 		F4A58FE518BE0867008B0832 /* project.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = project.iconset; path = NTX/Images.xcassets/project.iconset; sourceTree = "<group>"; };
 		F4A58FE618BE0867008B0832 /* proto.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = proto.iconset; path = NTX/Images.xcassets/proto.iconset; sourceTree = "<group>"; };
@@ -249,6 +250,7 @@
 		F4E5B97517EC6173007DA5BC /* stdioDirector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stdioDirector.h; path = NTX/stdioDirector.h; sourceTree = "<group>"; };
 		F4E5B97617EC6173007DA5BC /* stdioDirector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = stdioDirector.m; path = NTX/stdioDirector.m; sourceTree = "<group>"; };
 		F4E905AE098283B800247A7E /* Utilities.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Utilities.mm; path = NTX/Utilities.mm; sourceTree = "<group>"; };
+		F4EA9BF01E964457005EA8A3 /* MacRsrcTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacRsrcTypes.h; path = NTX/MacRsrcTypes.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -299,6 +301,7 @@
 				F4A58F9B18B24E82008B0832 /* ProjectTypes.h */,
 				F4B90A8A18927F7E004F1742 /* ProjectDocument.h */,
 				F4B90A8B18927F7E004F1742 /* ProjectDocument.mm */,
+				F4EA9BF01E964457005EA8A3 /* MacRsrcTypes.h */,
 				F4C2CB2D1AC45C71000E6887 /* MacRsrcProject.h */,
 				F4C2CB2E1AC45C71000E6887 /* MacRsrcProject.mm */,
 				F4C2CB371AD54C1B000E6887 /* PackagePart.h */,
@@ -361,7 +364,7 @@
 		66FC8158030106B8000ACE77 /* NTK Resources */ = {
 			isa = PBXGroup;
 			children = (
-				F4A58F9918ACEF21008B0832 /* CanonicalProject.stream */,
+				F40E8B4A1EAFA29500C66881 /* CanonicalProject.newtonstream */,
 				F4D44FA90BE9DCA9004937CC /* EditorCommands */,
 				F41121E11E5C9312004D3596 /* GlobalInit.newtonscript */,
 				F4D44FAA0BE9DCA9004937CC /* GlobalData.newtonscript */,
@@ -468,6 +471,7 @@
 				F4A58FF218BE0A66008B0832 /* platform.iconset */,
 				F4A58FF418BE0AC6008B0832 /* package.iconset */,
 				F4A58FFC18C777C9008B0832 /* nativecode.iconset */,
+				F40E8B481EAF5F0800C66881 /* resource.iconset */,
 			);
 			name = "Document Icons";
 			sourceTree = "<group>";
@@ -573,6 +577,7 @@
 				F477F5AA1E5EFBD700208D48 /* pkg.icns in Resources */,
 				F42A24951DF4749600CD22AD /* Layout.storyboard in Resources */,
 				F4AE56DA1B024E6D00F15F10 /* book.png in Resources */,
+				F40E8B4B1EAFA89800C66881 /* CanonicalProject.newtonstream in Resources */,
 				F41121ED1E5CB927004D3596 /* Newton 2.1 1.2d6 in Resources */,
 				F4A58FFD18C777C9008B0832 /* nativecode.iconset in Resources */,
 				F4A58FF118BE0A01008B0832 /* layout.iconset in Resources */,
@@ -597,6 +602,7 @@
 				F4BCE9111AFF7DB800423A34 /* Error.strings in Resources */,
 				F42AD88A1AC05DF300F18E96 /* DVTViewUtilities_10_10.pdf in Resources */,
 				F4A58FF318BE0A66008B0832 /* platform.iconset in Resources */,
+				F40E8B491EAF5F0800C66881 /* resource.iconset in Resources */,
 				F4AE56D81B024E1200F15F10 /* Package.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
