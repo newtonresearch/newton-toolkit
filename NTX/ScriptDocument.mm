@@ -103,12 +103,6 @@ extern Ref		ParseFile(const char * inFilename);
 }
 
 
-+ (BOOL)autosavesInPlace
-{
-    return YES;
-}
-
-
 /* -----------------------------------------------------------------------------
 	Evaluate our NewtonScript.
 ----------------------------------------------------------------------------- */
