@@ -93,6 +93,29 @@ FileTypeCode(const char * inPath)
 }
 
 
+const char *
+FilenameFromFSSpec(void * inFSpec, ArrayIndex inLen)
+{
+	const char * filename;
+	if (inLen == sizeof(FSSpecX)) {
+		// we have a filespec
+		FSSpecX * fsspec = (FSSpecX *)inFSpec;
+		filename = (const char *)&fsspec->name[0];
+	} else {
+		// this is an alias
+		FSAliasX * alias = (FSAliasX *)inFSpec;
+		filename = (const char *)&alias->fileName[0];
+	}
+	// convert pascal -> c string
+	static char cstr[64];
+	size_t filenameLen = filename[0];
+	strncpy(cstr, filename+1, filenameLen);
+	cstr[filenameLen] = 0;
+	return cstr;
+	// caller must copy this if necessary
+}
+
+
 Ref
 MakePoint(VPoint const& vpt)
 {
@@ -116,6 +139,7 @@ MakeRect(VRect const& vrect)
 Ref
 ReadLayoutSettings(NSURL * url)
 {
+	int layoutType = FileTypeCode(url.fileSystemRepresentation) == 'PRTO' ? kUserProtoLayoutType : kNormalLayoutType;
 	NTXRsrcFile * rf = [[NTXRsrcFile alloc] initWithURL:url];
 	if (rf) {
 		RsrcFMST * rsrc = (RsrcFMST *)[rf readResource:'FMST' number:9999];
@@ -126,7 +150,7 @@ ReadLayoutSettings(NSURL * url)
 			SetFrameSlot(layoutSettings, MakeSymbol("fileVersion"), MAKEINT(ntohs(rsrc->version)));
 			SetFrameSlot(layoutSettings, MakeSymbol("windowRect"), MakeRect(rsrc->windowPosition));
 			SetFrameSlot(layoutSettings, MakeSymbol("layoutName"), MakeString(url.lastPathComponent));
-			SetFrameSlot(layoutSettings, MakeSymbol("layoutType"), MAKEINT(0));
+			SetFrameSlot(layoutSettings, MakeSymbol("layoutType"), MAKEINT(layoutType));
 			SetFrameSlot(layoutSettings, MakeSymbol("layoutSize"), MakePoint(rsrc->layoutSize));
 			VPoint grid = {rsrc->grid[0].spacing, rsrc->grid[1].spacing};
 			SetFrameSlot(layoutSettings, MakeSymbol("gridSize"), MakePoint(grid));
@@ -269,7 +293,7 @@ ReadLayoutSettings(NSURL * url)
 
 - (Ref)projectRef {
 	//	stream in default project settings
-	NSURL * url = [NSBundle.mainBundle URLForResource: @"CanonicalProject" withExtension: @"stream"];
+	NSURL * url = [NSBundle.mainBundle URLForResource: @"CanonicalProject" withExtension: @"newtonstream"];
 	CStdIOPipe pipe(url.fileSystemRepresentation, "r");
 	RefVar proj(UnflattenRef(pipe));
 
@@ -287,30 +311,17 @@ ReadLayoutSettings(NSURL * url)
 	SetClass(protoFileRef, MakeSymbol("fileReference"));
 	SetFrameSlot(protoFileRef, MakeSymbol("fullPath"), RA(NILREF));
 	for (ArrayIndex i = 0; i < itemCount; ++i) {
-		char * filename = NULL;
 		// read aliases -- add to projectRef.projectItems.items
+		char fsData[KByte];
 		ULong itemLen = self.read4Bytes;
-		if (itemLen == sizeof(FSSpecX)) {
-			// we must convert a filespec
-			FSSpecX fspec;
-			[self read:itemLen into:(char *)&fspec];
-			filename = (char *)&fspec.name[0];
-		} else {
-			// this is an alias
-			if (itemLen > KByte)
-				printf("ALIAS BUFFER OVERFLOW!\n");
-			char aliasData[KByte];
-			[self read:itemLen into:aliasData];
-			FSAliasX * alias = (FSAliasX *)aliasData;
-			filename = (char *)&alias->fileName[0];
+		if (itemLen > KByte) {
+			itemLen = KByte;
+			printf("ALIAS BUFFER OVERFLOW!\n");
 		}
+		[self read:itemLen into:fsData];
+		const char * filename = FilenameFromFSSpec(fsData, itemLen);
 		if (filename) {
-			const char * filePath;
-			char cstr[64];
-			size_t filenameLen = *(uint8_t *)filename;
-			strncpy(cstr, filename+1, filenameLen);
-			cstr[filenameLen] = 0;
-			filePath = [[basePath URLByAppendingPathComponent:[NSString stringWithCString:cstr encoding:NSMacOSRomanStringEncoding]] fileSystemRepresentation];
+			const char * filePath = [[basePath URLByAppendingPathComponent:[NSString stringWithCString:filename encoding:NSMacOSRomanStringEncoding]] fileSystemRepresentation];
 			int fileType = 0;
 			//convert to index
 			switch (FileTypeCode(filePath)) {
@@ -333,8 +344,11 @@ ReadLayoutSettings(NSURL * url)
 			case 'STRM':
 				fileType = kStreamFileType;
 				break;
-			case 'CODE':	// really?
+			case 'CODE':
 				fileType = kNativeCodeFileType;
+				break;
+			case 'rsrc':
+				fileType = kResourceFileType;
 				break;
 			}
 
@@ -437,6 +451,9 @@ ReadLayoutSettings(NSURL * url)
 	SetFrameSlot(profilerSettings, MakeSymbol("detailedSystemCalls"), MAKEBOOLEAN(rsrc->detailedSystemCalls));
 	SetFrameSlot(profilerSettings, MakeSymbol("detailedUserFunctions"), MAKEBOOLEAN(rsrc->detailedUserFunctions));
  
+ 	// ignore the resource fork which contains the window settings -- we need a MUCH larger window
+//	VRect * wndw = (VRect *)[self readResource:'PJST' number:9999];
+
 	return proj;
 }
 
