@@ -51,7 +51,18 @@ enum
 	kNativeCodeFileType,
 
 //	additional type codes used by NTX
+	kResourceFileType,
 	kGroupType,
 	kProjectFileType
 };
 
+
+
+/* -----------------------------------------------------------------------------
+	Layout type in layout file layoutSettings.
+----------------------------------------------------------------------------- */
+enum {
+	kNormalLayoutType,
+	kPrintLayoutType,
+	kUserProtoLayoutType
+};
