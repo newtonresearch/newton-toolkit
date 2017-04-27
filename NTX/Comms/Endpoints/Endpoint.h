@@ -112,8 +112,8 @@ int	REPprintf(const char * inFormat, ...);
 /* -----------------------------------------------------------------------------
 	N C E n d p o i n t C o n t r o l l e r
 	There is a single instance of NCEndpointController that coordinates the
-	creation of transports to listen on all available interfaces, then cancels
-	transports once one has established a connection.
+	creation of endpoints to listen on all available interfaces, then cancels
+	endpoints once one has established a connection.
 ----------------------------------------------------------------------------- */
 
 @interface NCEndpointController : NSObject

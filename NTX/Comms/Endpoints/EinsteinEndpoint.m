@@ -47,31 +47,26 @@
 		// create the sending node if it does not exist yet
 		NSURL * wPipe = [pipeFolder URLByAppendingPathComponent:@"ExtrSerPortSend"];
 		const char * wPipePath = wPipe.fileSystemRepresentation;
-		if (access(wPipePath, S_IRUSR|S_IWUSR) == -1) {
-			XFAILIF(mkfifo(wPipePath, S_IRUSR|S_IWUSR) == -1,
-				NSLog(@"***** Error creating named pipe %s - %s (%d).", wPipePath, strerror(errno), errno); )
+		if (access(wPipePath, S_IRUSR|S_IWUSR) < 0) {
+			XFAILIF(mkfifo(wPipePath, S_IRUSR|S_IWUSR) < 0, NSLog(@"***** Error creating named pipe %s - %s (%d).", wPipePath, strerror(errno), errno); )
 		}
 		// create the receiving node if it does not exist yet
 		NSURL * rPipe = [pipeFolder URLByAppendingPathComponent:@"ExtrSerPortRecv"];
 		const char * rPipePath = rPipe.fileSystemRepresentation;
-		if (access(rPipePath, S_IRUSR|S_IWUSR) == -1) {
-			XFAILIF(mkfifo(rPipePath, S_IRUSR|S_IWUSR) == -1,
-				NSLog(@"***** Error creating named pipe %s - %s (%d).", rPipePath, strerror(errno), errno); )
+		if (access(rPipePath, S_IRUSR|S_IWUSR) < 0) {
+			XFAILIF(mkfifo(rPipePath, S_IRUSR|S_IWUSR) < 0, NSLog(@"***** Error creating named pipe %s - %s (%d).", rPipePath, strerror(errno), errno); )
 		}
 
 		// Open the the pipe for transmitting data from NCX to Einstein
 		// The O_NONBLOCK flag also causes subsequent I/O on the device to be non-blocking.
 		// Note: the name of the pipe is seen from Einsten. The receiving port must connect to the "Send" pipe.
-		XFAILIF((_rfd = open(wPipePath, O_RDWR | O_NOCTTY | O_NONBLOCK)) == -1,
-			NSLog(@"Error opening named pipe %s for receiving - %s (%d).", wPipePath, strerror(errno), errno); )
+		XFAILIF((_rfd = open(wPipePath, O_RDWR | O_NOCTTY | O_NONBLOCK)) < 0, NSLog(@"Error opening named pipe %s for receiving - %s (%d).", wPipePath, strerror(errno), errno); )
 
 		// Open the the pipe for transmitting data from NCX to Einstein
 		// The O_NONBLOCK flag also causes subsequent I/O on the device to be non-blocking.
 		// Note: the name of the pipe is seen from Einsten. The sneding port must connect to the "Recv" pipe.
-		XFAILIF((_wfd = open(rPipePath, O_RDWR | O_NOCTTY | O_NONBLOCK)) == -1,
-			NSLog(@"Error opening named pipe %s for transmitting - %s (%d).", rPipePath, strerror(errno), errno); )
+		XFAILIF((_wfd = open(rPipePath, O_RDWR | O_NOCTTY | O_NONBLOCK)) < 0, NSLog(@"Error opening named pipe %s for transmitting - %s (%d).", rPipePath, strerror(errno), errno); )
 
-		NSLog(@"Listening to Einstein connection via named pipes.");
 		return noErr;
 	}
 	XENDTRY;

@@ -737,7 +737,7 @@ NSLog(@" <-- received LD packet (disconnect)");
 - (void)writePage:(NCBuffer *)inFrameBuf from:(NSMutableData *)inDataBuf {
 	unsigned int count;
 	if (wFrameBuf.count == 0 && !isACKPending) {
-		count = [inDataBuf length];
+		count = inDataBuf.length;
 		if (count > 0) {
 			unsigned char packetBuf[kMNPPacketSize];
 			if (count > kMNPPacketSize) {
@@ -746,14 +746,14 @@ NSLog(@" <-- received LD packet (disconnect)");
 			[inDataBuf getBytes:packetBuf length:count];
 			[inDataBuf replaceBytesInRange: NSMakeRange(0, count) withBytes: NULL length: 0];
 
-			[self xmitLT: packetBuf length: count];
+			[self xmitLT:packetBuf length:count];
 		}
 	}
 	if ((count = wFrameBuf.count) > 0) {
 		if (count > inFrameBuf.freeSpace) {
 			count = inFrameBuf.freeSpace;
 		}
-		[inFrameBuf fill:count from:wFrameBuf.ptr];
+		[inFrameBuf fill:count from:wFrameBuf.basePtr];
 		[wFrameBuf drain:count];
 	}
 }
@@ -762,8 +762,6 @@ NSLog(@" <-- received LD packet (disconnect)");
 /* -----------------------------------------------------------------------------
 	Send a packet, optionally with data.
 	We can assume the data is already sub-packet-sized.
-	Actually, we don’t send here, we just prepare wFrameBuf
-	and say when asked that we willSend: it.
 ----------------------------------------------------------------------------- */
 
 - (void)send:(const unsigned char *)inHeader data:(const unsigned char *)inBuf length:(unsigned int)inLength {

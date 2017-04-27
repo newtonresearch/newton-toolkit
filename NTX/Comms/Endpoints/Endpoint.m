@@ -233,12 +233,12 @@ if (gTraceIO) {
 ------------------------------------------------------------------------------*/
 
 - (void)writePage:(NCBuffer *)inFrameBuf from:(NSMutableData *)inDataBuf {
-	unsigned int count = [inDataBuf length];
+	unsigned int count = inDataBuf.length;
 	if (count > inFrameBuf.freeSpace) {
 		count = inFrameBuf.freeSpace;
 	}
-	[inFrameBuf fill:count from:[inDataBuf bytes]];
-	[inDataBuf replaceBytesInRange: NSMakeRange(0, count) withBytes: NULL length: 0];
+	[inFrameBuf fill:count from:inDataBuf.bytes];
+	[inDataBuf replaceBytesInRange:NSMakeRange(0,count) withBytes:NULL length:0];
 }
 
 
@@ -251,16 +251,10 @@ if (gTraceIO) {
 
 - (NCError)write:(const void *)inData length:(unsigned int)inLength {
 	NCError err = noErr;
-	if (inData) {
-		NSData * data = nil;
-		if (inLength) {
-			data = [NSData dataWithBytes:inData length:inLength];
-		}
+	if (inData != NULL && inLength > 0) {
 		dispatch_sync(ioQueue, ^{
 			BOOL wasEmpty = wData.length == 0;
-			if (data) {
-				[wData appendData:data];
-			}
+			[wData appendBytes:inData length:inLength];
 			if (wasEmpty) {
 				write(self.pipefd, "X", 1);
 			}
@@ -279,11 +273,10 @@ if (gTraceIO) {
 
 - (NCError)writeSync:(const void *)inData length:(unsigned int)inLength {
 	NCError err = noErr;
-	if (inData) {
-		NSData * data = [NSData dataWithBytes:inData length:inLength];
+	if (inData != NULL && inLength > 0) {
 		dispatch_sync(ioQueue, ^{
 			BOOL wasEmpty = wData.length == 0;
-			[wData appendData:data];
+			[wData appendBytes:inData length:inLength];
 			if (wasEmpty) {
 				isSyncWrite = YES;
 				write(self.pipefd, "Y", 1);
@@ -295,7 +288,7 @@ if (gTraceIO) {
 }
 
 
-- (void) writeDone
+- (void)writeDone
 {
 	dispatch_sync(ioQueue, ^{
 		if (isSyncWrite && wData.length == 0) {
@@ -335,7 +328,6 @@ if (gTraceIO) {
 @end
 
 @implementation NCEndpointController
-@synthesize error;
 
 /*------------------------------------------------------------------------------
 	Initialize instance.
