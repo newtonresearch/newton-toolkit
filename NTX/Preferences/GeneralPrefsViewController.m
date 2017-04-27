@@ -17,31 +17,27 @@
 	Create the preferences toolbar.
 ------------------------------------------------------------------------------*/
 
-- (void) awakeFromNib
-{
+- (void)awakeFromNib {
 	ports = nil;
 	serialPort = nil;
 
 	if ([MNPSerialEndpoint isAvailable]
 	&&  [MNPSerialEndpoint getSerialPorts:&ports] == noErr
-	&&  ports.count > 0)
-	{
+	&&  ports.count > 0) {
 		[GeneralPrefsViewController preferredSerialPort: &serialPort bitRate: &serialSpeed];
 
 		// load it up with available serial port names
 		NSUInteger count = ports.count;
 		NSUInteger serialPortIndex = 999;
 		[serialPortPopup removeAllItems];
-		for (NSUInteger i = 0; i < count; ++i)
-		{
-			NSString * port = [[ports objectAtIndex:i] objectForKey:@"name"];
+		for (NSUInteger i = 0; i < count; ++i) {
+			NSString * port = [ports[i] objectForKey:@"name"];
 			[serialPortPopup addItemWithTitle:port];
-			port = [[ports objectAtIndex:i] objectForKey:@"path"];
+			port = [ports[i] objectForKey:@"path"];
 			if ([port isEqualToString:serialPort])
 				serialPortIndex = i;
 		}
-		if (serialPortIndex == 999)
-		{
+		if (serialPortIndex == 999) {
 			// serialPort isn’t known by IOKit -- maybe user has set their own default
 			// add name, path couplet to ports
 			NSMutableArray * newPorts = [NSMutableArray arrayWithArray:ports];
@@ -65,15 +61,14 @@
 	Return:	--
 ------------------------------------------------------------------------------*/
 
-- (void) windowWillClose: (NSNotification *) notification
-{
+- (void)windowWillClose:(NSNotification *)notification {
 	// only need to do anything if we have a serial port
-	if (serialPort != nil)
-	{
-		if (![serialPort isEqualToString:[NSUserDefaults.standardUserDefaults stringForKey:kSerialPortPref]])
+	if (serialPort != nil) {
+		if (![serialPort isEqualToString:[NSUserDefaults.standardUserDefaults stringForKey:kSerialPortPref]]) {
 			[[NSNotificationCenter defaultCenter] postNotificationName:kSerialPortChanged
 																				 object:self
 																			  userInfo:nil];
+		}
 	}
 }
 
@@ -83,32 +78,27 @@
 	G e n e r a l   P r e f e r e n c e s
 ------------------------------------------------------------------------------*/
 
-+ (int) preferredSerialPort: (NSString * __strong *) outPort bitRate: (NSUInteger *) outRate
-{
++ (int)preferredSerialPort:(NSString *__strong *)outPort bitRate:(NSUInteger *)outRate {
 	NSArray * ports;
 
 	NSUserDefaults * defaults = NSUserDefaults.standardUserDefaults;
 	NSString * serialPort = [defaults stringForKey:kSerialPortPref];
 
-	if (serialPort == nil)
-	{
+	if (serialPort == nil) {
 		// there’s no serial port preference -- use the first one available
 		if ([MNPSerialEndpoint isAvailable]
 		&&  [MNPSerialEndpoint getSerialPorts:&ports] == noErr
 		&&  ports.count > 0)
 		{
-			serialPort = [[ports objectAtIndex: 0] objectForKey:@"path"];
+			serialPort = [ports[0] objectForKey:@"path"];
 			[defaults setObject:serialPort forKey:kSerialPortPref];
 		}
-	}
-	else if ([serialPort rangeOfCharacterFromSet: [NSCharacterSet decimalDigitCharacterSet]].location == 0)
-	{
+	} else if ([serialPort rangeOfCharacterFromSet:[NSCharacterSet decimalDigitCharacterSet]].location == 0) {
 		// serial port pref is numeric, convert it to the string in ports[that index].path and write it back out
 		if ([MNPSerialEndpoint isAvailable]
 		&&  [MNPSerialEndpoint getSerialPorts: &ports] == noErr
-		&&  ports.count > 0)
-		{
-			serialPort = [[ports objectAtIndex:serialPort.intValue] objectForKey:@"path"];
+		&&  ports.count > 0) {
+			serialPort = [ports[serialPort.intValue] objectForKey:@"path"];
 			[defaults setObject:serialPort forKey:kSerialPortPref];
 		}
 	}
@@ -130,12 +120,10 @@
 	Return:	--
 ------------------------------------------------------------------------------*/
 
-- (IBAction) updateSerialPort: (id) sender
-{
+- (IBAction)updateSerialPort:(id)sender {
 	NSInteger i = [(NSPopUpButton *)sender indexOfSelectedItem];
-	if (i >= 0)
-	{
-		NSString * port = [[ports objectAtIndex: i] objectForKey:@"path"];
+	if (i >= 0) {
+		NSString * port = [ports[i] objectForKey:@"path"];
 		[NSUserDefaults.standardUserDefaults setObject:port forKey:kSerialPortPref];
 	}
 }
