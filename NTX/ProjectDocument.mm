@@ -142,15 +142,6 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 
 
 /* -----------------------------------------------------------------------------
-	Project documents should autosave.
------------------------------------------------------------------------------ */
-
-+ (BOOL)autosavesInPlace {
-	return YES;
-}
-
-
-/* -----------------------------------------------------------------------------
 	Initialize.
 	Initialize the projectRef with default values -- can be used for a new
 	document.
@@ -159,7 +150,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 - (id)init {
 	if (self = [super init]) {
 	//	stream in default project settings
-		NSURL * url = [NSBundle.mainBundle URLForResource: @"CanonicalProject" withExtension: @"stream"];
+		NSURL * url = [NSBundle.mainBundle URLForResource: @"CanonicalProject" withExtension: @"newtonstream"];
 		CStdIOPipe pipe(url.fileSystemRepresentation, "r");
 		_projectRef = UnflattenRef(pipe);
 	}
@@ -180,25 +171,109 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 	NTXProjectWindowController * windowController = [[NSStoryboard storyboardWithName:@"Project" bundle:nil] instantiateInitialController];
 	[self addWindowController: windowController];
 	self.windowController = windowController;
+}
 
-	newton_try
-	{
+
+/* -----------------------------------------------------------------------------
+	Return the window frame.
+	We expect the caller to make any conversion from window to content frame.
+----------------------------------------------------------------------------- */
+
+- (NSRect)windowFrame {
+	NSRect theFrame = NSMakeRect(100, 100, 720, 360);
+	newton_try {
 		RefVar windowRect = GetFrameSlot(self.projectRef, MakeSymbol("windowRect"));
 		if (NOTNIL(windowRect)) {
-			// windowRect is a frame: { top:x, left:x, bottom:x, right:x }
-			int windowTop = RINT(GetFrameSlot(windowRect, SYMA(top)));
-			int windowLeft = RINT(GetFrameSlot(windowRect, SYMA(left)));
-			int windowBottom = RINT(GetFrameSlot(windowRect, SYMA(bottom)));
-			int windowRight = RINT(GetFrameSlot(windowRect, SYMA(right)));
-			// to which we add the split positions: { sourceSplit:x, debugSplit:x }  0 => split is not shown
-			;	// set window’s bounds/splits accordingly
+			// windowRect is a frame: { top:x, left:x, right:x, bottom:x }
+			int top = RINT(GetFrameSlot(windowRect, SYMA(top)));
+			int left = RINT(GetFrameSlot(windowRect, SYMA(left)));
+			int bottom = RINT(GetFrameSlot(windowRect, SYMA(bottom)));
+			int right = RINT(GetFrameSlot(windowRect, SYMA(right)));
+
+			// if bottom > top the origin is top-left
+			if (bottom > top) {
+				// we need origin bottom-left
+				int screenHeight = NSScreen.mainScreen.frame.size.height;
+				top = screenHeight - top;
+				bottom = screenHeight - bottom;
+			}
+			theFrame.origin.x = left;
+			theFrame.origin.y = bottom;
+			theFrame.size.width = right - left;
+			theFrame.size.height = top - bottom;
+		} else {
+			theFrame.origin.y = NSScreen.mainScreen.frame.size.height - theFrame.origin.y - theFrame.size.height;
 		}
 	}
-	newton_catch_all
-	{
+	newton_catch_all {
 	}
 	end_try;
 
+	return theFrame;
+}
+
+/* -----------------------------------------------------------------------------
+	Set the window frame.
+	We expect the caller to have already made any conversion from content to
+	window frame.
+	This will save the frame in CG coordinates, ie wrt bottom-left of display.
+----------------------------------------------------------------------------- */
+#define canonicalRect MAKEMAGICPTR(36)
+
+- (void)setWindowFrame:(NSRect)frame {
+	RefVar windowRect(Clone(canonicalRect));
+	SetFrameSlot(windowRect, SYMA(top), MAKEINT(frame.origin.y + frame.size.height));
+	SetFrameSlot(windowRect, SYMA(left), MAKEINT(frame.origin.x));
+	SetFrameSlot(windowRect, SYMA(bottom), MAKEINT(frame.origin.y));
+	SetFrameSlot(windowRect, SYMA(right), MAKEINT(frame.origin.x + frame.size.width));
+
+	SetFrameSlot(self.projectRef, MakeSymbol("windowRect"), windowRect);
+	[self updateChangeCount:NSChangeDone];
+}
+
+
+/* -----------------------------------------------------------------------------
+	Do the same for window split poitions.
+----------------------------------------------------------------------------- */
+
+- (NSArray<NSNumber*> *)windowSplits {
+	NSMutableArray<NSNumber*> * theSplits = [[NSMutableArray alloc] init];
+	newton_try {
+		RefVar windowSplits = GetFrameSlot(self.projectRef, MakeSymbol("windowSplits"));
+		if (NOTNIL(windowSplits)) {
+			// windowSplits is an array: [ split-width, split-isCollapsed,... ]
+			for(ArrayIndex i = 0, count = Length(windowSplits); i < count; ++i) {
+				Ref value = GetArraySlot(windowSplits, i);
+				if ((i & 1) == 0) {
+					[theSplits addObject:[NSNumber numberWithInt:RINT(value)]];
+				} else {
+					[theSplits addObject:[NSNumber numberWithBool:NOTNIL(value)]];
+				}
+			}
+		}
+	}
+	newton_catch_all {
+	}
+	end_try;
+
+	return theSplits;
+}
+
+- (void)setWindowSplits:(NSArray<NSNumber*> *)splits {
+	RefVar splitPositions(MakeArray(0));
+
+	ArrayIndex i = 0;
+	for (NSNumber * item in splits) {
+		if ((i & 1) == 0) {
+			AddArraySlot(splitPositions, MAKEINT(item.intValue));
+		} else {
+			AddArraySlot(splitPositions, MAKEBOOLEAN(item.boolValue));
+		}
+		++i;
+	}
+
+	SetFrameSlot(self.projectRef, MakeSymbol("windowSplits"), splitPositions);
+	[self updateChangeCount:NSChangeDone];
 }
 
 
@@ -306,7 +381,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 // if groupLen > 0 then begin stack sidebarItems; create new sidebarItems end
 			}
 		}
-	END_FOREACH;
+	END_FOREACH
 
 	Ref selection;
 	NSInteger selItem = NOTNIL(selection = GetFrameSlot(projectItemsRef, MakeSymbol("selectedItem"))) ? RINT(selection) : -1;
@@ -316,6 +391,24 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 									@{ @"selectedItem":[NSNumber numberWithInteger:selItem],
 										@"sortOrder":[NSNumber numberWithInteger:sortOrder],
 										@"items":projItems }];
+}
+
+
+/* -----------------------------------------------------------------------------
+	Return an array of NTXProjectItem that are userProto layouts in the project.
+----------------------------------------------------------------------------- */
+
+- (NSArray<NTXProjectItem*> *)userProtos {
+	NSMutableArray<NTXProjectItem*> * thoseProtos = [[NSMutableArray alloc] init];
+	for (NTXProjectItem * item in [self.projectItems objectForKey:@"items"]) {
+		if (item.isLayout) {
+			NTXLayoutDocument * document = (NTXLayoutDocument *)item.document;
+			if (document.layoutType == kUserProtoLayoutType) {
+				[thoseProtos addObject:item];
+			}
+		}
+	}
+	return thoseProtos;
 }
 
 
@@ -395,6 +488,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 			NSString * when = [NSDateFormatter localizedStringFromDate:[NSDate date] dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterShortStyle];
 			fprintf(fp, "// Text of project %s written on %s\n\n", url.lastPathComponent.UTF8String, when.UTF8String);
 
+			[NTXLayoutDocument startBuild];	// yep, even though we’re only exporting
 			for (NTXProjectItem * item in [self.projectItems objectForKey:@"items"])
 			{
 				[self report:[NSString stringWithFormat:@"Exporting %@ to text", item.name]];
@@ -403,6 +497,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 					break;
 				}
 			}
+			[NTXLayoutDocument finishBuild];
 			fclose(fp);
 		}
 
@@ -414,9 +509,6 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 	}
 	else
 	{
-		// update windowRect & split positions
-//		RefVar windowRect = GetFrameSlot(self.projectRef, MakeSymbol("windowRect"));
-
 		// save settings and source list
 		CStdIOPipe pipe(url.fileSystemRepresentation, "w");
 		newton_try
@@ -539,6 +631,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 
 - (Ref)evaluate {
 	RefVar mainLayout;
+	[NTXLayoutDocument startBuild];
 	for (NTXProjectItem * item in [self.projectItems objectForKey:@"items"]) {
 		if (!item.isExcluded) {
 			RefVar result([item build]);
@@ -547,6 +640,7 @@ NSString * const NTXPackageFileType = @"com.newton.package";
 			}
 		}
 	}
+	[NTXLayoutDocument finishBuild];
 	return mainLayout;
 }
 
@@ -710,6 +804,7 @@ extern Ref ForwardReference(Ref r);
 				NSURL * streamURL = [self.fileURL.URLByDeletingPathExtension URLByAppendingPathExtension:@"newtonstream"];
 				CStdIOPipe pipe(streamURL.fileSystemRepresentation, "w");
 				FlattenRef(result, pipe);
+				[self report:@"Build successful"];
 			}
 			break;
 
@@ -735,7 +830,7 @@ extern Ref ForwardReference(Ref r);
 				if (IsFrame(devGlobal)) {
 					FOREACH_WITH_TAG(devGlobal, tag, value)
 						SetFrameSlot(privatePartFrame, tag, value);
-					END_FOREACH;
+					END_FOREACH
 				}
 
 				// copy the main layout to the part frame
@@ -847,7 +942,7 @@ extern Ref ForwardReference(Ref r);
 		if (!FrameHasSlot(origConsts, tag)) {
 			FUnDefineGlobalConstant(RA(NILREF), tag);
 		}
-	END_FOREACH;
+	END_FOREACH
 
 	// package up the part and write out the package file
 	NSURL * pkgURL = nil;

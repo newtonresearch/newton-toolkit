@@ -80,12 +80,15 @@ extern NSString * const NTXPackageFileType;
 @property(assign) Ref projectRef;
 // projectRef.projectItems -- the files in .items[] as NTXProjectItem*s
 @property(strong) NSMutableDictionary * projectItems;
+// those that are user protos
+@property(readonly) NSArray<NTXProjectItem*> * userProtos;
 
 // package parts we build, of PackagePart class
 @property(strong) NSMutableArray * parts;
 
 @property(strong) NTXProjectWindowController * windowController;
-//@property(strong) NSViewController * viewController;
+@property(assign) NSRect windowFrame;
+@property(copy) NSArray<NSNumber*> * windowSplits;
 
 // File menu actions
 - (IBAction)saveAllProjectItems:(id)sender;
