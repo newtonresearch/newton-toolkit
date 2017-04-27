@@ -56,140 +56,10 @@ extern void			PrintFramesErrorMsg(const char * inStr, RefArg inData);
 
 
 /* -----------------------------------------------------------------------------
-	N T X S t r e a m
------------------------------------------------------------------------------ */
-@interface NTXStream ()
-{
-	dispatch_semaphore_t readDataReady;
-	dispatch_queue_t accessQueue;
-	NSMutableData * inputStreamBuf;
-	NCEndpointController * ep;
-}
-@end
-
-
-@implementation NTXStream
-
-- (id)init {
-	if (self = [super init]) {
-		accessQueue = dispatch_queue_create("com.newton.connection.istream", NULL);
-		inputStreamBuf = [[NSMutableData alloc] init];
-		ep = [[NCEndpointController alloc] init];
-	}
-	return self;
-}
-
-
-- (void)observeValueForKeyPath:(NSString *)inKeyPath
-							 ofObject:(id)inObject
-								change:(NSDictionary *)inChange
-							  context:(void *)inContext {
-//	NSNumber * err = inChange[NSKeyValueChangeNewKey];	//doesn’t really matter what the error is, we just want to signal data-ready to stop the wait-loop
-	[self addData:nil];
-}
-
-
-/*------------------------------------------------------------------------------
-	Open the queue -- start listening.
-	Args:		--
-	Return:	--
-------------------------------------------------------------------------------*/
-
-- (void)open {
-	readDataReady = dispatch_semaphore_create(0);
-	[ep startListening:self];	// call us back <NTXStreamProtocol> when data arrives
-	[ep addObserver:self forKeyPath:@"error" options:NSKeyValueObservingOptionNew context:nil];
-}
-
-
-/*------------------------------------------------------------------------------
-	Close the queue -- flush events and stop listening for more.
-	Args:		--
-	Return:	--
-------------------------------------------------------------------------------*/
-
-- (void)close {
-	if (ep.isActive) {
-		[ep stop];		// will set ep.error
-//		ep.error = kDockErrAccessDenied;
-		[ep removeObserver:self forKeyPath:@"error"];
-	}
-}
-
-
-/*------------------------------------------------------------------------------
-	Dispose the queue.
-	Args:		--
-	Return:	--
-------------------------------------------------------------------------------*/
-
-- (void)dealloc {
-	[self close];
-	readDataReady = nil;
-	ep = nil;
-	accessQueue = nil;
-}
-
-
-/* -----------------------------------------------------------------------------
-	NTXStreamProtocol
+	N o t i f i c a t i o n s
 ----------------------------------------------------------------------------- */
 
-- (void)addData:(NSData *)inData {
-	if (inData) {
-		// add chunk of data to the input stream
-		// serialise access via a queue
-		dispatch_sync(accessQueue, ^{
-			[inputStreamBuf appendData:inData];
-		});
-	}
-	dispatch_semaphore_signal(readDataReady);
-}
-
-
-- (NewtonErr)read:(char *)inBuf length:(NSUInteger)inLength {
-	// read chunk of data from the input stream
-	// serialise access via a queue
-	NewtonErr err = noErr;
-	__block NSUInteger reqLength = inLength;
-	__block NSUInteger index = 0;
-
-	dispatch_sync(accessQueue, ^{
-		NSUInteger count = inputStreamBuf.length;
-		if (count > 0) {
-			if (count > reqLength)
-				count = reqLength;
-			[inputStreamBuf getBytes:inBuf+index length:count];
-			[inputStreamBuf replaceBytesInRange:NSMakeRange(0, count) withBytes:NULL length:0];
-			index += count;
-			reqLength -= count;
-		}
-	});
-
-	while (reqLength > 0) {
-		XFAIL(err = ep.error)
-		XFAILIF(dispatch_semaphore_wait(readDataReady, DISPATCH_TIME_FOREVER), err = kDockErrIdleTooLong;)	// non-zero result => timeout
-//NSLog(@"-[NTXStream read:length:%ld]",reqLength);
-
-		dispatch_sync(accessQueue, ^{
-			NSUInteger count = inputStreamBuf.length;
-			if (count > reqLength)
-				count = reqLength;
-			[inputStreamBuf getBytes:inBuf+index length:count];
-			[inputStreamBuf replaceBytesInRange:NSMakeRange(0, count) withBytes:NULL length:0];
-			index += count;
-			reqLength -= count;
-		});
-	}
-	return err;
-}
-
-
-- (NewtonErr)send:(char *)inBuf length:(NSUInteger)inLength {
-	return [ep.endpoint write:inBuf length:inLength];
-}
-
-@end
+NSString * const kNubStatusDidChangeNotification = @"NTX:NubStatus";
 
 
 #pragma mark -
@@ -198,8 +68,12 @@ extern void			PrintFramesErrorMsg(const char * inStr, RefArg inData);
 ----------------------------------------------------------------------------- */
 @interface NTXToolkitProtocolController ()
 {
-//	event queue
-	NTXStream * ioStream;
+	//	data stream
+	dispatch_semaphore_t readDataReady;
+	dispatch_queue_t accessQueue;
+	NSMutableData * inputStreamBuf;
+	// endpoint
+	NCEndpointController * ep;
 
 	NewtonErr toolkitError;
 	RefStruct toolkitObject;
@@ -266,7 +140,12 @@ NTXToolkitProtocolController * gNTXNub = nil;
 - (id)init {
 	if (self = [super init]) {
 		self.delegate = nil;
-		ioStream = [[NTXStream alloc] init];
+		// data stream
+		readDataReady = dispatch_semaphore_create(0);
+		accessQueue = dispatch_queue_create("com.newton.connection.istream", NULL);
+		inputStreamBuf = [[NSMutableData alloc] init];
+		// endpoint
+		ep = [[NCEndpointController alloc] init];
 	}
 	return self;
 }
@@ -275,19 +154,33 @@ NTXToolkitProtocolController * gNTXNub = nil;
 - (void)open {
 	_isTethered = NO;
 	self.breakLoopDepth = 0;
-	[ioStream open];
-	[self waitForEvent];
+	[ep startListening:self];	// call us back <NTXStreamProtocol> when data arrives
+
+	// wait for a dock protocol event
+	__block NTXToolkitProtocolController *__weak weakself = self;	// use weak reference so async block does not retain self
+	dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+		NewtonErr err = [weakself doDockEventLoop];
+		// if we get here then the event queue has been flushed, so we can ditch it: there are no more events coming
+		[weakself close];
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[NSNotificationCenter.defaultCenter postNotificationName:kNubStatusDidChangeNotification object:nil userInfo:@{@"error":[NSNumber numberWithInt:err]}];
+		});
+	});
 }
 
 
 - (void)close {
 	_isTethered = NO;
-	[ioStream close];
+	[ep stop];
 }
 
 
 - (void)dealloc {
 	[self close];
+	self.delegate = nil;
+	readDataReady = nil;
+	ep = nil;
+	accessQueue = nil;
 }
 
 
@@ -309,6 +202,57 @@ NTXToolkitProtocolController * gNTXNub = nil;
 }
 
 
+#pragma mark Data I/O
+/* -----------------------------------------------------------------------------
+	NTXStreamProtocol
+----------------------------------------------------------------------------- */
+
+- (void)addData:(NSData *)inData {
+	if (inData) {
+		// add chunk of data to the input stream
+		// serialise access via a queue
+		dispatch_sync(accessQueue, ^{
+			[inputStreamBuf appendData:inData];
+		});
+	}
+	dispatch_semaphore_signal(readDataReady);
+}
+
+
+- (NewtonErr)read:(char *)inBuf length:(NSUInteger)inLength {
+	// read chunk of data from the input stream
+	// serialise access via a queue
+	NewtonErr err = noErr;
+	__block NSUInteger reqLength = inLength;
+	__block NSUInteger index = 0;
+
+	while (reqLength > 0) {
+		dispatch_sync(accessQueue, ^{
+			NSUInteger count = inputStreamBuf.length;
+			if (count > 0) {
+				if (count > reqLength)
+					count = reqLength;
+				[inputStreamBuf getBytes:inBuf+index length:count];
+				[inputStreamBuf replaceBytesInRange:NSMakeRange(0, count) withBytes:NULL length:0];
+				index += count;
+				reqLength -= count;
+			}
+		});
+		XFAIL(err = ep.error)
+		if (reqLength > 0) {
+			// wait for more
+			XFAILIF(dispatch_semaphore_wait(readDataReady, DISPATCH_TIME_FOREVER), err = kDockErrIdleTooLong;)	// non-zero result => timeout
+		}
+	}
+	return err;
+}
+
+
+- (NewtonErr)send:(char *)inBuf length:(NSUInteger)inLength {
+	return [ep.endpoint write:inBuf length:inLength];
+}
+
+
 /* -----------------------------------------------------------------------------
 	Read word from Newton.
 ----------------------------------------------------------------------------- */
@@ -321,13 +265,13 @@ NTXToolkitProtocolController * gNTXNub = nil;
 		ULong word;
 	} buf;
 
-	err = [ioStream read:buf.chars length:sizeof(buf)];
+	err = [self read:buf.chars length:sizeof(buf)];
 	*outWord = CANONICAL_LONG(buf.word);
 if (err) NSLog(@"-[NTXToolkitProtocolController readWord:] error = %d",err);
 	return err;
 }
 
-
+#pragma mark Event I/O
 /* -----------------------------------------------------------------------------
 	Read command header words from Newton.
 ----------------------------------------------------------------------------- */
@@ -344,11 +288,7 @@ if (err) NSLog(@"-[NTXToolkitProtocolController readWord:] error = %d",err);
 		} words;
 	} buf;
 
-	// NTXStream* ioStream should return error on disconnection
-	// no need for dock event queue any more
-	// just read from input stream
-
-	err = [ioStream read:buf.chars length:sizeof(buf)];
+	err = [self read:buf.chars length:sizeof(buf)];
 	*outHdr1 = CANONICAL_LONG(buf.words.hdr1);
 	*outHdr2 = CANONICAL_LONG(buf.words.hdr2);
 #if kDebugOn
@@ -401,7 +341,7 @@ if (err) NSLog(@"-[NTXToolkitProtocolController readCommand:length:] error = %d"
 	{
 		buf = (char *)malloc(inLength);
 		XFAILNOT(buf, err = kOSErrNoMemory;)
-		err = [ioStream read:buf length:inLength];
+		err = [self read:buf length:inLength];
 
 		CPtrPipe pipe;
 		pipe.init(buf, inLength, NO, nil);
@@ -433,7 +373,7 @@ if (err) NSLog(@"-[NTXToolkitProtocolController readCommand:length:] error = %d"
 
 	buf.words.hdr1 = CANONICAL_LONG(inHdr1);
 	buf.words.hdr2 = CANONICAL_LONG(inHdr2);
-	err = [ioStream send:buf.chars length:sizeof(buf)];
+	err = [self send:buf.chars length:sizeof(buf)];
 	
 	return err;
 }
@@ -478,14 +418,14 @@ if (inLength > 0) printf("[%ld] ", (unsigned long)inLength);
 	XTRY
 	{
 		XFAIL(err = [self sendCommand:inCmd length:inLength])
-		XFAIL(err = [ioStream send:inData length:inLength])
+		XFAIL(err = [self send:inData length:inLength])
 
 		NSUInteger padLength = inLength & 0x03;
 		if (padLength != 0)
 		{
 		// pad with zeroes
 			ULong padding = 0;
-			err = [ioStream send: (char *)&padding length: 4 - padLength];
+			err = [self send: (char *)&padding length: 4 - padLength];
 		}
 	}
 	XENDTRY;
@@ -511,15 +451,7 @@ if (inLength > 0) printf("[%ld] ", (unsigned long)inLength);
 	Return:	--
 ------------------------------------------------------------------------------*/
 
-- (void)waitForEvent {
-	__block NTXToolkitProtocolController *__weak weakself = self;	// use weak reference so async block does not retain self
-	dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
-		[weakself doDockEventLoop];
-		// if we get here then the event queue has been flushed, so we can ditch it: there are no more events coming
-	});
-}
-
-- (void)doDockEventLoop {
+- (NewtonErr)doDockEventLoop {
 	NewtonErr	err;
 	char			exName[256];
 	ULong			exNameLen, objLen;
@@ -542,7 +474,7 @@ if (inLength > 0) printf("[%ld] ", (unsigned long)inLength);
 		// + C string
 			while (evtLen > 0) {
 				NSUInteger strLen = MIN(evtLen, 255);
-				err = [ioStream read:exName length:strLen];
+				err = [self read:exName length:strLen];
 				exName[strLen] = 0;
 				NSString * str = [NSString stringWithCString:exName encoding:NSMacOSRomanStringEncoding];
 				dispatch_async(dispatch_get_main_queue(), ^{[self.delegate receivedText:str];});
@@ -551,7 +483,7 @@ if (inLength > 0) printf("[%ld] ", (unsigned long)inLength);
 		}
 		break;
 
-//			case 'fstk': Stack Trace mentioned in Jake Borden’s NewtonInspector
+//		case 'fstk': Stack Trace mentioned in Jake Borden’s NewtonInspector
 		case kTObject: {
 		// + ref
 			toolkitObject = [self readRef:evtLen];
@@ -629,7 +561,7 @@ if (inLength > 0) printf("[%ld] ", (unsigned long)inLength);
 
 			// read exception name
 			err = [self readWord:(int *)&exNameLen];
-			err = [ioStream read:exName length:exNameLen];
+			err = [self read:exName length:exNameLen];
 			REPprintf("\n\t%s\n\t", exName);
 
 			// read error
@@ -656,7 +588,7 @@ if (inLength > 0) printf("[%ld] ", (unsigned long)inLength);
 
 			// read exception name
 			err = [self readWord:(int *)&exNameLen];
-			err = [ioStream read:exName length:exNameLen];
+			err = [self read:exName length:exNameLen];
 			REPprintf("\n\t%s\n\t", exName);
 
 			// read message
@@ -665,7 +597,7 @@ if (inLength > 0) printf("[%ld] ", (unsigned long)inLength);
 			err = [self readWord:(int *)&msgLen];
 			while (msgLen > 0) {
 				NSUInteger strLen = MIN(msgLen, 255);
-				err = [ioStream read:msg length:strLen];
+				err = [self read:msg length:strLen];
 				msg[strLen] = 0;
 				REPprintf("%s",msg);
 				msgLen -= strLen;
@@ -682,7 +614,7 @@ if (inLength > 0) printf("[%ld] ", (unsigned long)inLength);
 
 			// read exception name
 			err = [self readWord:(int *)&exNameLen];
-			err = [ioStream read:exName length:exNameLen];
+			err = [self read:exName length:exNameLen];
 			REPprintf("\n\t%s\n\t", exName);
 
 			// read ref
@@ -702,10 +634,6 @@ if (inLength > 0) printf("[%ld] ", (unsigned long)inLength);
 
 		case kTTerminate: {
 		// - data
-			_isTethered = NO;
-			self.delegate.connected = NO;
-			// that’s the end of THIS session
-			// but keep listening for the NEXT session
 			err = kDockErrDisconnected;
 		}
 		break;
@@ -715,6 +643,7 @@ if (inLength > 0) printf("[%ld] ", (unsigned long)inLength);
 			break;
 		}
 	}
+	return err;
 }
 
 
@@ -795,7 +724,7 @@ extern void REPExceptionNotify(Exception * inException);
 				if (chunkSize > amountRemaining)
 					chunkSize = amountRemaining;
 NSLog(@"-[NTXToolkitProtocolController installPackage:“%@”] sending %d bytes", pkgName, chunkSize);
-				err = [ioStream send:(char *)pkgData.bytes + amountDone length:chunkSize];
+				err = [self send:(char *)pkgData.bytes + amountDone length:chunkSize];
 				if (err) {
 					break;
 				}
@@ -808,7 +737,7 @@ NSLog(@"-[NTXToolkitProtocolController installPackage:“%@”] sending %d bytes
 		// pad with zeroes
 NSLog(@"-[NTXToolkitProtocolController installPackage:“%@”] padding %lu bytes", pkgName, 4-padLength);
 			uint32_t padding = 0;
-			err = [ioStream send:(char *)&padding length:4-padLength];
+			err = [self send:(char *)&padding length:4-padLength];
 		}
 		dispatch_async(dispatch_get_main_queue(), ^{
 			if (err == noErr) {

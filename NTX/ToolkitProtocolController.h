@@ -49,7 +49,7 @@
 	N T X T o o l k i t P r o t o c o l C o n t r o l l e r
 ----------------------------------------------------------------------------- */
 
-@interface NTXToolkitProtocolController : NSObject
+@interface NTXToolkitProtocolController : NSObject <NTXStreamProtocol>
 // state
 @property(assign,readonly) BOOL isTethered;		// we are tethered between receiving kTConnect -- kTTerminate from Newton
 @property(assign) NSUInteger breakLoopDepth;
@@ -70,3 +70,5 @@
 
 // There is one global NTXToolkitProtocolController
 extern NTXToolkitProtocolController * gNTXNub;
+
+extern NSString * const kNubStatusDidChangeNotification;
