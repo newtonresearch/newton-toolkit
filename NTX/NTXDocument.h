@@ -30,6 +30,9 @@
 
 @interface NTXLayoutDocument : NTXDocument
 @property(assign) Ref layoutRef;
+@property(readonly) int layoutType;
++ (void)startBuild;
++ (void)finishBuild;
 @end
 
 

@@ -7,6 +7,7 @@
 */
 
 #import "NTXDocument.h"
+#import "ProjectTypes.h"
 #import "Utilities.h"
 #import "NTK/Funcs.h"
 #import "NTK/Globals.h"
@@ -140,7 +141,127 @@ PrintObject(RefArg inRef)
 /* -----------------------------------------------------------------------------
 	N T X L a y o u t D o c u m e n t
 	A hierarchy of view templates.
+
+class CUserProtoList
+{
+public:
+	CUserProtoList();
+
+	void addObject(RefArg inFSpec, RefArg obj);
+	Ref objectFor(RefArg inFSpec);
+	ArrayIndex indexFor(RefArg inFSpec);
+
+private:
+	ArrayIndex index;
+	// each element in userProtos is a frame { path:<binary object>, index:<int>, object:<user proto>}
+	// and we only need the index in case the frame gets sorted
+	RefStruct userProtos;
+};
+
+
+CUserProtoList::CUserProtoList() {
+	index = 0;
+	userProtos = MakeArray(0);
+}
+
+
+void
+CUserProtoList::addObject(RefArg fSpec, RefArg obj) {
+	RefVar item(AllocateFrame());
+	SetFrameSlot(item, SYMA(path), fSpec);
+	SetFrameSlot(item, SYMA(index), MAKEINT(index));
+	SetFrameSlot(item, SYMA(object), obj);
+	AddArraySlot(userProtos, item);
+	++index;
+}
+
+
+Ref
+CUserProtoList::objectFor(RefArg fSpec) {
+	const char * filename = FilenameFromFSSpec(BinaryData(fSpec), Length(fSpec));
+	FOREACH(userProtos, proto)
+		RefVar upfs(GetFrameSlot(proto, SYMA(path)));
+		if (strcmp(filename, FilenameFromFSSpec(BinaryData(upfs), Length(upfs))) == 0) {
+			return GetFrameSlot(proto, SYMA(object));
+		}
+	END_FOREACH
+	printf("USER PROTO NOT FOUND!");
+	return NILREF;
+}
+
+
+ArrayIndex
+CUserProtoList::indexFor(RefArg fSpec) {
+	// userProtos is a frame { fSpec:<binary object>, index:<int>, object:<user proto>}  and we only need the index in case the frame gets sorted
+	const char * filename = FilenameFromFSSpec(BinaryData(fSpec), Length(fSpec));
+	ArrayIndex index = 0;
+	FOREACH(userProtos, proto)
+		if (filename == FilenameFromFSSpec(BinaryData(proto), Length(proto))) {
+			return index;
+		++index;
+		}
+	END_FOREACH
+	printf("USER PROTO NOT FOUND!");
+	return 0;
+}
+
 ----------------------------------------------------------------------------- */
+extern const char * FilenameFromFSSpec(void * inFSpec, ArrayIndex inLen);
+extern Ref MakeString(NSString * str);
+
+@interface UserProtoList : NSObject
+{
+	ArrayIndex index;
+	// each element in userProtos is a frame { path:<binary object>, name:<string>, object:<user proto>}
+	// and we only need the index in case the frame gets sorted
+	RefStruct userProtos;
+}
+- (void)addObject:(RefArg)inObj for:(NSURL *)inFSpec;
+- (Ref)objectFor:(RefArg)inFSpec;
+@end
+
+
+@implementation UserProtoList
+
+- (id)init {
+	if (self = [super init]) {
+		index = 0;
+		userProtos = MakeArray(0);
+	}
+	return self;
+}
+
+- (void)dealloc {
+	userProtos = nil;
+}
+
+- (void)addObject:(RefArg)inObj for:(NSURL *)inFSpec {
+	RefVar item(AllocateFrame());
+	// only save the filename from the URL
+	RefVar upfs(MakeString(inFSpec.lastPathComponent));
+	SetFrameSlot(item, SYMA(path), upfs);
+	SetFrameSlot(item, SYMA(object), inObj);
+	AddArraySlot(userProtos, item);
+	++index;
+}
+
+
+- (Ref)objectFor:(RefArg)fSpec {
+	const char * filename = FilenameFromFSSpec(BinaryData(fSpec), Length(fSpec));
+	FOREACH(userProtos, proto)
+		RefVar upfs(GetFrameSlot(proto, SYMA(path)));
+		const char * upfilename = BinaryData(ASCIIString(upfs));
+		if (strcmp(filename, upfilename) == 0) {
+			return GetFrameSlot(proto, SYMA(object));
+		}
+	END_FOREACH
+	printf("USER PROTO NOT FOUND!");
+	return NILREF;
+}
+
+@end
+
+
 #import "LayoutViewController.h"
 
 @interface NTXLayoutDocument ()
@@ -159,6 +280,11 @@ PrintObject(RefArg inRef)
 
 - (void)setLayoutRef:(Ref)inRef {
 	_layoutRef = inRef;
+}
+
+- (int)layoutType {
+	RefVar settings(GetFrameSlot(self.layoutRef, MakeSymbol("layoutSettings")));
+	return RVALUE(GetFrameSlot(settings, MakeSymbol("layoutType")));
 }
 
 - (NSString *)storyboardName {
@@ -198,7 +324,7 @@ Ref ReadLayoutSettings(NSURL * url);
 
 	if (err && outError)
 		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:err userInfo:nil];
-
+//PrintObject(self.layoutRef, 0);
 	return err == noErr;
 }
 
@@ -244,8 +370,6 @@ Ref ReadLayoutSettings(NSURL * url);
 ----------------------------------------------------------------------------- */
 extern Ref ParseString(RefArg inStr);
 
-static bool fgUseStepChildren;
-
 Ref
 AddStepForm(RefArg parent, RefArg child) {
 	RefVar childArraySym(fgUseStepChildren? SYMA(stepChildren) : SYMA(viewChildren));
@@ -266,8 +390,7 @@ StepDeclare(RefArg parent, RefArg child, RefArg tag) {
 }
 
 
-Ref
-BuildViewTemplate(RefArg viewTemplate, RefArg parent, RefArg namedViews, int depth) {
+- (Ref)buildViewTemplate:(RefArg)viewTemplate type:(int)layoutType parent:(RefArg)parent namedViews:(RefArg)namedViews {
 
 	// build thisView...
 	RefVar thisView(AllocateFrame());
@@ -293,7 +416,7 @@ BuildViewTemplate(RefArg viewTemplate, RefArg parent, RefArg namedViews, int dep
 		RemoveSlot(slots, SYMA(afterScript));
 	}
 
-	RefVar regularSlot, proto, viewClass, stepChildren;
+	RefVar regularSlot, proto, userProto, viewClass, stepChildren;
 	FOREACH_WITH_TAG(slots, tag, slot)
 		RefVar value(GetFrameSlot(slot, SYMA(value)));
 		RefVar type(GetFrameSlot(slot, MakeSymbol("__ntDataType")));
@@ -307,6 +430,9 @@ BuildViewTemplate(RefArg viewTemplate, RefArg parent, RefArg namedViews, int dep
 			break;
 		case 'PROT':
 			proto = MAKEMAGICPTR(RVALUE(value));
+			break;
+		case 'USER':
+			userProto = value;
 			break;
 		case 'CLAS':
 			viewClass = value;
@@ -337,11 +463,14 @@ BuildViewTemplate(RefArg viewTemplate, RefArg parent, RefArg namedViews, int dep
 			}
 			SetFrameSlot(thisView, tag, regularSlot);
 		}
-	END_FOREACH;
+	END_FOREACH
 
 	// if we have a proto or viewClass, add it
 	if (NOTNIL(proto)) {
 		SetFrameSlot(thisView, SYMA(_proto), proto);
+	} else if (NOTNIL(userProto)) {
+		// userProto is an FSSpecX - map it to userProto object (which we MUST have already encountered)
+		SetFrameSlot(thisView, SYMA(_proto), [fgUserProtoList objectFor:userProto]);
 	} else if (NOTNIL(viewClass)) {
 		SetFrameSlot(thisView, SYMA(viewClass), viewClass);
 	}
@@ -382,10 +511,23 @@ BuildViewTemplate(RefArg viewTemplate, RefArg parent, RefArg namedViews, int dep
 
 	if (NOTNIL(stepChildren)) {
 		FOREACH(stepChildren, child)
-			BuildViewTemplate(child, thisView, namedViews, depth+1);
-		END_FOREACH;
+			[self buildViewTemplate:child type:kLayoutFileType parent:thisView namedViews:namedViews];
+		END_FOREACH
 	}
 	return thisView;
+}
+
+
+static ArrayIndex fgUserProtoSequenceNumber, fgAnonymousViewSequenceNumber;
+static bool fgUseStepChildren;
+static UserProtoList * fgUserProtoList = nil;
++ (void)startBuild {
+	// for export
+	fgUserProtoSequenceNumber = 0;
+	fgAnonymousViewSequenceNumber = 0;
+	// for build
+	fgUseStepChildren = NOTNIL(GetGlobalConstant(MakeSymbol("kUseStepChildren")));
+	fgUserProtoList = [[UserProtoList alloc] init];
 }
 
 
@@ -394,19 +536,21 @@ BuildViewTemplate(RefArg viewTemplate, RefArg parent, RefArg namedViews, int dep
 	RefVar layout;
 	newton_try
 	{
-		fgUseStepChildren = NOTNIL(GetGlobalConstant(MakeSymbol("kUseStepChildren")));
 		RefVar viewTemplate(GetFrameSlot(self.layoutRef, MakeSymbol("templateHierarchy")));
 		RefVar namedViews(AllocateFrame());
-		layout = BuildViewTemplate(viewTemplate, RA(NILREF), namedViews, 0);
+		layout = [self buildViewTemplate:viewTemplate type:self.layoutType parent:RA(NILREF) namedViews:namedViews];
+		if (self.layoutType == kUserProtoLayoutType) {
+			[fgUserProtoList addObject:layout for:self.fileURL];
+		}
 		DefConst(self.symbol.UTF8String, layout);
 	}
-//	newton_catch_all
-//	{
-//		err = (NewtonErr)(long)CurrentException()->data;;
-//		layout = NILREF;
-//	}
 	end_try;
 	return layout;
+}
+
+
++ (void)finishBuild {
+	fgUserProtoList = nil;
 }
 
 
@@ -418,7 +562,7 @@ BuildViewTemplate(RefArg viewTemplate, RefArg parent, RefArg namedViews, int dep
 		// End of file <fileName>
 		-each view is output as
 			<viewName> := \n{<slots>}
-		-anonymous views are named <parentName>_v<viewClassAsInt>_<seqWithinFile>
+		-anonymous views are named <parentName>_v<viewClassAsInt>_<seqWithinFile> -- dunno where this came from, they also seem to be named _viewxxx or _userprotoxxx
 		-child views are added:
 			AddStepForm(<parentName>, <viewName>);
 		-and declared if necessary:
@@ -429,8 +573,7 @@ BuildViewTemplate(RefArg viewTemplate, RefArg parent, RefArg namedViews, int dep
 			constant |layout_<viewName>| := <viewName>;
 ----------------------------------------------------------------------------- */
 
-Ref
-PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth) {
+- (Ref)printViewTemplate:(RefArg)viewTemplate type:(int)layoutType parent:(const char *)parent toFile:(FILE *)fp {
 
 	RefVar slots(Clone(GetFrameSlot(viewTemplate, SYMA(value))));
 	RefVar name(GetFrameSlot(viewTemplate, MakeSymbol("__ntName")));
@@ -439,15 +582,18 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 		isNamed = true;
 	} else {
 		// make anon name
-		RefVar proto(GetFrameSlot(viewTemplate, MakeSymbol("__ntTemplate")));
 		char anon[256];
-		sprintf(anon, "%s_v%ld_%d", parent? parent : "", RVALUE(proto), depth);
+		if (layoutType == kUserProtoLayoutType) {
+			sprintf(anon, "_userProto%03d", fgUserProtoSequenceNumber++);
+		} else {
+			sprintf(anon, "_view%03d", fgAnonymousViewSequenceNumber++);
+		}
 		name = MakeStringFromCString(anon);
 		isNamed = false;
 	}
 	CDataPtr nameStr(ASCIIString(name));
 
-	RefVar proto, viewClass, stepChildren;
+	RefVar proto, userProto, viewClass, stepChildren;
 	// beforeScript
 	RefVar script(GetFrameSlot(slots, SYMA(beforeScript)));
 	if (NOTNIL(script)) {
@@ -477,6 +623,9 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 			break;
 		case 'PROT':
 			proto = value;
+			break;
+		case 'USER':
+			userProto = value;
 			break;
 		case 'CLAS':
 			viewClass = value;
@@ -515,7 +664,7 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 			}
 			++index;
 		}
-	END_FOREACH;
+	END_FOREACH
 	// if name is not anon, add debug:<name> slot
 	if (isNamed) {
 		fprintf(fp, ",\n     debug: \"%s\"", (char *)nameStr);
@@ -523,6 +672,10 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 	// if we have a proto or viewClass, add it last
 	if (NOTNIL(proto)) {
 		fprintf(fp, ",\n     _proto: @%ld", RVALUE(proto));
+	} else if (NOTNIL(userProto)) {
+		// map FSSpecX to userProto name
+		RefVar upName([fgUserProtoList objectFor:userProto]);
+		fprintf(fp, ",\n     _proto: %s", BinaryData(ASCIIString(upName)));
 	} else if (NOTNIL(viewClass)) {
 		fprintf(fp, ",\n     viewClass: %ld", RVALUE(viewClass));
 	}
@@ -549,8 +702,8 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 
 	if (NOTNIL(stepChildren)) {
 		FOREACH(stepChildren, child)
-			PrintViewTemplate(fp, child, (char *)nameStr, depth+1);
-		END_FOREACH;
+			[self printViewTemplate:child type:kLayoutFileType parent:nameStr toFile:fp];
+		END_FOREACH
 	}
 	return name;
 }
@@ -567,9 +720,12 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 	newton_try
 	{
 		RefVar viewTemplate(GetFrameSlot(self.layoutRef, MakeSymbol("templateHierarchy")));
-		RefVar templateName(PrintViewTemplate(fp, viewTemplate, NULL, 0));
+		RefVar templateName([self printViewTemplate:viewTemplate type:self.layoutType parent:NULL toFile:fp]);
 		CDataPtr nameStr(ASCIIString(templateName));
-		fprintf(fp, "constant |%s| := %s\n", self.symbol.UTF8String, (char *)nameStr);
+		if (self.layoutType == kUserProtoLayoutType) {
+			[fgUserProtoList addObject:templateName for:self.fileURL];
+		}
+		fprintf(fp, "constant |%s| := %s;\n", self.symbol.UTF8String, (char *)nameStr);
 	}
 	newton_catch_all
 	{
@@ -831,7 +987,7 @@ PrintViewTemplate(FILE * fp, RefArg viewTemplate, const char * parent, int depth
 				fnNames = [NSString stringWithFormat:@"Ref %@(RefArg rcvr%@);", nameStr, argStr];
 			else
 				fnNames = [NSString stringWithFormat:@"%@\nRef %@(RefArg rcvr%@);", fnNames, nameStr, argStr];
-			END_FOREACH;
+			END_FOREACH
 			_entryPoints = [[NSAttributedString alloc] initWithString:fnNames
 																		  attributes:@{ NSFontAttributeName:[NSFont systemFontOfSize:NSFont.smallSystemFontSize], NSForegroundColorAttributeName:NSColor.blackColor }];
 		}
