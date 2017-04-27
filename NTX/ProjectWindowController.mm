@@ -46,9 +46,10 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 @end
 
 @implementation NTXProjectWindowController
-@synthesize connectionIcon;
-@synthesize progress;
-@synthesize progressText;
+
+- (BOOL) shouldCascadeWindows {
+	return NO;
+}
 
 /* -----------------------------------------------------------------------------
 	Initialize after nib has been loaded.
@@ -65,11 +66,17 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 
 	self.progress = [[NSProgress alloc] initWithParent:nil userInfo:nil];
 
+	// start listening for notifications re: nub status
+	[[NSNotificationCenter defaultCenter] addObserver:self
+														  selector:@selector(nubStatusDidChange:)
+																name:kNubStatusDidChangeNotification
+															 object:nil];
+
 	// start listening for notifications re: becoming key window
 	[[NSNotificationCenter defaultCenter] addObserver:self
 														  selector:@selector(windowDidBecomeKey:)
 																name:NSWindowDidBecomeKeyNotification
-															 object:nil];
+															 object:self.window];
 
 	// when the window closes, undo those hooks
 	[[NSNotificationCenter defaultCenter] addObserver:self
@@ -81,26 +88,39 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 	// defer population until window has fully loaded
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[self.sourceListController populateSourceList];
+
+		// when the window moves, update the project’s windowRect
+		[[NSNotificationCenter defaultCenter] addObserver:self
+															 selector:@selector(windowGeometryDidChange:)
+																  name:NSWindowDidMoveNotification
+																object:self.window];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+															 selector:@selector(windowGeometryDidChange:)
+																  name:NSWindowDidResizeNotification
+																object:self.window];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+															 selector:@selector(windowGeometryDidChange:)
+																  name:NSSplitViewDidResizeSubviewsNotification
+																object:nil];
 	});
 }
 
 - (void)setDocument:(id)inDocument {
 	[super setDocument:inDocument];
 
-	NTXProjectDocument * theDocument = inDocument;
-	NSURL * projectURL = theDocument.fileURL;
-	if (projectURL)
-		self.windowFrameAutosaveName = projectURL.lastPathComponent;
-	// update our frame from the document
-	//[self.window.setFrame: theDocument.windowFrame];
+	if (inDocument) {
+		NTXProjectDocument * theDocument = inDocument;
+		// update our frame from the document
+		[self.window setFrame:[self.window frameRectForContentRect:theDocument.windowFrame] display:NO];
+		[self setSplits:theDocument.windowSplits];
 
-	// observe changes to our progress so we can update the progress box
-	[self.progress addObserver:self
-				  forKeyPath:@"localizedDescription"
-					  options:NSKeyValueObservingOptionInitial
-					  context:ProgressObserverContext];
-	self.progress.localizedDescription = @"Welcome to NewtonScript!";
-
+		// observe changes to our progress so we can update the progress box
+		[self.progress addObserver:self
+					  forKeyPath:@"localizedDescription"
+						  options:NSKeyValueObservingOptionInitial
+						  context:ProgressObserverContext];
+		self.progress.localizedDescription = @"Welcome to NewtonScript!";
+	}
 }
 
 // save all documents represented in the project
@@ -158,11 +178,10 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 
 - (void)nubStatusDidChange:(NSNotification *)inNotification {
 	NSNumber * err = inNotification.userInfo[@"error"];
-	if (err.intValue == kDockErrDisconnected) {
-		self.connected = NO;
-		if (NSApp.keyWindow == self.window) {
-			[NTXToolkitProtocolController bind:self];		// we want the frontmost window to bind; not necessarily this one
-		}
+	self.progress.localizedDescription = [NSString stringWithFormat:@"There’s a problem with the connection (%@).", err];
+	self.connected = NO;	// unbind
+	if (NSApp.keyWindow == self.window) {
+		[NTXToolkitProtocolController bind:self];		// we want the frontmost window to bind; not necessarily this one
 	}
 }
 
@@ -172,9 +191,19 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 ----------------------------------------------------------------------------- */
 
 - (void)windowDidBecomeKey:(NSNotification *)inNotification {
-	if (inNotification.object == self.window) {
-		[NTXToolkitProtocolController bind:self];
-	}
+	[NTXToolkitProtocolController bind:self];
+}
+
+
+/* -----------------------------------------------------------------------------
+	Update the document when the window moves or resizes.
+----------------------------------------------------------------------------- */
+
+- (void)windowGeometryDidChange:(NSNotification *)inNotification {
+	NTXProjectDocument * theDocument = self.document;
+	theDocument.windowFrame = [self.window contentRectForFrameRect:self.window.frame];
+	// also split positions
+	theDocument.windowSplits = self.windowSplits;
 }
 
 
@@ -184,10 +213,6 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 
 - (void)windowWillClose:(NSNotification *)inNotification {
 	[NTXToolkitProtocolController unbind:self];
-	// update our frame in the document
-	NTXProjectDocument * theDocument = self.document;
-	//theDocument.windowFrame = self.window.frame;
-	// also split positions
 	// stop listening for notifications
 	[NSNotificationCenter.defaultCenter removeObserver:self];
 	[self.progress removeObserver:self forKeyPath:NSStringFromSelector(@selector(localizedDescription)) context:ProgressObserverContext];
@@ -215,6 +240,47 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 		[self.inspectorSplitController toggleInspector:sender];
 	} else if (item == 2) {
 		[self.sourceSplitController toggleSourceInfo:sender];
+	}
+}
+
+
+- (NSArray<NSNumber*> *)windowSplits {
+	NSMutableArray<NSNumber*> * theSplits = [[NSMutableArray alloc] init];
+
+	for (NSSplitViewItem * item in self.sourceSplitController.splitViewItems) {
+		[theSplits addObject:[NSNumber numberWithInt:item.viewController.view.frame.size.width]];
+		[theSplits addObject:[NSNumber numberWithBool:item.isCollapsed]];
+	}
+	for (NSSplitViewItem * item in self.inspectorSplitController.splitViewItems) {
+		[theSplits addObject:[NSNumber numberWithInt:item.viewController.view.frame.size.height]];
+		[theSplits addObject:[NSNumber numberWithBool:item.isCollapsed]];
+	}
+	return theSplits;
+}
+
+- (void)setSplits:(NSArray<NSNumber*> *)splitPositions {
+	NSUInteger i = 0;
+	for (NSSplitViewItem * item in self.sourceSplitController.splitViewItems) {
+		if (i >= splitPositions.count) {
+			break;
+		}
+		NSRect viewframe = item.viewController.view.frame;
+		viewframe.size.width = splitPositions[i].floatValue;
+		item.viewController.view.frame = viewframe;
+		++i;
+		item.collapsed = splitPositions[i].boolValue;
+		++i;
+	}
+	for (NSSplitViewItem * item in self.inspectorSplitController.splitViewItems) {
+		if (i >= splitPositions.count) {
+			break;
+		}
+		NSRect viewframe = item.viewController.view.frame;
+		viewframe.size.height = splitPositions[i].floatValue;
+		item.viewController.view.frame = viewframe;
+		++i;
+		item.collapsed = splitPositions[i].boolValue;
+		++i;
 	}
 }
 
