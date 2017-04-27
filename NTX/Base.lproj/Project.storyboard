@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="inJ-cq-jtf">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="inJ-cq-jtf">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -11,12 +11,12 @@
         <scene sceneID="CbL-bO-NyZ">
             <objects>
                 <windowController storyboardIdentifier="Document Window Controller" id="inJ-cq-jtf" customClass="NTXProjectWindowController" sceneMemberID="viewController">
-                    <window key="window" title="Project" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="Project" animationBehavior="default" id="aob-xc-kJD">
+                    <window key="window" title="Project" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="aob-xc-kJD">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                        <rect key="contentRect" x="256" y="960" width="650" height="256"/>
+                        <rect key="contentRect" x="256" y="960" width="650" height="350"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
-                        <value key="minSize" type="size" width="650" height="256"/>
+                        <value key="minSize" type="size" width="650" height="350"/>
                         <toolbar key="toolbar" implicitIdentifier="F415C595-B4F4-4B26-BC68-A99C2B06D6F1" autosavesConfiguration="NO" allowsUserCustomization="NO" showsBaselineSeparator="NO" displayMode="iconOnly" sizeMode="regular" id="R1N-EI-VKS">
                             <allowedToolbarItems>
                                 <toolbarItem implicitItemIdentifier="NSToolbarShowColorsItem" id="OBm-dJ-rZT"/>
@@ -91,7 +91,7 @@
                         <splitViewItem holdingPriority="255" id="GV9-yy-VAK"/>
                         <splitViewItem canCollapse="YES" holdingPriority="260" id="jZo-4J-6Pd"/>
                     </splitViewItems>
-                    <splitView key="splitView" wantsLayer="YES" autosaveName="SourceList" dividerStyle="thin" vertical="YES" id="fXh-iO-dkS">
+                    <splitView key="splitView" wantsLayer="YES" autosaveName="" dividerStyle="thin" vertical="YES" id="fXh-iO-dkS">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <connections>
@@ -154,7 +154,7 @@
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <imageCell key="cell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSActionTemplate" id="hQ9-Ba-zH1"/>
                                                                 </imageView>
-                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DgM-db-Y7B">
+                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsExpansionToolTips="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DgM-db-Y7B">
                                                                     <rect key="frame" x="25" y="0.0" width="170" height="14"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="U2a-oI-r7b">
@@ -273,7 +273,7 @@
                         <splitViewItem holdingPriority="300" id="IUN-LN-SYs"/>
                         <splitViewItem canCollapse="YES" holdingPriority="301" id="FbL-98-hrU"/>
                     </splitViewItems>
-                    <splitView key="splitView" wantsLayer="YES" autosaveName="Content" id="uL0-f5-bn6" customClass="NTXSplitView">
+                    <splitView key="splitView" wantsLayer="YES" autosaveName="" id="uL0-f5-bn6" customClass="NTXSplitView">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <connections>
@@ -363,7 +363,8 @@
                                                         <menuItem title="Stream Object" tag="7" id="4ZV-If-SZI"/>
                                                         <menuItem title="C++ Code Module" tag="8" id="WF7-6A-aHi"/>
                                                         <menuItem isSeparatorItem="YES" id="cQK-8E-u9U"/>
-                                                        <menuItem title="Project" tag="10" enabled="NO" id="V9e-Lw-5tJ"/>
+                                                        <menuItem title="Project" tag="11" enabled="NO" id="V9e-Lw-5tJ"/>
+                                                        <menuItem title="Resource" tag="9" enabled="NO" id="TcI-ju-7mg"/>
                                                         <menuItem title="Unknown" tag="2" enabled="NO" id="FCH-JO-qZn"/>
                                                     </items>
                                                 </menu>
@@ -395,12 +396,12 @@
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
                                             <connections>
-                                                <binding destination="zuq-Gi-Nx0" name="enabled" keyPath="representedObject.isProject" id="mQF-Lw-4vx">
+                                                <binding destination="zuq-Gi-Nx0" name="value" keyPath="representedObject.isExcluded" id="px8-Dw-8Xu">
                                                     <dictionary key="options">
                                                         <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                     </dictionary>
                                                 </binding>
-                                                <binding destination="zuq-Gi-Nx0" name="value" keyPath="representedObject.isExcluded" id="px8-Dw-8Xu">
+                                                <binding destination="zuq-Gi-Nx0" name="enabled" keyPath="representedObject.isProject" id="mQF-Lw-4vx">
                                                     <dictionary key="options">
                                                         <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                     </dictionary>
