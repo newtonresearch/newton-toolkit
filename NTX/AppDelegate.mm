@@ -48,9 +48,9 @@ extern void PrintCode(RefArg inFunc);
 		@"Platform":@"Newton 2.1",
 	//	General
 		@"MainHeapSize":@"4096",
-		@"BuildHeapSize":@"1024",
-		@"AutoSave":@"YES",
-		@"AutoDownload":@"YES"
+		@"BuildHeapSize":@"1024",		// don’t use this any more
+		@"AutoSave":@"YES",				// save before building
+		@"AutoDownload":@"YES"			// download after building
 	//	Layout
 	//	Browser
 	}];
