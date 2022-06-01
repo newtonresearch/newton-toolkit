@@ -4,10 +4,6 @@ The NTX application is intended to be a replacement for NTK.
 There is still a lot of work to do! However, you can already use it as a NewtonScript playground.
 Try executing the scripts in the Demos folder to get a flavour of what’s possible. (Select text, press fn-return to execute.)
 
-The built application is on the [Newton Research](https://www.newtonresearch.org/toolkit/) site.
-
-By Simon Bell <simon@newtonresearch.org>.
-
 
 BUILDING
 ----
@@ -26,7 +22,7 @@ I don’t know how to express that dependency in GitHub.
 
 File types
 ----
-Files must have the appropriate extension to be recognised by NTX. (Is this really progress?)
+Files must have the appropriate extension to be recognised by NTX.
 
 File type | Extension
 --- | ---
